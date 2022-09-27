@@ -1,0 +1,9 @@
+.checkbox-common{
+    .ant-checkbox-checked::after{
+        border-color: #D13D9E;
+    }
+    .ant-checkbox-checked .ant-checkbox-inner{
+        background: #D13D9E;
+        border-color: #D13D9E;
+    }
+}

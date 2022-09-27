@@ -1,0 +1,11 @@
+{
+  "welcome_back": "Welcome back",
+  "login_title": "Login with CMS Account",
+  "email/username": "Email/User name",
+  "password": "Password",
+  "forgot_password": "Forgot password?",
+  "btn_login": "Login",
+  "msg_required": "Please input your email/username",
+  "msg_required_password": "Please input your password",
+  "msg_invalid_email_password": "Email or password is invalid"
+}

@@ -1,0 +1,76 @@
+.MultiSelectCommon {
+    &.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+        border-radius: 8px;
+        padding: 3px 20px;
+    }
+
+    &.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+        border-color: #D13D9E;
+    }
+
+    &.ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {
+        box-shadow: 0 0 0 2px rgb(209 61 158 / 20%);
+        border-color: #D13D9E;
+    }
+
+    &.ant-select-multiple {
+        .ant-select-selection-item {
+            background: rgba(209, 61, 158, 0.1);
+            border-color: #D13D9E;
+            color: rgba(209, 61, 158, 1);
+            font-weight: 500;
+            line-height: 26px;
+            border-radius: 4px;
+            height: 28px;
+        }
+    } 
+
+    &__dropdown {
+        border-radius: 8px;
+        padding: 0;
+
+        .ant-select-item {
+            padding-top: 0;
+            padding-bottom: 0;
+
+            .ant-select-item-option-content {
+                padding: 12px 0 12px 35px;
+                border-bottom: 1px solid #E7E7E7;
+            }
+
+            &:last-child {
+                .ant-select-item-option-content {
+                    border-bottom: none;
+                    padding-bottom: 18px;
+                }
+
+                .ant-select-item-option-state {
+                    top: 23px;
+                }
+        
+            }
+
+            &:first-child {
+                .ant-select-item-option-content {
+                    padding-top: 18px;
+                }
+
+                .ant-select-item-option-state {
+                    top: 29px;
+                }
+            }
+
+            .ant-select-item-option-state {
+                position: absolute;
+                left: 18px;
+                top: 24px;
+                transform: translateY(-50%);
+                line-height: 1;
+            }
+    
+            .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+                background: rgba(209, 61, 158, 0.1);
+            }
+        }
+    }
+}

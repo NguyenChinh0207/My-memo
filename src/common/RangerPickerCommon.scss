@@ -1,0 +1,68 @@
+.rangepicker-dropdown-common{
+    .ant-picker-body{
+        .ant-picker-content{
+            tbody{
+                tr{
+                    .ant-picker-cell-range-hover-end{
+                        .ant-picker-cell-inner::before{
+                            background-color: #f6c5e3;
+                        
+                        }
+                    }
+                    .ant-picker-cell-range-hover-end::after{
+                        border-color: #D13D9E ;
+                    }
+    
+    
+                    .ant-picker-cell-range-hover-start::after{
+                        border-color: #D13D9E;
+                    }
+                    .ant-picker-cell-range-hover::after{
+                        border-color: #D13D9E;
+                    }
+                    .ant-picker-cell-today{
+                        .ant-picker-cell-inner::before{
+                            border: 1px solid #D13D9E;
+    
+                        }
+                    }
+                    .ant-picker-cell-range-start-single{
+                        .ant-picker-cell-inner{
+                            background-color: #D13D9E;
+                        }
+                    }
+                    .ant-picker-cell-selected{
+                        .ant-picker-cell-inner{
+                            background-color: #D13D9E;
+    
+                        }
+                    }
+                    .ant-picker-cell-range-start{
+                        .ant-picker-cell-inner{
+                            background-color: #D13D9E;
+    
+                        }
+                    }
+                    .ant-picker-cell-range-end{
+                        .ant-picker-cell-inner{
+                            background-color: #D13D9E;
+    
+                        }
+                    }
+                    .ant-picker-cell-in-view.ant-picker-cell-in-range::before{
+                        background-color: #ffe7f6;
+                    }
+                    .ant-picker-cell-in-view.ant-picker-cell-range-start:not(.ant-picker-cell-range-start-single)::before, .ant-picker-cell-in-view.ant-picker-cell-range-end:not(.ant-picker-cell-range-end-single)::before{
+                        background-color: #ffe7f6;
+                    }
+                }
+            }
+        }
+    }
+    @media screen and (max-width: 480px) {
+        .ant-picker-panel-container .ant-picker-panels{
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}

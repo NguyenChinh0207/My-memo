@@ -1,0 +1,112 @@
+.btn-primary,
+.btn-outline {
+    min-height: 40px;
+}
+.btn-primary:not([disabled]) {
+    &,
+    &:hover,
+    &:focus {
+        background: var(--color-aeon, --color);
+        border-color: var(--color-aeon, --color);
+        color: var(--color-light, --color-contrast);
+    }
+}
+.btn-outline:not([disabled]) {
+    &,
+    &:hover,
+    &:focus {
+        background: transparent;
+        color: var(--color-aeon, --color);
+        border-color: var(--color-aeon, --color);
+    }
+}
+.modal-primary {
+    &.ant-modal-confirm {
+        max-width: 400px;
+        .ant-modal-content {
+            border-radius: 8px;
+        }
+        .ant-modal-body {
+            padding: 24px;
+        }
+        .ant-modal-confirm-content {
+            font-size: 16px;
+        }
+        .ant-modal-confirm-btns {
+            .ant-btn {
+                height: 40px;
+                border-radius: 4px;
+                min-width: 114px;
+            }
+        }
+    }
+    &.modal-reject {
+        max-width: 700px;
+    }
+}
+
+.common-table-pagination {
+    &.ant-table-pagination {
+        .ant-pagination-item-active,
+        .ant-pagination-item:hover,
+        .ant-pagination-prev:focus-visible .ant-pagination-item-link,
+        .ant-pagination-next:focus-visible .ant-pagination-item-link,
+        .ant-pagination-prev:hover .ant-pagination-item-link,
+        .ant-pagination-next:hover .ant-pagination-item-link {
+            border-color: var(--color-aeon);
+            color: var(--color-aeon);
+            a {
+                color: var(--color-aeon);
+            }
+        }
+
+        .ant-pagination-disabled .ant-pagination-item-link,
+        .ant-pagination-disabled:hover .ant-pagination-item-link,
+        .ant-pagination-disabled:focus-visible .ant-pagination-item-link {
+            color: rgba(0, 0, 0, 0.25);
+            border-color: #d9d9d9;
+            cursor: not-allowed;
+        }
+
+        .ant-select:not(.ant-select-disabled):hover {
+            .ant-select-selector {
+                border-color: var(--color-aeon);
+                box-shadow: 0 0 0 2px rgb(209 61 158 / 20%);
+            }
+
+            &.ant-select-focused:not(.ant-select-disabled):hover {
+                .ant-select-selector {
+                    border-color: var(--color-aeon);
+                    box-shadow: 0 0 0 2px rgb(209 61 158 / 20%);
+                }
+            }
+        }
+
+        .ant-select:not(.ant-select-disabled) {
+            &.ant-select-focused:not(.ant-select-disabled) {
+                .ant-select-selector {
+                    border-color: var(--color-aeon);
+                    box-shadow: 0 0 0 2px rgb(209 61 158 / 20%);
+                }
+            }
+        }
+
+        .ant-pagination-options-quick-jumper {
+            input {
+                &:focus {
+                    border-color: var(--color-aeon);
+                    box-shadow: 0 0 0 2px rgb(209 61 158 / 20%);
+                }
+
+                &:hover {
+                    border-color: var(--color-aeon);
+                }
+            }
+        }
+        .ant-pagination-options{
+            .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+                background-color: rgba(179, 30, 141, 0.1);;
+            }
+        }
+    }
+}

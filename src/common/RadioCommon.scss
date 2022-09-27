@@ -1,0 +1,22 @@
+.Radio-common{
+    .ant-radio-wrapper:hover .ant-radio,
+    .ant-radio:hover .ant-radio-inner,
+    .ant-radio-input:focus + .ant-radio-inner {
+        border-color: #d13d9e;
+    }
+
+    .ant-radio-inner {
+        width: 16px;
+        height: 16px;
+    }
+
+    .ant-radio-checked {
+        .ant-radio-inner {
+            border-color: #d13d9e;
+
+            &:after {
+                background-color: #d13d9e;
+            }
+        }
+    }
+}

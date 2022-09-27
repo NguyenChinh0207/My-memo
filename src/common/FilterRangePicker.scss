@@ -1,0 +1,39 @@
+.Filter-Rangepicker {
+    width: auto;
+    border-radius: 4px;
+    
+    .ant-picker-active-bar{
+        background-color: #D13D9E;
+    }
+    
+    &:hover{
+        border-color: #D13D9E;
+    }
+    
+    &.ant-picker-focused{
+        border-color: #D13D9E;
+        box-shadow: 0 0 0 2px rgb(209 61 158 / 20%);
+    }
+    
+    .ant-picker-input {
+        width: 100px;
+        input::placeholder {
+            color: rgba(0, 0, 0, 0.85);
+        }
+        
+    }
+    
+    &__unselected {
+        .ant-picker-range-separator {
+            display: none;
+        }
+        
+        .ant-picker-input {
+            width: 220px;
+            &:nth-child(3) {
+                display: none;
+            }
+        }
+    }
+}
+

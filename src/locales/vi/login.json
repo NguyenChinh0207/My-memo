@@ -1,0 +1,11 @@
+{
+  "welcome_back": "Chào mừng bạn đã trở lại",
+  "login_title": "Đăng nhập tài khoản",
+  "email/username": "Email/User name",
+  "password": "Mật khẩu",
+  "forgot_password": "Quên mật khẩu?",
+  "btn_login": "Đăng nhập",
+  "msg_required": "Vui lòng nhập email/username",
+  "msg_required_password": "Vui lòng nhập mật khẩu",
+  "msg_invalid_email_password": "Email hoặc mật khẩu không chính xác"
+}

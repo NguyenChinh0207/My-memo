@@ -1,0 +1,25 @@
+.Empty-Common {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    min-height: 500px;
+
+    &__text {
+        font-weight: bold;
+        font-size: 36px;
+        margin-bottom: 40px;
+        color: #2d2d2d;
+    }
+
+    &__icon {
+        width: 228px;
+        height: 228px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff0f9;
+        border-radius: 114px;
+    }
+}
