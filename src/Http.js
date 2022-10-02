@@ -2,7 +2,7 @@ import axios from 'axios'
 import qs from 'qs'
 import { AUTH_TOKEN, USER_INFO } from './config/const'
 import { getCurrentLanguage } from './config/function'
-import { ADMIN_LOGIN } from './config/path'
+import { USER_LOGIN } from './config/path'
 
 /**
  * Get access token
@@ -49,7 +49,7 @@ export function getAxios(url, params, configs = {}) {
                 if (response.data.code === 401 || (response.status !== 200 && response.data.code === 403)) {
                     localStorage.removeItem(AUTH_TOKEN)
                     localStorage.removeItem(USER_INFO)
-                    window.location = ADMIN_LOGIN
+                    window.location = USER_LOGIN
                 }
                 resolve(response.data)
             })

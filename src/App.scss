@@ -1,8 +1,4 @@
-@import 'styles/_variables.scss';
-@import 'styles/_utilities.scss';
-@import 'styles/_components.scss';
-
-$primaryColor: #d13d9e;
+$primaryColor: #7757a8;
 $borderColor: #e7e7e7;
 
 @mixin customScrollbar {
@@ -376,6 +372,9 @@ $borderColor: #e7e7e7;
 
 .ant-avatar {
   cursor: pointer;
+  width: 26px !important;
+  height: 26px !important;
+  font-size: 20px !important;
 }
 
 .ant-skeleton {

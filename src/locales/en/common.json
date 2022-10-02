@@ -1,2 +1,6 @@
 {
+    "home": "Home",
+    "courses": "Courses",
+    "logout": "Logout",
+    "notify": "Notification"
 }

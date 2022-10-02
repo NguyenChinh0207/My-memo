@@ -4,8 +4,6 @@ import {
     DEFAULT_LANGUAGE,
     KEY_LANGUAGE,
     USER_INFO,
-    PAGE_LIMIT,
-    SCROLL_TO_ID,
 } from './const'
 import { getAxios } from '../Http'
 

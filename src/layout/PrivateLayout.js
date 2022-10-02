@@ -1,213 +1,163 @@
-import React, { useState, useContext } from 'react'
-import PropTypes from 'prop-types'
-import { Layout, Menu, Breadcrumb, Avatar, Space, Dropdown } from 'antd'
+import React, { useState, useContext } from "react";
+import { Layout, Menu, Avatar, Space, Dropdown } from "antd";
+import { IconEng, IconVi } from "../common/Icon/Icon";
+import { NavLink, useHistory, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { AUTH_TOKEN, EN, KEY_LANGUAGE, USER_INFO, VI } from "../config/const";
+import { getCurrentLanguage } from "../config/function";
+import i18n from "i18next";
+import avatar from "../assets/img/avatar.png";
 import {
-    RobotOutlined,
-} from '@ant-design/icons'
-import Sider from 'antd/es/layout/Sider'
-import { IconEng, IconVi } from '../common/Icon/Icon'
-import { NavLink, useHistory, useLocation } from 'react-router-dom'
-import {
-    ADMIN_LOGIN, 
-} from '../config/path'
-import { useTranslation } from 'react-i18next'
-import {
-    AUTH_TOKEN,
-    EN,
-    KEY_LANGUAGE,
-    USER_INFO,
-    VI,
-    MENU_KEY,
-} from '../config/const'
-import { getCurrentLanguage, getMallId, getRole } from '../config/function'
-import i18n from 'i18next'
-// import avatar from '../assets/img/avatar.png'
-import { LogoutOutlined } from '@ant-design/icons'
-import { postAxios } from '../Http'
-import { AppContext } from '../context/AppContext'
-
-const { SubMenu } = Menu
+  LogoutOutlined,
+  NotificationOutlined,
+  BellOutlined,
+} from "@ant-design/icons";
+import { AppContext } from "../context/AppContext";
+import "./PrivateLayout.scss";
+import { COURSES_PATH, HOME_PATH, USER_LOGIN } from "../config/path";
 
 const PrivateLayout = (props) => {
-    const { breadcrumbs, children } = props
-    const { handleSelectLanguage, openedMenus, setOpenMenus } = useContext(AppContext)
-    const history = useHistory()
-    const location = useLocation()
-    const { t } = useTranslation('common')
-    const role = getRole()
-    const [visible, setVisible] = useState(false)
-    const [visibleLogout, setVisibleLogout] = useState(false)
+  const { children } = props;
+  const { handleSelectLanguage } = useContext(AppContext);
+  const history = useHistory();
+  const location = useLocation();
+  const { t } = useTranslation("common");
+  const [visible, setVisible] = useState(false);
+  const [visibleLogout, setVisibleLogout] = useState(false);
+  const [visibleNotify, setVisibleNotify] = useState(false);
 
-    const locale = getCurrentLanguage()
+  const locale = getCurrentLanguage();
 
-    let menus = [
-        {
-            key: 'lifestyle',
-            name: t('Lifestyle'),
-            children: [
-            ],
-            icon: <RobotOutlined />,
-        },
-    ]
+  const handleChangeLanguage = (e) => {
+    localStorage.setItem(KEY_LANGUAGE, e.key);
+    i18n.changeLanguage(e.key).then(() => {
+      setVisible(false);
+    });
+    handleSelectLanguage(e.key);
+  };
 
-    const handleChangeLanguage = (e) => {
-        localStorage.setItem(KEY_LANGUAGE, e.key)
-        i18n.changeLanguage(e.key).then(() => {
-            setVisible(false)
-        })
-        handleSelectLanguage(e.key)
-    }
+  const handleLogout = () => {
+    localStorage.removeItem(AUTH_TOKEN);
+    localStorage.removeItem(USER_INFO);
+    history.push(USER_LOGIN);
+  };
 
-    const handleLogout = () => {
-        // postAxios(API_LOGOUT, {}).then(() => {
-        //     localStorage.removeItem(AUTH_TOKEN)
-        //     localStorage.removeItem(USER_INFO)
-        //     localStorage.removeItem(MENU_KEY)
-        //     history.push(ADMIN_LOGIN)
-        // })
-    }
+  const menu = (
+    <Menu onClick={handleChangeLanguage} selectedKeys={locale}>
+      <Menu.Item key={VI}>
+        <Avatar src={<IconVi />} />
+      </Menu.Item>
+      <Menu.Item key={EN}>
+        <Avatar src={<IconEng />} />
+      </Menu.Item>
+    </Menu>
+  );
 
-    const menu = (
-        <Menu onClick={handleChangeLanguage} selectedKeys={locale}>
-            <Menu.Item key={VI}>
-                <Avatar src={<IconVi />} />
-            </Menu.Item>
-            <Menu.Item key={EN}>
-                <Avatar src={<IconEng />} />
-            </Menu.Item>
-        </Menu>
-    )
+  const menuUser = (
+    <Menu onClick={handleLogout}>
+      <Menu.Item key={"logout"} icon={<LogoutOutlined />}>
+        {t("logout")}
+      </Menu.Item>
+    </Menu>
+  );
 
-    const menuUser = (
-        <Menu onClick={handleLogout}>
-            <Menu.Item key={'logout'} icon={<LogoutOutlined />}>
-                {t('logout')}
-            </Menu.Item>
-        </Menu>
-    )
+  const notifyList = (
+    <Menu onClick={handleLogout}>
+      <Menu.Item key={"notify"} icon={<NotificationOutlined />}>
+        {t("notify")}
+      </Menu.Item>
+    </Menu>
+  );
 
-    const selectedKey = `/${location.pathname.split('/')[1]}/${location.pathname.split('/')[2]}`
-    const openMenu = menus.find((menu) => {
-        const childIndex = menu?.children?.findIndex((item) => {
-            return item?.key?.includes(selectedKey)
-        })
-
-        return childIndex !== -1
-    })
-
-    const openKey = openMenu ? openMenu.key : 'lifestyle'
-
-    let defaultOpenKeys = openedMenus
-    if (openedMenus.indexOf(openKey) === -1) {
-        defaultOpenKeys = [...openedMenus, openKey]
-    }
-
+  const NavButton = (props) => {
+    const active = props.isActive ? "ActiveButton" : "";
     return (
-        <Layout style={{ minHeight: '100vh' }} >
-                <Sider
-                    theme={'dark'}
-                    breakpoint="lg"
-                    collapsedWidth="0"
-                    width={272}
-                    defaultCollapsed={window.innerWidth < '992'}
+      <NavLink to={props.to} className={"NavButton " +`${active}`}>
+        {props.children}
+      </NavLink>
+    );
+  };
+
+  const url = `${location.pathname}`;
+
+  const buttons = (
+    <React.Fragment>
+      <div className="NavRow">
+        <NavButton to={HOME_PATH} isActive={url === HOME_PATH}>
+          {t("home")}
+        </NavButton>
+        <NavButton to={COURSES_PATH} isActive={url === COURSES_PATH}>
+          {t("courses")}
+        </NavButton>
+        {/* <NavButton to='/groups' isActive={url === 'groups'}>Groups</NavButton> */}
+      </div>
+    </React.Fragment>
+  );
+
+  return (
+    <Layout style={{ minWidth: "100vh" }}>
+      <div className="Header">
+        <div className="HeaderWrap">
+          <div className="HeaderRow">
+            <NavLink to="/" className="LogoWrapper" />
+            {buttons}
+            <div>
+              <Space size={"large"}>
+                <Dropdown
+                  overlay={menu}
+                  trigger={["click"]}
+                  onOpenChange={(flag) => setVisible(flag)}
+                  open={visible}
                 >
-                    <div
-                        className="logo"
-                        // onClick={() => history.push(role !== ROLE_PARKING_ADMIN ? CUSTOMER_PATH : SEARCH_PARKING_PATH)}
-                    // onClick={() => history.push(DASHBOARD)}
-                    >
-                        {/* {genLogo()} */}
+                  <Avatar src={locale === VI ? <IconVi /> : <IconEng />} />
+                </Dropdown>
+                <Dropdown
+                  overlay={notifyList}
+                  trigger={["click"]}
+                  onOpenChange={(flag) => setVisibleNotify(flag)}
+                  open={visibleNotify}
+                >
+                  <div style={{ position: "relative" }}>
+                    <Avatar
+                      style={{ color: "#8d8d8f" }}
+                      width={26}
+                      height={26}
+                      src={<BellOutlined />}
+                    />
+                    <span class="badge-up pointer">6</span>
+                  </div>
+                </Dropdown>
+                <Dropdown
+                  overlay={menuUser}
+                  trigger={["click"]}
+                  onOpenChange={(flag) => setVisibleLogout(flag)}
+                  open={visibleLogout}
+                >
+                  <div className="avatar-swap pointer">
+                    <div style={{ position: "relative" }}>
+                      <Avatar width={26} height={26} src={avatar} />
+                      <span className="avatar-status-online"></span>
                     </div>
-                    (
-                        <Menu
-                            defaultSelectedKeys={[
-                                `/${location.pathname.split('/')[1]}/${location.pathname.split('/')[2]}`,
-                            ]}
-                            mode="inline"
-                            defaultOpenKeys={defaultOpenKeys}
-                            className="main-menu"
-                            onOpenChange={(openKeys) => setOpenMenus(openKeys)}
-                        >
-                            {menus.map((menu) => {
-                                return (
-                                    <SubMenu key={menu.key} icon={menu.icon} title={menu.name}>
-                                        {menu.children.map((item) => {
-                                            const linkSplitted = item.key.split('/')
-                                            return (
-                                                <Menu.Item
-                                                    key={[linkSplitted[0], linkSplitted[1], linkSplitted[2]].join('/')}
-                                                >
-                                                    <NavLink to={item.key}>{item.name}</NavLink>
-                                                </Menu.Item>
-                                            )
-                                        })}
-                                    </SubMenu>
-                                )
-                            })}
-                        </Menu>
-                    )
-                </Sider>
+                    <span className="textColor">Nguyen Chinh</span>
+                  </div>
+                </Dropdown>
+              </Space>
+            </div>
+          </div>
+        </div>
+      </div>
+      <Layout.Content style={{ marginTop: 64, minHeight: "100vh" }}>
+        {children}
+      </Layout.Content>
+      <Layout.Footer
+        style={{
+          textAlign: "center",
+        }}
+      >
+        My memo ©2022 Created by Chinh Nguyen
+      </Layout.Footer>
+    </Layout>
+  );
+};
 
-            <Layout className="site-layout">
-                {role && (
-                    <Layout.Header className="site-layout-header">
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <div>
-                                <Breadcrumb style={{ margin: '16px 0' }}>
-                                    {breadcrumbs.map((item, key) => (
-                                        <Breadcrumb.Item
-                                            key={key}
-                                            className={
-                                                key === breadcrumbs.length - 2 ? 'breadcrumb-separator-before-last' : ''
-                                            }
-                                        >
-                                            {item}
-                                        </Breadcrumb.Item>
-                                    ))}
-                                </Breadcrumb>
-                            </div>
-                            <div>
-                                <Space size={'large'}>
-                                    <Dropdown
-                                        overlay={menu}
-                                        trigger={['click']}
-                                        onVisibleChange={(flag) => setVisible(flag)}
-                                        visible={visible}
-                                    >
-                                        <Avatar src={locale === VI ? <IconVi /> : <IconEng />} />
-                                    </Dropdown>
-                                    <Dropdown
-                                        overlay={menuUser}
-                                        trigger={['click']}
-                                        onVisibleChange={(flag) => setVisibleLogout(flag)}
-                                        visible={visibleLogout}
-                                    >
-                                        {/* <Avatar width={30} height={30} src={avatar} /> */}
-                                    </Dropdown>
-                                </Space>
-                            </div>
-                        </div>
-                    </Layout.Header>
-                )}
-                <Layout.Content style={{ margin: 16 }} >
-                    {children}
-                </Layout.Content>
-            </Layout>
-        </Layout>
-    )
-}
-
-PrivateLayout.defaultProps = {
-    breadcrumbs: [],
-}
-
-PrivateLayout.propTypes = {
-    breadcrumbs: PropTypes.array.isRequired,
-}
-export default PrivateLayout
+export default PrivateLayout;

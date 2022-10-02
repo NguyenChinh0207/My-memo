@@ -2,7 +2,7 @@ import React from 'react';
 
 const IconEng = () => {
     return (
-        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="26" height="26" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M2.64175 6.50061C1.67445 7.90459 0.939335 9.48104 0.493591 11.1754H7.31681L2.64175 6.50061Z"
                   fill="#29337A"/>
             <path d="M10.799 0.600403C9.07079 1.10372 7.47022 1.90685 6.06079 2.9544L10.799 7.69266V0.600403Z"

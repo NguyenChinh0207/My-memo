@@ -1,7 +1,7 @@
 import React from 'react'
 import { Route, Redirect } from "react-router-dom";
 import { isLogin } from "../config/function";
-import {ADMIN_LOGIN } from "../config/path";
+import {ADMIN_LOGIN, DASHBOARD_PATH } from "../config/path";
 
 const PrivateRoute = ({ component: Component, restricted, ...rest }) => {
   return (
@@ -9,7 +9,7 @@ const PrivateRoute = ({ component: Component, restricted, ...rest }) => {
       {...rest}
       render={(props) =>
         !isLogin() ? (
-          <Redirect to={ADMIN_LOGIN} />
+          <Redirect to={DASHBOARD_PATH} />
         ) 
         :  <Component {...props} />
       }
