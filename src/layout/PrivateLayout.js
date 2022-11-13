@@ -124,7 +124,7 @@ const PrivateLayout = (props) => {
                       height={26}
                       src={<BellOutlined />}
                     />
-                    <span class="badge-up pointer">6</span>
+                    <span className="badge-up pointer">6</span>
                   </div>
                 </Dropdown>
                 <Dropdown

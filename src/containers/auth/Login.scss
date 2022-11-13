@@ -1,125 +1,86 @@
 $primaryColor: #8C55AA;
+.Content {
+  box-sizing: border-box;
+  padding: 62px 0;
+  width: 100%;
+  min-height: 100vh;
+  background-position: 0% 100%;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-color: rgba(0, 0, 0, 0.62);
+}
 
- .main {
-   background-color: #FFFFFF;
-   width: 500px;
-  //  height: 400px;
-   margin: 7em auto;
-   border-radius: 1.5em;
-   box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
-   padding-bottom: 20px;
- }
+.WhiteBox {
+  margin: 50px auto;
+  margin-bottom: 0;
+  width: 60%;
+  max-width: 80%;
+  background-color: white;
+  border-radius: 10px;
+  padding: 30px 50px 30px 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
 
- .sign {
-   padding-top: 40px;
-   color: $primaryColor;
-   font-weight: bold;
-   font-size: 23px;
- }
+.imgLogin {
+  min-width: 291px;
+  min-height: 290px;
+}
 
- .un {
-   width: 76%;
-   color: rgb(38, 50, 56);
-   font-weight: 700;
-   font-size: 14px;
-   letter-spacing: 1px;
-   background: rgba(136, 126, 126, 0.04);
-   padding: 10px 20px;
-   border: none;
-   border-radius: 20px;
-   outline: none;
-   box-sizing: border-box;
-   border: 2px solid rgba(0, 0, 0, 0.02);
-   margin-bottom: 50px;
-   margin-left: 46px;
-   text-align: center;
-   margin-bottom: 27px;
- }
+.wrapLogin {
+  width: 50%;
+}
 
- form.form1 {
-   padding-top: 40px;
- }
+.LoginTitle {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.5em;
+  color: #3E3E3E;
+  margin-bottom: 20px;
+}
 
- .pass {
-   width: 76%;
-   color: rgb(38, 50, 56);
-   font-weight: 700;
-   font-size: 14px;
-   letter-spacing: 1px;
-   background: rgba(136, 126, 126, 0.04);
-   padding: 10px 20px;
-   border: none;
-   border-radius: 20px;
-   outline: none;
-   box-sizing: border-box;
-   border: 2px solid rgba(0, 0, 0, 0.02);
-   margin-bottom: 50px;
-   margin-left: 46px;
-   text-align: center;
-   margin-bottom: 27px;
- }
+.Label {
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #3E3E3E;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
 
+.Input {
+  width: 100%;
+  font-size: 16px;
+  height: 44px;
+  border-radius: 6px;
+  border: 1px solid #e4e4e4;
+  box-sizing: border-box;
+  padding: 11px 18px;
+  color: #3E3E3E;
+  outline-color: #80008063;
+}
 
- .un:focus,
- .pass:focus {
-   border: 2px solid rgba(0, 0, 0, 0.18) !important;
-
- }
-
- .submit-login {
-   cursor: pointer;
-   border-radius: 5em;
-   color: #fff;
-   background: linear-gradient(to right, #9C27B0, #E040FB);
-   border: 0;
-   padding-left: 40px;
-   padding-right: 40px;
-   padding-bottom: 10px;
-   padding-top: 10px;
-   margin-left: 35%;
-   font-size: 13px;
-   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
- }
-
- .submit-login:hover{
+.LoginButton {
+  margin: 40px 0 20px 0;
+  background-color: green;
   color: #fff;
- }
-
- .forgot {
-   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-   color: #E1BEE7;
-   padding-top: 15px;
- }
-
- .submit-login {
-   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-   color: #E1BEE7;
-   text-decoration: none
- }
-
- .btn-send{
-  margin-left: 30%;
- }
-
- .login-google{
-  background: linear-gradient(to right, #138cb1, #4ebfec) !important;
-  margin-left: 10% !important;
-  margin-top: 20px;
- }
-
- .btn-login-group{
+  border: 1px solid #699f30;
+  background-color: #83ca38;
+  height: 47px;
+  border-radius: 6px;
+  text-align: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
- }
+  cursor: pointer;
+  user-select: none;
+}
 
- .btn-login{
-  width: 85%;
- }
+.ErrorMessage {
+  color: red;
+  font-size: 0.8em;
+}
 
- @media (max-width: 600px) {
-   .main {
-     border-radius: 0px;
-   }
-  }
+.Error {
+  border: 1px solid rgba(255, 0, 0, 0.7);
+}

@@ -5,6 +5,8 @@ import { USER_FORGOT_PASSWORD } from "../../config/path";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
+import PrivateLayout from "../../layout/PrivateLayout";
+import img from "../../assets/img/space.png";
 
 const Login = () => {
   const { t } = useTranslation("login");
@@ -12,6 +14,7 @@ const Login = () => {
   const history = useHistory();
 
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(false);
 
   const [isInvalidEmailPassword, setIsInvalidEmailPassword] = useState(false);
 
@@ -20,42 +23,61 @@ const Login = () => {
       setIsInvalidEmailPassword(false);
     }
   };
+  const loginClick = () => {
+    let correct = true;
+    if (this.state.email === "") {
+      correct = false;
+      this.setState({
+        emailInputClasses: styles.Input + " " + styles.Error,
+      });
+    }
+    if (this.state.password === "") {
+      correct = false;
+      this.setState({
+        passwordInputClasses: styles.Input + " " + styles.Error,
+      });
+    }
+    if (correct) {
+      this.login();
+    }
+  };
+  const onKeyDown = (event) => {
+    if (event.key === "Enter") {
+      loginClick();
+    }
+  };
 
   const onFinish = async (data) => {};
 
   return (
-    <div className="main">
-      <p className="sign" align="center">
-        Sign in
-      </p>
-      <form className="form1" />
-      <input
-        className="un "
-        type="text"
-        align="center"
-        placeholder="Username"
-      />
-      <input
-        className="pass"
-        type="password"
-        align="center"
-        placeholder="Password"
-      />
-      <div className="btn-login-group">
-        <div className="btn-login">
-          <a className="submit-login" align="center">
-            Sign in
-          </a>
-          <p className="forgot" align="center">
-            <NavLink to={USER_FORGOT_PASSWORD}>Forgot Password?</NavLink>
-          </p>
+    <PrivateLayout breadcrumbs={[t("event:title")]}>
+      <div className="Content">
+        <div className="WhiteBox">
+          <img className="imgLogin" src={img} alt="" />
+          <div className="wrapLogin">
+            <div className="LoginTitle">Đăng nhập</div>
+            {errorMessage}
+            <div className={"LoginTitle labelRequire"}>Họ tên:</div>
+            <input
+              name="email"
+              // onChange={this.inputChange}
+              className="emailInputClasses"
+            />
+            <div className={"LoginTitle labelRequire"}>Mật khẩu:</div>
+            <input
+              name="password"
+              // onChange={this.inputChange}
+              type="password"
+              // className={this.state.passwordInputClasses}
+              onKeyDown={onKeyDown}
+            />
+            <div onClick={loginClick} className="LoginButton">
+              Đăng nhập
+            </div>
+          </div>
         </div>
-        <a className="submit-login login-google" align="center">
-          <GoogleOutlined />
-          Sign in with Google
-        </a>
       </div>
-    </div>
+    </PrivateLayout>
   );
 };
 

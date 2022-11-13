@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
-import { COURSES_PATH } from "../../../config/path";
+import { COURSES_PATH } from "../../config/path";
+import { Link } from "react-router-dom";
 import './Welcome.scss';
 
 const Welcome = () => {
@@ -10,7 +10,7 @@ const Welcome = () => {
   return (
     <div className={"WelcomeCard"}>
       <div className={"TextWrapper"}>
-        <div className={"Title"}> Welcome to Memrise! </div>
+        <div className={"Title"}> Welcome to My-memo! </div>
         Pick a course and start learning.
       </div>
       <div className={"BtnWrapper"}>

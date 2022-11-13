@@ -11,14 +11,6 @@ const HomeWelcome = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [isInvalidEmailPassword, setIsInvalidEmailPassword] = useState(false);
-
-  const onValuesChange = () => {
-    if (isInvalidEmailPassword) {
-      setIsInvalidEmailPassword(false);
-    }
-  };
-
   const onFinish = async (data) => {};
 
   return (

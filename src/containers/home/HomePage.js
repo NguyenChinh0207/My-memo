@@ -5,6 +5,7 @@ import LeftColumn from "../../components/home/LeftColumn";
 import "./HomePage.scss";
 import PrivateLayout from "../../layout/PrivateLayout";
 import { Layout } from "antd";
+import Welcome from '../../components/home/Welcome';
 
 const HomePage = () => {
   const { t } = useTranslation("login");
@@ -13,11 +14,13 @@ const HomePage = () => {
 
   return (
     <PrivateLayout breadcrumbs={[t("event:title")]}>
-      <Layout>
+      <Layout className="bg-white">
         <div className={"Content"}>
           <div className={"ContainerMain"}>
             <LeftColumn profile={""} />
-            <div className={"RightColumn"}></div>
+            <div className={"RightColumn"}>
+              <Welcome />
+            </div>
           </div>
         </div>
       </Layout>
