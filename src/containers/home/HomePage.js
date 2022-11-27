@@ -8,13 +8,13 @@ import { Layout } from "antd";
 import Welcome from '../../components/home/Welcome';
 
 const HomePage = () => {
-  const { t } = useTranslation("login");
+  const { t } = useTranslation("common");
 
   const history = useHistory();
 
   return (
-    <PrivateLayout breadcrumbs={[t("event:title")]}>
-      <Layout className="bg-white">
+    <PrivateLayout>
+      <Layout>
         <div className={"Content"}>
           <div className={"ContainerMain"}>
             <LeftColumn profile={""} />

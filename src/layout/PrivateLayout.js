@@ -14,7 +14,7 @@ import {
 } from "@ant-design/icons";
 import { AppContext } from "../context/AppContext";
 import "./PrivateLayout.scss";
-import { COURSES_PATH, HOME_PATH, USER_LOGIN } from "../config/path";
+import { COURSES_PATH, DASHBOARD_PATH, HOME_PATH, USER_LOGIN, USER_REGISTER } from "../config/path";
 
 const PrivateLayout = (props) => {
   const { children } = props;
@@ -72,7 +72,7 @@ const PrivateLayout = (props) => {
   const NavButton = (props) => {
     const active = props.isActive ? "ActiveButton" : "";
     return (
-      <NavLink to={props.to} className={"NavButton " +`${active}`}>
+      <NavLink to={props.to} className={"NavButton " + `${active}`}>
         {props.children}
       </NavLink>
     );
@@ -80,8 +80,8 @@ const PrivateLayout = (props) => {
 
   const url = `${location.pathname}`;
 
-  const buttons = (
-    <React.Fragment>
+  let buttons = (
+    <>
       <div className="NavRow">
         <NavButton to={HOME_PATH} isActive={url === HOME_PATH}>
           {t("home")}
@@ -91,8 +91,90 @@ const PrivateLayout = (props) => {
         </NavButton>
         {/* <NavButton to='/groups' isActive={url === 'groups'}>Groups</NavButton> */}
       </div>
-    </React.Fragment>
+      <div>
+        <Space size={"large"}>
+          <Dropdown
+            overlay={menu}
+            trigger={["click"]}
+            onOpenChange={(flag) => setVisible(flag)}
+            open={visible}
+          >
+            <Avatar src={locale === VI ? <IconVi /> : <IconEng />} />
+          </Dropdown>
+          <Dropdown
+            overlay={notifyList}
+            trigger={["click"]}
+            onOpenChange={(flag) => setVisibleNotify(flag)}
+            open={visibleNotify}
+          >
+            <div style={{ position: "relative" }}>
+              <Avatar
+                style={{ color: "white" }}
+                width={26}
+                height={26}
+                src={<BellOutlined />}
+              />
+              <span className="badge-up pointer">6</span>
+            </div>
+          </Dropdown>
+          <Dropdown
+            overlay={menuUser}
+            trigger={["click"]}
+            onOpenChange={(flag) => setVisibleLogout(flag)}
+            open={visibleLogout}
+          >
+            <div className="avatar-swap pointer">
+              <div style={{ position: "relative" }}>
+                <Avatar width={26} height={26} src={avatar} />
+                <span className="avatar-status-online"></span>
+              </div>
+              <span className="textColor">Nguyen Chinh</span>
+            </div>
+          </Dropdown>
+        </Space>
+      </div>
+    </>
   );
+  
+  if (url === USER_LOGIN || url === USER_REGISTER || url === DASHBOARD_PATH) {
+    const loginBtnActive =
+      url === USER_LOGIN ? "ActiveButtonLoginLogout" : "loginBtn";
+    const signUpBtnActive =
+      url === USER_REGISTER ? "ActiveButtonLoginLogout" : "SignUpPurple";
+
+    buttons = (
+      <div className="HeaderRow" style={{ justifyContent: "flex-end" }}>
+        <div className="AuthNavButtonsDiv">
+          <Space size={"large"}>
+            <Dropdown
+              overlay={menu}
+              trigger={["click"]}
+              onOpenChange={(flag) => setVisible(flag)}
+              open={visible}
+            >
+              <Avatar
+                style={{ marginRight: "15px" }}
+                src={locale === VI ? <IconVi /> : <IconEng />}
+              />
+            </Dropdown>
+          </Space>
+          <NavLink
+            to={USER_LOGIN}
+            className={"NavLoginSignup AuthNavButtonsDiv " + loginBtnActive}
+          >
+            {t("login:btn_login")}
+          </NavLink>
+          <NavLink
+            to={USER_REGISTER}
+            className={`NavLoginSignup LRMargin ${signUpBtnActive}`}
+            style={{ color: "#2b3648" }}
+          >
+            {t("login:btn_signup")}
+          </NavLink>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Layout style={{ minWidth: "100vh" }}>
@@ -101,52 +183,10 @@ const PrivateLayout = (props) => {
           <div className="HeaderRow">
             <NavLink to="/" className="LogoWrapper" />
             {buttons}
-            <div>
-              <Space size={"large"}>
-                <Dropdown
-                  overlay={menu}
-                  trigger={["click"]}
-                  onOpenChange={(flag) => setVisible(flag)}
-                  open={visible}
-                >
-                  <Avatar src={locale === VI ? <IconVi /> : <IconEng />} />
-                </Dropdown>
-                <Dropdown
-                  overlay={notifyList}
-                  trigger={["click"]}
-                  onOpenChange={(flag) => setVisibleNotify(flag)}
-                  open={visibleNotify}
-                >
-                  <div style={{ position: "relative" }}>
-                    <Avatar
-                      style={{ color: "#8d8d8f" }}
-                      width={26}
-                      height={26}
-                      src={<BellOutlined />}
-                    />
-                    <span className="badge-up pointer">6</span>
-                  </div>
-                </Dropdown>
-                <Dropdown
-                  overlay={menuUser}
-                  trigger={["click"]}
-                  onOpenChange={(flag) => setVisibleLogout(flag)}
-                  open={visibleLogout}
-                >
-                  <div className="avatar-swap pointer">
-                    <div style={{ position: "relative" }}>
-                      <Avatar width={26} height={26} src={avatar} />
-                      <span className="avatar-status-online"></span>
-                    </div>
-                    <span className="textColor">Nguyen Chinh</span>
-                  </div>
-                </Dropdown>
-              </Space>
-            </div>
           </div>
         </div>
       </div>
-      <Layout.Content style={{ marginTop: 64, minHeight: "100vh" }}>
+      <Layout.Content style={{ marginTop: 62, minHeight: "100vh" }}>
         {children}
       </Layout.Content>
       <Layout.Footer

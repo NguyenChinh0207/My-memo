@@ -5,6 +5,7 @@
   "password": "Password",
   "forgot_password": "Forgot password?",
   "btn_login": "Login",
+  "btn_signup": "Register",
   "msg_required": "Please input your email/username",
   "msg_required_password": "Please input your password",
   "msg_invalid_email_password": "Email or password is invalid"

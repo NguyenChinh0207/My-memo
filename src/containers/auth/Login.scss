@@ -1,5 +1,4 @@
-$primaryColor: #8C55AA;
-.Content {
+.Content-login {
   box-sizing: border-box;
   padding: 62px 0;
   width: 100%;
@@ -11,7 +10,7 @@ $primaryColor: #8C55AA;
 }
 
 .WhiteBox {
-  margin: 50px auto;
+  margin: 0px auto;
   margin-bottom: 0;
   width: 60%;
   max-width: 80%;
@@ -24,9 +23,8 @@ $primaryColor: #8C55AA;
 }
 
 .imgLogin {
-  min-width: 291px;
-  min-height: 290px;
-}
+  min-width: 45%;
+  }
 
 .wrapLogin {
   width: 50%;
@@ -61,19 +59,19 @@ $primaryColor: #8C55AA;
 }
 
 .LoginButton {
-  margin: 40px 0 20px 0;
-  background-color: green;
+  width: 100%;
+    margin-top: 20px;
   color: #fff;
   border: 1px solid #699f30;
   background-color: #83ca38;
-  height: 47px;
+  height: 40px;
   border-radius: 6px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  cursor: pointer;
-  user-select: none;
+}
+
+.LoginButton:focus,
+.LoginButton:hover {
+  border: 1px solid #699f30;
+  background-color: #83ca38;
 }
 
 .ErrorMessage {

@@ -1,13 +1,13 @@
-$primaryColor: #353b48;
-$primaryTextColor: #7757a8;
+$primaryColor: #2b3648;
+$primaryTextColor: #d7bdff;
 
 .Header {
-    background-color: #ffff;
+    background-color: $primaryColor;
     position: fixed;
     top: 0;
     width: 100%;
     max-width: 100%;
-    color: $primaryColor;
+    color: white;
     padding: 0;
     border: none;
     z-index: 10;
@@ -52,7 +52,7 @@ $primaryTextColor: #7757a8;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $primaryColor;
+    color: white;
     text-decoration: none;
     font-weight: 600;
     position: relative;
@@ -72,12 +72,19 @@ $primaryTextColor: #7757a8;
     border-bottom: 2px solid $primaryTextColor;
 }
 
+.ActiveButtonLoginLogout {
+    color: white !important;
+    background: rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.49);
+}
+
 .Invisible {
     display: none;
 }
 
 .SignUpPurple {
-    background-color: #f8379c;
+    color: black;
+    background-color: #ffc000;
 }
 
 .LRMargin {
@@ -88,8 +95,6 @@ $primaryTextColor: #7757a8;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
-    margin-right: 30px;
-    width: 100%;
 }
 
 .LogoutBtn {
@@ -117,7 +122,7 @@ $primaryTextColor: #7757a8;
 
 .avatar-status-online {
     background-color: #28c76f;
-    border-color: $primaryColor;
+    border-color: white;
     border-radius: 50%;
     width: 9px;
     height: 9px;
@@ -153,9 +158,24 @@ $primaryTextColor: #7757a8;
 }
 
 .textColor {
-    color: $primaryColor;
+    color: white
 }
 
 .pointer {
     cursor: pointer;
+}
+
+.NavLoginSignup {
+    padding: 8px 30px;
+    align-items: center;
+    border-radius: 20px;
+    color: white;
+}
+
+.loginBtn {
+    color: white;
+}
+
+.loginBtn:hover {
+    color: white;
 }

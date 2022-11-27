@@ -806,3 +806,22 @@ div.parking-time-picker>div.ant-picker-panel-container {
 .bg-white{
   background-color: white !important;
 }
+.labelRequire::before {
+  display: inline-block;
+  margin-right: 4px;
+  color: #ff4d4f;
+  font-size: 14px;
+  font-family: SimSun, sans-serif;
+  line-height: 1;
+  content: "*";
+}
+
+.ant-input, .ant-input-password {
+  border-radius: 6px !important;
+}
+
+.ant-input:hover,
+.ant-input:focus, .ant-input-password:hover, .ant-input-password:focus {
+  border-color: $primaryColor !important;
+  box-shadow: none !important;
+}

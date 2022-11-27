@@ -4,6 +4,7 @@ import {
     DASHBOARD_PATH,
     HOME_PATH,
     COURSES_PATH,
+    USER_REGISTER,
 } from '../config/path'
 
 const routes = [
@@ -15,11 +16,18 @@ const routes = [
     restricted: true,
   },
   {
+    path: USER_REGISTER,
+    exact: true,
+    isPrivate: false,
+    component: import("../containers/auth/Signup"),
+    restricted: true,
+  },
+  {
     path: USER_FORGOT_PASSWORD,
     exact: true,
     isPrivate: false,
     component: import("../containers/auth/ForgotPassword"),
-    restricted: true,
+    restricted: false,
   },
   {
     path: DASHBOARD_PATH,
@@ -31,6 +39,7 @@ const routes = [
   {
     path: HOME_PATH,
     exact: true,
+    // isPrivate: true,
     isPrivate: false,
     component: import("../containers/home/HomePage"),
     restricted: false,
@@ -38,6 +47,7 @@ const routes = [
   {
     path: COURSES_PATH,
     exact: true,
+    // isPrivate: true,
     isPrivate: false,
     component: import("../containers/course/Courses"),
     restricted: false,

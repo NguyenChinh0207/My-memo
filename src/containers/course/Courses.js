@@ -22,7 +22,7 @@ const Courses = () => {
   const onFinish = async (data) => {};
 
   return (
-    <PrivateLayout breadcrumbs={[t("event:title")]}>
+    <PrivateLayout>
       <div className="wrapper">
         <div className="wrapper-banner">
           {/* <div className="banner" />
