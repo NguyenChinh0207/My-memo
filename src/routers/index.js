@@ -30,7 +30,7 @@ const AppRouter = () => {
               <PublicRoute restricted={restricted} {...props} />
             );
           })}
-          <Route component={NotFound} />
+          <Route component={NotFound} isPublicRoute />
         </Switch>
       </Suspense>
     </BrowserRouter>

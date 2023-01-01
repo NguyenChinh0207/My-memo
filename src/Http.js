@@ -12,7 +12,12 @@ export const getToken = () => {
 }
 
 // GLOBAL DEFAULT
-axios.defaults.headers.common['Cache-Control'] = 'no-cache'
+axios.defaults.headers.common["Access-Control-Allow-Origin"] =
+    "http://localhost:5000";
+axios.defaults.headers.common["Access-Control-Allow-Methods"] =
+  "HEAD, GET, POST, PUT, DELETE";
+axios.defaults.headers.common["Access-Control-Allow-Credentials"] = true
+axios.defaults.headers.common["Cache-Control"] = "no-cache";
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Cache-Control'] = 'max-age=0'
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
@@ -66,7 +71,8 @@ export function getAxios(url, params, configs = {}) {
  * @param isAuth
  */
 export function postAxios(url, body, config = {}, isAuth = true) {
-    axios.defaults.headers.common['AUTHORIZATION'] = `Bearer ${getToken()}`
+    axios.defaults.headers.common["Access-Control-Allow-Credentials"] = true;
+    axios.defaults.headers.common["AUTHORIZATION"] = `Bearer ${getToken()}`;
     axios.defaults.headers.common['lang'] = getCurrentLanguage()
 
     if (!isAuth) {

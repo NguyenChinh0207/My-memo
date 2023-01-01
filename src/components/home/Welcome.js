@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { COURSES_PATH } from "../../config/path";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import './Welcome.scss';
 import img from "../../assets/img/rocket.png";
 
@@ -24,9 +24,9 @@ const Welcome = () => {
         </p>
       </div>
       <div className={"BtnWrapper"}>
-        <Link to={COURSES_PATH} className={"CoursesBtn"}>
+        <NavLink to={COURSES_PATH} className={"CoursesBtn"}>
           Tìm khóa học
-        </Link>
+        </NavLink>
       </div>
     </div>
   );

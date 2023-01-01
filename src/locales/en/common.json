@@ -24,5 +24,12 @@
   "learn": "Learn",
   "course_finish": "Course finished!",
   "goal_complete": "Session completed!",
-  "course": "Course"
+  "course": "Course",
+  "Đây là thông tin bắt buộc.": "This field is require.",
+  "Nhập mật khẩu...": "Input password...",
+  "Các khóa học":"Courses",
+  "Tạo khóa học": "Create course",
+  "Đã có lỗi xảy ra, vui lòng thử lại sau.": "Server error.",
+  "Hiển thị thêm":"Load more",
+  "Nhập từ khóa...": "Input keyword..."
 }

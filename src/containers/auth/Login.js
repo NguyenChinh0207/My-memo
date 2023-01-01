@@ -1,17 +1,39 @@
 import React, { useState } from "react";
 import "./Login.scss";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import PrivateLayout from "../../layout/PrivateLayout";
 import img from "../../assets/img/space.png";
-import { Button, Col, Form, Input, Row } from "antd";
+import { Button, Checkbox, Col, Form, Input, notification } from "antd";
 import validator from "validator";
+import { API_LOGIN } from "../../config/endpointApi";
+import { HOME_PATH, USER_FORGOT_PASSWORD } from "../../config/path";
+import { postAxios } from "../../Http";
+import { AUTH_TOKEN, E001, E002 } from "../../config/const";
+import { saveAccessToken, saveUserInfo } from "../../config/function";
 
 const Login = () => {
   const { t } = useTranslation("login");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
-  const onFinish = async (data) => {};
+
+  const onFinish = async (data) => {
+    setLoading(true);
+    postAxios(API_LOGIN, data)
+      .then((res) => {
+        saveAccessToken(res?.accessToken);
+        saveUserInfo(res?.data);
+        history.push(HOME_PATH);
+      })
+      .catch((error) => {
+        const { response } = error;
+        if (response?.data?.code === E001)
+          notification.error({
+            message: t("Tên đăng nhập hoặc mật khẩu không đúng."),
+          });
+      })
+      .then(() => setLoading(false));
+  };
 
   return (
     <PrivateLayout>
@@ -72,13 +94,20 @@ const Login = () => {
             >
               <Input.Password placeholder={t("Nhập mật khẩu...")} />
             </Form.Item>
-
+            <Form.Item className="rememberPassword-wrap">
+              <Form.Item name="remember" valuePropName="checked" className="checkbox-rememberme">
+                <Checkbox>{t("Ghi nhớ mật khẩu")}</Checkbox>
+              </Form.Item>
+              <NavLink className="login-form-forgot" to={USER_FORGOT_PASSWORD}>
+                {t("Quên mật khẩu?")}
+              </NavLink>
+            </Form.Item>
             <Form.Item>
               <Button
                 type="primary"
                 htmlType="submit"
                 className="LoginButton"
-                // loading={true}
+                loading={loading}
               >
                 {t("btn_login")}
               </Button>

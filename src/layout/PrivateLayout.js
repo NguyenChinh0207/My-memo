@@ -18,7 +18,7 @@ import { COURSES_PATH, DASHBOARD_PATH, HOME_PATH, USER_LOGIN, USER_REGISTER } fr
 
 const PrivateLayout = (props) => {
   const { children } = props;
-  const { handleSelectLanguage } = useContext(AppContext);
+  const { handleSelectLanguage, user_info } = useContext(AppContext);
   const history = useHistory();
   const location = useLocation();
   const { t } = useTranslation("common");
@@ -128,7 +128,9 @@ const PrivateLayout = (props) => {
                 <Avatar width={26} height={26} src={avatar} />
                 <span className="avatar-status-online"></span>
               </div>
-              <span className="textColor">Nguyen Chinh</span>
+              <span style={{ marginLeft: "4px" }} className="textColor">
+                {user_info?.username}
+              </span>
             </div>
           </Dropdown>
         </Space>
@@ -181,7 +183,7 @@ const PrivateLayout = (props) => {
       <div className="Header">
         <div className="HeaderWrap">
           <div className="HeaderRow">
-            <NavLink to="/" className="LogoWrapper" />
+            <NavLink to={HOME_PATH} className="LogoWrapper" />
             {buttons}
           </div>
         </div>

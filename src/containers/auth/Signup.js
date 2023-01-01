@@ -4,8 +4,12 @@ import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import PrivateLayout from "../../layout/PrivateLayout";
 import img from "../../assets/img/space.png";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, notification } from "antd";
 import validator from "validator";
+import { API_REGISTER } from "../../config/endpointApi";
+import { postAxios } from "../../Http";
+import { USER_LOGIN } from "../../config/path";
+import { CODE_EMAIL_ALREADY, CODE_USERNAME_ALREADY } from "../../config/const";
 
 const Signup = () => {
   const { t } = useTranslation("login");
@@ -14,6 +18,7 @@ const Signup = () => {
   const [form] = Form.useForm();
 
   const [loading, setLoading] = useState(false);
+
   const onFinish = async (data) => {
     if (data.password !== data.password_again) {
       form.setFields([
@@ -31,6 +36,26 @@ const Signup = () => {
         },
       ]);
     }
+    setLoading(true);
+    postAxios(API_REGISTER, data)
+      .then(() => {
+        notification.success({
+          message: t("Bạn đã đăng kí thành công!"),
+        });
+        history.push(USER_LOGIN);
+      })
+      .catch((error) => {
+        const { response } = error;
+        if (response?.data?.code === CODE_USERNAME_ALREADY )
+          notification.error({
+            message: t("Tên đăng nhập đã được sử dụng."),
+          });
+        if (response?.data?.code === CODE_EMAIL_ALREADY)
+          notification.error({
+            message: t("Email đã được sử dụng."),
+          });
+      })
+      .then(() => setLoading(false));
   };
 
   return (
@@ -63,6 +88,7 @@ const Signup = () => {
             <Form.Item
               label={t("Tên đăng nhập")}
               name="username"
+              // extra={t("Tên đăng nhập tối đa 12 kí tự")}
               rules={[
                 {
                   required: true,
@@ -145,7 +171,7 @@ const Signup = () => {
                 type="primary"
                 htmlType="submit"
                 className="LoginButton"
-                // loading={true}
+                loading={loading}
               >
                 {t("btn_signup")}
               </Button>

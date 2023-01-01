@@ -3,19 +3,9 @@ import "./Login.scss";
 import { useTranslation } from "react-i18next";
 
 const ForgotPassword = () => {
-  const { t } = useTranslation("forgotPassword");
+  const { t } = useTranslation("common");
 
   const [loading, setLoading] = useState(false);
-
-  const [isInvalidEmail, setIsInvalidEmail] = useState(false);
-
-  const [success, setSuccess] = useState(false);
-
-  const onValuesChange = () => {
-    if (isInvalidEmail) {
-      setIsInvalidEmail(false);
-    }
-  };
 
   const onFinish = async (data) => {};
 

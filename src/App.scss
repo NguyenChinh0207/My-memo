@@ -825,3 +825,12 @@ div.parking-time-picker>div.ant-picker-panel-container {
   border-color: $primaryColor !important;
   box-shadow: none !important;
 }
+.ant-select:hover,
+.ant-select:focus {
+  border-color: $primaryColor !important;
+  box-shadow: none !important;
+}
+
+.ant-select-selector {
+  border-radius: 6px !important;
+}

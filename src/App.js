@@ -3,6 +3,7 @@ import "antd/dist/antd.css";
 import AppRouter from "./routers";
 import { QueryClient, QueryClientProvider } from "react-query";
 import AppContextProvider from "./context/AppContext";
+import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
 
 function App() {
   const queryClient = new QueryClient();
@@ -10,7 +11,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppContextProvider>
-        <AppRouter />
+        <ErrorBoundary>
+          <AppRouter />
+        </ErrorBoundary>
       </AppContextProvider>
     </QueryClientProvider>
   );

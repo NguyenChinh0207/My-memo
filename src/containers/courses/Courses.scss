@@ -1,0 +1,181 @@
+$primaryColor: #7757a8;
+.PageHead {
+    background-color: white;
+    /* height: 74px; */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    border-bottom: solid 1px #e6e6e6;
+}
+
+.PageHeadRow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+    width: 100%;
+    margin: auto;
+    padding: 0 30px;
+    max-width: 1008px
+    // margin: 0 0 0 20px;
+}
+
+.Title {
+    font-size: 25px;
+    font-weight: bold;
+    color: #3e3e3e;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.CreateButton {
+    text-decoration: none;
+    background-color: #08b60b;
+    border: 1px solid #069108;
+    color: #fff;
+    padding: 7px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: -1px 2px 4px 0px rgba(0, 0, 0, 0.16), inset 0px -2px 7px 0px rgba(0, 0, 0, 0.1),
+        inset 0px 2px 0px 0px rgba(255, 255, 255, 0.3);
+    font-size: 0.9em;
+    user-select: none;
+}
+
+.CreateButton:hover {
+    color: white;
+    background-color: #10c010;
+}
+
+.Content-courses {
+    box-sizing: border-box;
+    background: transparent;
+    margin: auto;
+    padding: 20px 30px;
+    width: 100%;
+    max-width: 1008px;
+}
+
+.ContainerMain-courses {
+    width: 960px;
+    max-width: 100%;
+    height: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+}
+
+.RightColumn-courses {
+    height: 100%;
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.CourseCard {
+    width: 200px;
+    height: 100px;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.08) 0 1px 2px;
+    border: 1px solid #e4e4e4;
+    border-radius: 10px;
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    text-decoration: none;
+    color: #3e3e3e;
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.CourseCard:hover {
+    box-shadow: rgba(0, 0, 0, 0.3) 0 1px 2px;
+}
+
+.CourseCardPlaceHolder {
+    width: 200px;
+    height: 100px;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.08) 0 1px 2px;
+    border: 1px solid #e4e4e4;
+    border-radius: 10px;
+    margin: 20px;
+    box-sizing: border-box;
+    background-color: #ccc;
+    animation-name: shine;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-direction: alternate;
+}
+
+@keyframes shine {
+    from {
+        transition: none;
+    }
+
+    to {
+        background-color: #dedede;
+        transition: all 0.3s ease-out;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .Content-courses {
+        padding-top: 10px;
+    }
+
+    .CourseCard {
+        width: 80%;
+        margin: 10px 20px;
+    }
+}
+.wrapCourseCreate{
+    width: 50%;
+    margin: auto;
+    margin-top: 20px;
+    background-color: white;
+    padding: 40px 40px;
+}
+.createCourse{
+    border-radius: 6px;
+}
+.spin{
+    margin: auto;
+}
+.create-search{
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
+.imgCourse{
+    height: 250px
+}
+.loadmore_wrap{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+.btn-load:hover, .btn-load:focus{
+    border-color: $primaryColor;
+    color: $primaryColor;
+}
+.tabbar-form{
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+}
+.tabbar-form .ant-form-item{
+    margin: 0px !important;
+}

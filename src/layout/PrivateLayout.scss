@@ -1,5 +1,5 @@
 $primaryColor: #2b3648;
-$primaryTextColor: #d7bdff;
+$primaryTextColor: #caa7ff;
 
 .Header {
     background-color: $primaryColor;
@@ -35,16 +35,16 @@ $primaryTextColor: #d7bdff;
 }
 
 .LogoWrapper {
-    width: 80px;
-    min-width: 80px;
+    width: 50px;
+    min-width: 50px;
     align-items: center;
     display: flex;
     margin-right: 24px;
-    background-image: url('../assets/img/logoMemo.png');
+    background-image: url('../assets/img/logoIcon.PNG');
     background-position: 0% 100%;
     background-size: 100% auto;
     background-repeat: no-repeat;
-    height: 60px;
+    height: 44px;
     fill: white;
 }
 
@@ -134,9 +134,9 @@ $primaryTextColor: #d7bdff;
 
 .avatar-swap {
     display: flex;
-    justify-content: space-between;
+    justify-content: end;
     align-items: center;
-    width: 126px;
+    // width: 126px;
 }
 
 .badge-up {

@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink, useHistory } from 'react-router-dom'
+import { NavLink, Redirect, useHistory } from 'react-router-dom'
 import './HomeWelcome.scss'
 import PrivateLayout from '../../layout/PrivateLayout'
-import { USER_LOGIN } from '../../config/path'
+import { HOME_PATH, USER_LOGIN } from '../../config/path'
 
 const HomeWelcome = () => {
   const { t } = useTranslation("common");
-
-  const history = useHistory();
   return (
     <PrivateLayout>
       <div className="wrapper">

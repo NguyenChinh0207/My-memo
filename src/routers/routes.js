@@ -1,11 +1,13 @@
 import {
-    USER_LOGIN,
-    USER_FORGOT_PASSWORD,
-    DASHBOARD_PATH,
-    HOME_PATH,
-    COURSES_PATH,
-    USER_REGISTER,
-} from '../config/path'
+  USER_LOGIN,
+  USER_FORGOT_PASSWORD,
+  DASHBOARD_PATH,
+  HOME_PATH,
+  COURSES_PATH,
+  USER_REGISTER,
+  COURSE_CREATE_PATH,
+  COURSE_DETAIL_PATH,
+} from "../config/path";
 
 const routes = [
   {
@@ -13,45 +15,57 @@ const routes = [
     exact: true,
     isPrivate: false,
     component: import("../containers/auth/Login"),
-    restricted: true,
+    // restricted: false,
   },
   {
     path: USER_REGISTER,
     exact: true,
     isPrivate: false,
     component: import("../containers/auth/Signup"),
-    restricted: true,
+    // restricted: true,
   },
   {
     path: USER_FORGOT_PASSWORD,
     exact: true,
     isPrivate: false,
     component: import("../containers/auth/ForgotPassword"),
-    restricted: false,
+    // restricted: true,
   },
   {
     path: DASHBOARD_PATH,
     exact: true,
     isPrivate: false,
     component: import("../containers/welcome/HomeWelcome"),
-    restricted: false,
+    restricted: true,
   },
   {
     path: HOME_PATH,
     exact: true,
-    // isPrivate: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/home/HomePage"),
     restricted: false,
   },
   {
     path: COURSES_PATH,
     exact: true,
-    // isPrivate: true,
-    isPrivate: false,
-    component: import("../containers/course/Courses"),
+    isPrivate: true,
+    component: import("../containers/courses/Courses"),
+    restricted: false,
+  },
+  {
+    path: COURSE_CREATE_PATH,
+    exact: true,
+    isPrivate: true,
+    component: import("../containers/courses/CreateCourse"),
+    restricted: false,
+  },
+  {
+    path: COURSE_DETAIL_PATH,
+    exact: true,
+    isPrivate: true,
+    component: import("../containers/courses/course/CourseDetail"),
     restricted: false,
   },
 ];
 
-export default routes
+export default routes;

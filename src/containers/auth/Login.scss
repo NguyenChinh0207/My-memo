@@ -82,3 +82,11 @@
 .Error {
   border: 1px solid rgba(255, 0, 0, 0.7);
 }
+.checkbox-rememberme{
+  margin: 0;
+}
+.rememberPassword-wrap .ant-form-item-control-input-content{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
