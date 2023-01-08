@@ -16,4 +16,5 @@ export const COURSES_PATH = `${BASE_PATH}/courses`;
 
 // Course
 export const COURSE_CREATE_PATH = `${COURSES_PATH}/create`;
-export const COURSE_DETAIL_PATH = `${COURSES_PATH}/:courseId/detail`;
+export const COURSE_DETAIL_PATH = `${COURSES_PATH}/:courseId`;
+export const COURSE_EDIT_PATH = `${COURSES_PATH}/:courseId/edit`;

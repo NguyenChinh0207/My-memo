@@ -1,7 +1,7 @@
 import React, { Component, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import styles from './AddWordsRow.module.css';
+import './AddWordsRow.scss';
 import { useTranslation } from 'react-i18next';
 
 const AddWordsRow = (props) => {
@@ -40,48 +40,50 @@ const AddWordsRow = (props) => {
 		}
 	};
 
-		let confirmIconClasses = styles.ConfirmIcon + ' ' + styles.Invisible;
+		let confirmIconClasses ="ConfirmIcon Invisible";
 		if ((word !== '') & (description !== '')) {
-			confirmIconClasses = styles.ConfirmIcon;
+			confirmIconClasses = "ConfirmIcon";
 		}
 		return (
-			<React.Fragment>
-				<div className={styles.RowWrapper}>
-					<div className={styles.Row}>
-						<div className={styles.AddWords}>{t('add_words')}</div>
-					</div>
-				</div>
-				<div className={styles.RowWrapper}>
-					<div className={styles.Row}>
-						<div className={styles.Column}>
-							<input
-								ref={input => {
-									reference.current = input;
-								}}
-								name="word"
-								value={word}
-								onKeyDown={e => onKeyDown(e, true)}
-								onChange={inputChangeWord}
-								className={styles.Input}
-							/>
-						</div>
-						<div className={styles.Column}>
-							<input
-								ref={input => {
-									reference.current = input;
-								}}
-								name="description"
-								value={description}
-								onKeyDown={e => onKeyDown(e, false)}
-								onChange={inputChangeDescription}
-								className={styles.Input}
-							/>
-						</div>
-						<div className={confirmIconClasses} onClick={confirm} />
-					</div>
-				</div>
-			</React.Fragment>
-		);
+      <React.Fragment>
+        <div className="AddWordsRow">
+          <div className="RowWrapper">
+            <div className="Row">
+              <div className="AddWords">{t("add_words")}</div>
+            </div>
+          </div>
+          <div className="RowWrapper">
+            <div className="Row">
+              <div className="Column">
+                <input
+                  ref={(input) => {
+                    reference.current = input;
+                  }}
+                  name="word"
+                  value={word}
+                  onKeyDown={(e) => onKeyDown(e, true)}
+                  onChange={inputChangeWord}
+                  className="Input"
+                />
+              </div>
+              <div className="Column">
+                <input
+                  ref={(input) => {
+                    reference.current = input;
+                  }}
+                  name="description"
+                  value={description}
+                  onKeyDown={(e) => onKeyDown(e, false)}
+                  onChange={inputChangeDescription}
+                  className="Input"
+                />
+              </div>
+              <div className={confirmIconClasses} onClick={confirm} />
+            </div>
+          </div>
+        </div>
+      </React.Fragment>
+    );
 	}
 
 

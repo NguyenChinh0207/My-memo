@@ -7,6 +7,7 @@ import {
   USER_REGISTER,
   COURSE_CREATE_PATH,
   COURSE_DETAIL_PATH,
+  COURSE_EDIT_PATH,
 } from "../config/path";
 
 const routes = [
@@ -64,6 +65,13 @@ const routes = [
     exact: true,
     isPrivate: true,
     component: import("../containers/courses/course/CourseDetail"),
+    restricted: false,
+  },
+  {
+    path: COURSE_EDIT_PATH,
+    exact: true,
+    isPrivate: true,
+    component: import("../containers/courses/course/CourseEdit"),
     restricted: false,
   },
 ];

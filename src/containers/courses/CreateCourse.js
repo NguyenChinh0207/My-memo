@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink, useHistory } from "react-router-dom";
 import "./Courses.scss";
@@ -7,19 +7,32 @@ import {
   COURSES_PATH,
   COURSE_CREATE,
   COURSE_CREATE_PATH,
+  COURSE_EDIT_PATH,
 } from "../../config/path";
 import Layout from "antd/lib/layout/layout";
 import { postAxios } from "../../Http";
 import { API_COURSE_CREATE, API_COURSE_LIST } from "../../config/endpointApi";
-import { Button, Form, Input, notification, Select, Spin } from "antd";
+import {
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  notification,
+  Select,
+  Spin,
+} from "antd";
 import { LANGUAGES } from "../../config/const";
+import { AppContext } from "../../context/AppContext";
+import { bindParams } from "../../config/function";
 
 const CreateCourse = () => {
   const { t } = useTranslation("common");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
+  const { user_info } = useContext(AppContext);
   const languages = LANGUAGES;
   const { TextArea } = Input;
+  const [value, setValue] = useState(false);
 
   const formItemLayout = {
     labelCol: {
@@ -39,12 +52,20 @@ const CreateCourse = () => {
 
   const onFinish = async (data) => {
     setLoading(true);
+    data.owner = user_info?._id;
+    if (value) {
+      data.active = 1;
+    } else {
+      data.active = 0;
+    }
     postAxios(API_COURSE_CREATE, data)
       .then((res) => {
         notification.success({
           message: t("Tạo mới khóa học thành công."),
         });
-        history.push(COURSES_PATH);
+        history.push(
+          bindParams(COURSE_EDIT_PATH, { courseId: res?.data?._id })
+        );
       })
       .catch((error) => {
         notification.error({
@@ -56,7 +77,7 @@ const CreateCourse = () => {
 
   return (
     <PrivateLayout>
-      <Layout style={{ minWidth: "100vh" }}>
+      <Layout style={{ minWidth: "100vh" }} className="Course">
         <div className="PageHead">
           <div className="PageHeadRow">
             <div className="Title">{t("Tạo khóa học")}</div>
@@ -140,6 +161,22 @@ const CreateCourse = () => {
           >
             <TextArea rows={4} />
           </Form.Item>
+          <Form.Item
+            name="active"
+            wrapperCol={{
+              xs: { span: 24, offset: 0 },
+              sm: { span: 18, offset: 6 },
+            }}
+          >
+            <Checkbox
+              defaultChecked={false}
+              checked={value}
+              onChange={() => setValue(!value)}
+            >
+              {t("Công khai")}
+            </Checkbox>
+          </Form.Item>
+
           <Form.Item
             wrapperCol={{
               xs: { span: 24, offset: 0 },

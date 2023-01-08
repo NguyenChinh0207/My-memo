@@ -1,40 +1,35 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-
+import React from "react";
+import { useTranslation } from "react-i18next";
 import "./WordsTable.scss";
 
-const WordsTable = props => {
-	return (
+const WordsTable = (props) => {
+  console.log("in words", typeof props.words, props.words);
+  return (
     <div className="WordsTable">
       <div className="RowWrapper">
         <div className="LanguagesRow">
-          <div className="Column">{props.teaching}</div>
-          <div className="Column">{props.description_language}</div>
+          <div className="Column">{props.language}</div>
+          <div className="Column">{props.my_language}</div>
         </div>
       </div>
-
-      {props.words.map((p, idx) => (
-        <div key={idx} className="RowWrapper">
-          <div className="Row">
-            <div className="Column">{p.word}</div>
-            <div className="Column">{p.description}</div>
-            {props.removeWord && (
-              <div className="RemoveBtn" onClick={() => props.removeWord(p)} />
-            )}
+      {props.words &&
+        props.words.map((p, idx) => (
+          <div key={idx} className="RowWrapper">
+            <div className="Row">
+              <div className="Column">{p.name}</div>
+              <div className="Column">{p.description}</div>
+              {props.removeWord && (
+                <div
+                  className="RemoveBtn"
+                  onClick={() => props.removeWord(p)}
+                />
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
       {props.children}
     </div>
   );
-}
+};
 
 export default WordsTable;
-
-WordsTable.propTypes = {
-	name: PropTypes.string.isRequired,
-	description: PropTypes.string.isRequired,
-	teaching: PropTypes.string.isRequired,
-	description_language: PropTypes.string.isRequired,
-	words: PropTypes.array.isRequired,
-};

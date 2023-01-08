@@ -24,6 +24,7 @@ $primaryTextColor: #caa7ff;
     height: 100%;
     display: flex;
     align-items: center;
+    height: 62px;
 }
 
 .NavRow {
@@ -46,6 +47,12 @@ $primaryTextColor: #caa7ff;
     background-repeat: no-repeat;
     height: 44px;
     fill: white;
+}
+.username{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 85px;
 }
 
 .NavButton {
@@ -134,7 +141,7 @@ $primaryTextColor: #caa7ff;
 
 .avatar-swap {
     display: flex;
-    justify-content: end;
+    justify-content: start;
     align-items: center;
     // width: 126px;
 }

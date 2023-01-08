@@ -11,10 +11,18 @@ import {
   LogoutOutlined,
   NotificationOutlined,
   BellOutlined,
+  FolderOpenOutlined,
 } from "@ant-design/icons";
 import { AppContext } from "../context/AppContext";
 import "./PrivateLayout.scss";
-import { COURSES_PATH, DASHBOARD_PATH, HOME_PATH, USER_LOGIN, USER_REGISTER } from "../config/path";
+import {
+  COURSES_PATH,
+  COURSE_DETAIL_PATH,
+  DASHBOARD_PATH,
+  HOME_PATH,
+  USER_LOGIN,
+  USER_REGISTER,
+} from "../config/path";
 
 const PrivateLayout = (props) => {
   const { children } = props;
@@ -25,7 +33,7 @@ const PrivateLayout = (props) => {
   const [visible, setVisible] = useState(false);
   const [visibleLogout, setVisibleLogout] = useState(false);
   const [visibleNotify, setVisibleNotify] = useState(false);
-
+  console.log("user info", user_info, user_info?.username);
   const locale = getCurrentLanguage();
 
   const handleChangeLanguage = (e) => {
@@ -54,15 +62,22 @@ const PrivateLayout = (props) => {
   );
 
   const menuUser = (
-    <Menu onClick={handleLogout}>
-      <Menu.Item key={"logout"} icon={<LogoutOutlined />}>
+    <Menu>
+      <Menu.Item key={"courseCreated"} icon={<FolderOpenOutlined />}>
+        {t("Khóa học đã tạo")}
+      </Menu.Item>
+      <Menu.Item
+        key={"logout"}
+        icon={<LogoutOutlined />}
+        onClick={handleLogout}
+      >
         {t("logout")}
       </Menu.Item>
     </Menu>
   );
 
   const notifyList = (
-    <Menu onClick={handleLogout}>
+    <Menu>
       <Menu.Item key={"notify"} icon={<NotificationOutlined />}>
         {t("notify")}
       </Menu.Item>
@@ -78,15 +93,15 @@ const PrivateLayout = (props) => {
     );
   };
 
-  const url = `${location.pathname}`;
-
+  const url = `${location.pathname}`.split("/")[2];
+  const urlRouter = `${location.pathname}`;
   let buttons = (
     <>
       <div className="NavRow">
-        <NavButton to={HOME_PATH} isActive={url === HOME_PATH}>
+        <NavButton to={HOME_PATH} isActive={url === "home"}>
           {t("home")}
         </NavButton>
-        <NavButton to={COURSES_PATH} isActive={url === COURSES_PATH}>
+        <NavButton to={COURSES_PATH} isActive={url === "courses"}>
           {t("courses")}
         </NavButton>
         {/* <NavButton to='/groups' isActive={url === 'groups'}>Groups</NavButton> */}
@@ -128,7 +143,10 @@ const PrivateLayout = (props) => {
                 <Avatar width={26} height={26} src={avatar} />
                 <span className="avatar-status-online"></span>
               </div>
-              <span style={{ marginLeft: "4px" }} className="textColor">
+              <span
+                style={{ marginLeft: "4px" }}
+                className="textColor username"
+              >
                 {user_info?.username}
               </span>
             </div>
@@ -137,12 +155,16 @@ const PrivateLayout = (props) => {
       </div>
     </>
   );
-  
-  if (url === USER_LOGIN || url === USER_REGISTER || url === DASHBOARD_PATH) {
+
+  if (
+    urlRouter === USER_LOGIN ||
+    urlRouter === USER_REGISTER ||
+    urlRouter === DASHBOARD_PATH
+  ) {
     const loginBtnActive =
-      url === USER_LOGIN ? "ActiveButtonLoginLogout" : "loginBtn";
+      urlRouter === USER_LOGIN ? "ActiveButtonLoginLogout" : "loginBtn";
     const signUpBtnActive =
-      url === USER_REGISTER ? "ActiveButtonLoginLogout" : "SignUpPurple";
+      urlRouter === USER_REGISTER ? "ActiveButtonLoginLogout" : "SignUpPurple";
 
     buttons = (
       <div className="HeaderRow" style={{ justifyContent: "flex-end" }}>

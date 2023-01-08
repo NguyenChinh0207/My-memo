@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./Login.scss";
 import { useTranslation } from "react-i18next";
 import { NavLink, useHistory } from "react-router-dom";
@@ -6,16 +6,19 @@ import PrivateLayout from "../../layout/PrivateLayout";
 import img from "../../assets/img/space.png";
 import { Button, Checkbox, Col, Form, Input, notification } from "antd";
 import validator from "validator";
-import { API_LOGIN } from "../../config/endpointApi";
+import { API_LOGIN, API_SAVE_USER } from "../../config/endpointApi";
 import { HOME_PATH, USER_FORGOT_PASSWORD } from "../../config/path";
 import { postAxios } from "../../Http";
 import { AUTH_TOKEN, E001, E002 } from "../../config/const";
 import { saveAccessToken, saveUserInfo } from "../../config/function";
+import ReactFacebookLogin from "react-facebook-login";
+import { AppContext } from "../../context/AppContext";
 
 const Login = () => {
   const { t } = useTranslation("login");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
+  const { setUserInfo } = useContext(AppContext);
 
   const onFinish = async (data) => {
     setLoading(true);
@@ -23,6 +26,7 @@ const Login = () => {
       .then((res) => {
         saveAccessToken(res?.accessToken);
         saveUserInfo(res?.data);
+        setUserInfo(res?.data);
         history.push(HOME_PATH);
       })
       .catch((error) => {
@@ -33,6 +37,23 @@ const Login = () => {
           });
       })
       .then(() => setLoading(false));
+  };
+
+  const responseFacebook = (response) => {
+    postAxios(API_SAVE_USER, response)
+      .then((res) => {
+        saveAccessToken(res?.accessToken);
+        saveUserInfo(res?.data);
+        setUserInfo(res?.data);
+        history.push(HOME_PATH);
+      })
+      .catch((error) => {
+        const { response } = error;
+        if (response?.data?.code === E001)
+          notification.error({
+            message: t("Đã có lỗi xảy ra, vui lòng thử lại sau!"),
+          });
+      });
   };
 
   return (
@@ -70,32 +91,16 @@ const Login = () => {
                   whitespace: true,
                   message: t("Đây là thông tin bắt buộc."),
                 },
-                {
-                  validator(_, value) {
-                    if (value.trim()) {
-                      if (
-                        validator.isStrongPassword(value, {
-                          minLength: 8,
-                          minLowercase: 1,
-                          minUppercase: 1,
-                          minNumbers: 1,
-                          minSymbols: 1,
-                        })
-                      ) {
-                        return Promise.resolve();
-                      } else {
-                        return Promise.reject("Mật khẩu chưa đủ mạnh.");
-                      }
-                    }
-                    return Promise.resolve();
-                  },
-                },
               ]}
             >
               <Input.Password placeholder={t("Nhập mật khẩu...")} />
             </Form.Item>
             <Form.Item className="rememberPassword-wrap">
-              <Form.Item name="remember" valuePropName="checked" className="checkbox-rememberme">
+              <Form.Item
+                name="remember"
+                valuePropName="checked"
+                className="checkbox-rememberme"
+              >
                 <Checkbox>{t("Ghi nhớ mật khẩu")}</Checkbox>
               </Form.Item>
               <NavLink className="login-form-forgot" to={USER_FORGOT_PASSWORD}>
@@ -111,6 +116,21 @@ const Login = () => {
               >
                 {t("btn_login")}
               </Button>
+            </Form.Item>
+            <Form.Item>
+              <ReactFacebookLogin
+                appId="906729733674195"
+                autoLoad={true}
+                fields="name,email,picture"
+                callback={responseFacebook}
+                cssClass="my-facebook-button-class"
+                icon="fa-facebook"
+                render={(renderProps) => (
+                  <Button onClick={renderProps.onClick} >
+                    {t("login:login_title")}
+                  </Button>
+                )}
+              />
             </Form.Item>
           </Form>
         </div>

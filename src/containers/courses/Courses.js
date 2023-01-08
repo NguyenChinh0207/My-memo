@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink, useHistory } from "react-router-dom";
 import "./Courses.scss";
@@ -13,6 +13,7 @@ import {
   Card,
   Col,
   Form,
+  Image,
   Input,
   List,
   notification,
@@ -22,10 +23,13 @@ import {
 import { bindParams } from "../../config/function";
 import { SearchOutlined } from "@ant-design/icons";
 import FormItem from "antd/es/form/FormItem";
+import logoCourses from "../../assets/img/logoCourses.png";
+import { AppContext } from "../../context/AppContext";
 
 const Courses = () => {
   const { t } = useTranslation("common");
   const history = useHistory();
+  const { user_info } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [courses, setCourses] = useState([]);
   const [skip, setSkip] = useState(0);
@@ -79,7 +83,7 @@ const Courses = () => {
           <Spin size={"large"} />
         </div>
       ) : (
-        <Layout style={{ minWidth: "100vh" }}>
+        <Layout style={{ minWidth: "100vh" }} className="Course">
           <div className="PageHead">
             <div className="PageHeadRow">
               <div className="Title">{t("Các khóa học")}</div>
@@ -129,6 +133,7 @@ const Courses = () => {
                               })
                             )
                           }
+                          className="card-box"
                         >
                           <Card
                             loading={loading}
@@ -137,14 +142,30 @@ const Courses = () => {
                               <img
                                 className="imgCourse"
                                 alt="example"
-                                src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+                                src={logoCourses}
                               />
                             }
                           >
-                            <Meta
-                              title={item.name}
-                              description={item.description}
-                            />
+                            <div className="detail-wrapper">
+                              <div className="author-box">
+                                <a href="#" className="category">
+                                  {item?.language}
+                                </a>
+                                <span className="author">
+                                  {t("bởi")}{" "}
+                                  <a
+                                    href="#"
+                                    data-role="hovercard"
+                                    data-user-id="2224242"
+                                    data-direction="bottom"
+                                    className="author-link"
+                                  >
+                                    {item?.owner?.username}
+                                  </a>
+                                </span>
+                              </div>
+                              <h3 className="inner">{item?.name}</h3>
+                            </div>
                           </Card>
                         </div>
                       </List.Item>

@@ -52,7 +52,8 @@ export const getUserInfo = () => {
   const data = localStorage.getItem(USER_INFO);
   if (data) {
     try {
-      return JSON.parse(decrypt(data, SECRET_KEY).toString(utf8));
+      const result = JSON.parse(decrypt(data, SECRET_KEY).toString(utf8));
+      return result;
     } catch (e) {}
   }
 };

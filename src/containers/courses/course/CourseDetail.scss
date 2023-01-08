@@ -1,0 +1,154 @@
+.Course-detail{
+    min-width: 100vh;
+    .StartButton {
+        max-width: 210px;
+        text-align: center;
+        text-decoration: none;
+        background-color: #4cd137;
+        color: #fff;
+        padding: 7px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: -1px 2px 4px 0px rgba(0, 0, 0, 0.16), inset 0px -2px 7px 0px rgba(0, 0, 0, 0.1),
+            inset 0px 2px 0px 0px rgba(255, 255, 255, 0.3);
+        font-size: 1em;
+        user-select: none;
+        line-height: 1em;
+    }
+
+    .RemoveButton {
+        max-width: 180px;
+        text-align: center;
+        text-decoration: none;
+        background-color: #ff5253;
+        color: #fff;
+        padding: 7px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: -1px 2px 4px 0px rgba(0, 0, 0, 0.16), inset 0px -2px 7px 0px rgba(0, 0, 0, 0.1),
+            inset 0px 2px 0px 0px rgba(255, 255, 255, 0.3);
+        font-size: 0.9em;
+        user-select: none;
+    }
+
+    .Disabled {
+        cursor: default !important;
+        filter: grayscale(100%) opacity(0.6);
+    }
+
+    .SecondHeader {
+        background-color: white;
+        border-bottom: solid 1px #e6e6e6;
+    }
+
+    .Row {
+        margin: auto;
+        padding: 20px 0px;
+        max-width: 960px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .EditBtn {
+        background-image: linear-gradient(-180deg, #fff 0%, #f4f4f4 100%);
+        border: 1px solid #cdcdcd;
+        font-size: 0.9em;
+        color: #696464;
+        padding: 7px 20px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    .ProgressDiv {
+        margin: 30px auto 30px auto;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        max-width: 950px;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .ProgressBar {
+        margin-top: 15px;
+        border-radius: 4px;
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.06) inset;
+        background-color: #f7f7f7;
+        height: 10px;
+        margin-bottom: 4px;
+    }
+
+    .Progress {
+        height: 100%;
+        border-radius: 4px;
+        background-color: #4cd137;
+    }
+
+    .LearnBtn {
+        margin-top: 15px;
+        max-width: 120px;
+        text-align: center;
+        text-decoration: none;
+        background-color: #4cd137;
+        color: #fff;
+        padding: 7px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: -1px 2px 4px 0px rgba(0, 0, 0, 0.16), inset 0px -2px 7px 0px rgba(0, 0, 0, 0.1),
+            inset 0px 2px 0px 0px rgba(255, 255, 255, 0.3);
+        font-size: 0.9em;
+        user-select: none;
+    }
+
+    .CourseCompleted {
+        margin-top: 5px;
+        color: #83c53d;
+        font-weight: 600;
+        font-size: 0.9em;
+    }
+    .startCourse {
+        width: 200px;
+        border-radius: 5px;
+        margin-top: 15px;
+        /* background-color: yellow; */
+        background-color: #ffc000;
+        color: #2c3445;
+        border: none;
+        font-size: 18px;
+        font-weight: bold;
+        line-height: 18px;
+    }
+
+}
+.wrapCourseCreate {
+    width: 70%;
+    background-color: white;
+    margin-top: 20px;
+        padding: 40px 40px;
+}
+
+.imgCourseEdit{
+    width: 270px;
+    height: 270px;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #fff;
+    // border-radius: 5px;
+}
+.imgWrapper{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 30%;
+    margin-top: 20px;
+        // padding: 40px 40px;
+}
+.formEditInfor{
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 950px;
+    margin: auto;
+}

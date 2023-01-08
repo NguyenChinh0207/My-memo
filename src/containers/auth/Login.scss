@@ -60,7 +60,7 @@
 
 .LoginButton {
   width: 100%;
-    margin-top: 20px;
+    margin-top: 5px;
   color: #fff;
   border: 1px solid #699f30;
   background-color: #83ca38;
@@ -89,4 +89,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.my-facebook-button-class{
+  width: 100%;
+    color: #fff;
+    border: 1px solid #3761b7;
+    background-color: #4267b2;
+    height: 40px;
+    border-radius: 6px;
+}
+
+.my-facebook-button-class i{
+  margin-right: 5px !important;
 }

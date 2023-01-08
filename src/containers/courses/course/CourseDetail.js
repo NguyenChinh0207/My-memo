@@ -1,20 +1,39 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink, useHistory, useParams } from "react-router-dom";
 import "./CourseDetail.scss";
 import PrivateLayout from "../../../layout/PrivateLayout";
-import { COURSE_CREATE_PATH } from "../../../config/path";
+import { COURSE_CREATE_PATH, COURSE_EDIT_PATH } from "../../../config/path";
 import Layout from "antd/lib/layout/layout";
-import { Avatar, Card, Col, Input, List, notification, Row, Spin } from "antd";
-import { API_COURSE_DETAIL } from "../../../config/endpointApi";
+import {
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Input,
+  List,
+  notification,
+  Row,
+  Spin,
+} from "antd";
+import {
+  API_ACTION_MY_COURSE,
+  API_ADD_MY_COURSE,
+  API_COURSE_DETAIL,
+  API_GET_MY_COURSE,
+} from "../../../config/endpointApi";
 import { postAxios } from "../../../Http";
 import QuitCourseModal from "../../../components/quit-course-modal/QuitCourseModal";
 import CourseHead from "../../../components/course/CourseHead/CourseHead";
 import WordsTable from "../../../components/course/WordsTable/WordsTable";
+import { AppContext } from "../../../context/AppContext";
+import { bindParams } from "../../../config/function";
+import useGetMyCourse from "../../../hook/useGetMyCourse";
 
 const ComponentRender = (items) => {
   const { t } = useTranslation("common");
   const history = useHistory();
+  const { user_info } = useContext(AppContext);
   return (
     <>
       <div className="SecondHeader">
@@ -24,19 +43,25 @@ const ComponentRender = (items) => {
               {t("quit_course")}
             </div>
           ) : (
-            <div
+            <Button
               className="StartButton"
               onClick={() => items.updateCourse("add")}
             >
               {t("add_to_my_courses")}
-            </div>
+            </Button>
           )}
           {items.owner && (
             <div
-              onClick={() => history.push(items.courseId + "/edit")}
+              onClick={() =>
+                history.push(
+                  bindParams(COURSE_EDIT_PATH, {
+                    courseId: items.courseId,
+                  })
+                )
+              }
               className="EditBtn"
             >
-              {t("editing")}
+              {t("Chỉnh sửa khóa học")}
             </div>
           )}
         </div>
@@ -67,6 +92,7 @@ const CourseDetail = (props) => {
   const history = useHistory();
   const params = useParams();
   const { courseId } = params;
+  const { user_info } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [course, setCourse] = useState({});
   const [owner, setOwner] = useState(false);
@@ -78,6 +104,8 @@ const CourseDetail = (props) => {
   const [learnBtnClasses, setLearnBtnClasses] = useState("LearnBtn Disabled");
   const [progressWidth, setProgressWidth] = useState();
   const [progress, setProgress] = useState(0);
+  const [myCourses, setMyCourses] = useState([]);
+  const userId = user_info?._id;
 
   useEffect(() => {
     loadCourse();
@@ -85,7 +113,22 @@ const CourseDetail = (props) => {
   }, []);
 
   useEffect(() => {
-    if (course && !loading) {
+    setLoading(true);
+    postAxios(API_GET_MY_COURSE, { userId })
+      .then((res) => {
+        console.log("in my course", res?.data);
+        setMyCourses(res?.data);
+      })
+      .catch((error) => {
+        notification.error({
+          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+        });
+      })
+      .then(() => setLoading(false));
+  }, [userId]);
+
+  useEffect(() => {
+    if (course) {
       setShowElement(true);
       if (added) {
         if (Number(course.totalWords) !== 0) {
@@ -106,10 +149,10 @@ const CourseDetail = (props) => {
     postAxios(API_COURSE_DETAIL, { id: courseId })
       .then((res) => {
         const course = res?.data;
+        const words = course?.words ? JSON.parse(course.words) : [];
         if (course) {
-          const words = course?.words;
-          if (course?.words.length === 0) {
-            course.words = [{ word: "This course is empty", description: "" }];
+          if (words.length === 0) {
+            course.words = [{ word: t("Khóa học trống"), description: "" }];
           } else {
             course.words = words;
           }
@@ -127,20 +170,19 @@ const CourseDetail = (props) => {
   };
 
   const checkIfOwner = (course = course) => {
-    if (course.owner === props.profile.username) {
+    if (course.owner._id === user_info._id) {
       setOwner(true);
     }
   };
 
   const checkIfAdded = () => {
-    if (!props.profile.loading) {
+    if (!loading) {
       setLoading(false);
-      const courses = props.profile.courses;
       let addedWord = false;
       let words = 0;
 
-      if (courses && courses.length !== 0) {
-        for (let c of courses) {
+      if (myCourses && myCourses.length !== 0) {
+        for (let c of myCourses) {
           if (String(c.id) === courseId) {
             addedWord = true;
             words = c.wordsLearned;
@@ -161,22 +203,22 @@ const CourseDetail = (props) => {
   };
 
   const updateCourse = (action) => {
-    // axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
-    // axios.defaults.xsrfCookieName = "csrftoken";
-    // axios.defaults.headers = {
-    //   "Content-Type": "application/json",
-    //   Authorization: `Token ${this.props.token}`,
-    // };
-    // axios
-    //   .post(
-    //     BASE_URL + "profiles-api/" + action + "/" + this.state.courseId + "/"
-    //   )
-    //   .then((res) => {
-    //     this.props.updateProfile();
-    //     if (action === "remove") {
-    //       this.closeModal();
-    //     }
-    //   });
+    setLoading(true);
+    postAxios(`${API_ACTION_MY_COURSE}/${action}`, {
+      courseId: courseId,
+      userId: user_info._id,
+    })
+      .then((res) => {
+        if (action === "remove") {
+          closeModal();
+        }
+      })
+      .catch((error) => {
+        notification.error({
+          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+        });
+      })
+      .then(() => setLoading(false));
   };
 
   const learn = () => {
@@ -202,40 +244,36 @@ const CourseDetail = (props) => {
           <Spin size={"large"} />
         </div>
       ) : (
-        <Layout style={{ minWidth: "100vh" }}>
-          <div className="PageHead">
-            <div className="PageHeadRow">
-              {showElement ? (
-                <div>
-                  {modal && (
-                    <Suspense fallback={null}>
-                      <QuitCourseModal
-                        closeModal={this.closeModal}
-                        quitCourse={() => this.updateCourse("remove")}
-                      />
-                    </Suspense>
-                  )}
-                  <CourseHead {...course} />
-                  <ComponentRender
-                    course={course}
-                    progress={progress}
-                    progressWidth={progressWidth}
-                    learnBtnClasses={learnBtnClasses}
-                    added={added}
-                    owner={owner}
-                    courseId={courseId}
-                    wordsLearned={wordsLearned}
-                    openModal={openModal}
-                    learn={learn}
-                    updateCourse={updateCourse}
+        <Layout className="Course-detail">
+          {showElement ? (
+            <div>
+              {modal && (
+                <Suspense fallback={null}>
+                  <QuitCourseModal
+                    closeModal={closeModal}
+                    quitCourse={() => updateCourse("remove")}
                   />
-                  {/* <WordsTable {...course} /> */}
-                </div>
-              ) : (
-                <CourseHead />
+                </Suspense>
               )}
+              <CourseHead {...course} />
+              <ComponentRender
+                course={course}
+                progress={progress}
+                progressWidth={progressWidth}
+                learnBtnClasses={learnBtnClasses}
+                added={added}
+                owner={owner}
+                courseId={courseId}
+                wordsLearned={wordsLearned}
+                openModal={openModal}
+                learn={learn}
+                updateCourse={updateCourse}
+              />
+              <WordsTable {...course} />
             </div>
-          </div>
+          ) : (
+            <CourseHead />
+          )}
         </Layout>
       )}
     </PrivateLayout>
