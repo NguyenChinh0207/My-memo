@@ -1,4 +1,4 @@
-.LeftColumn {
+.LeftColumnProfile {
     border-radius: 5px;
     box-sizing: border-box;
     background-color: #ddd;
@@ -7,7 +7,7 @@
 }
 
 @media only screen and (max-width: 600px) {
-    .LeftColumn {
+    .LeftColumnProfile {
         margin: 0 auto;
     }
 }

@@ -3,7 +3,7 @@ import Profile from "./Profile";
 import './LeftColumn.scss'
 
 const LeftColumn = (props) => (
-  <div className={"LeftColumn"}>
+  <div className={"LeftColumnProfile"}>
     <Profile {...props.profile} />
   </div>
 );

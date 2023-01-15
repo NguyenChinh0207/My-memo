@@ -1,9 +1,7 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
 import "./WordsTable.scss";
 
 const WordsTable = (props) => {
-  console.log("in words", typeof props.words, props.words);
   return (
     <div className="WordsTable">
       <div className="RowWrapper">

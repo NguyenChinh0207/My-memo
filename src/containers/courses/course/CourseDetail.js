@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { NavLink, useHistory, useParams } from "react-router-dom";
 import "./CourseDetail.scss";
 import PrivateLayout from "../../../layout/PrivateLayout";
-import { COURSE_CREATE_PATH, COURSE_EDIT_PATH } from "../../../config/path";
+import { COURSE_CREATE_PATH, COURSE_EDIT_PATH, COURSE_LEARN_PATH } from "../../../config/path";
 import Layout from "antd/lib/layout/layout";
 import {
   Avatar,
@@ -12,6 +12,7 @@ import {
   Col,
   Input,
   List,
+  Modal,
   notification,
   Row,
   Spin,
@@ -28,64 +29,8 @@ import CourseHead from "../../../components/course/CourseHead/CourseHead";
 import WordsTable from "../../../components/course/WordsTable/WordsTable";
 import { AppContext } from "../../../context/AppContext";
 import { bindParams } from "../../../config/function";
-import useGetMyCourse from "../../../hook/useGetMyCourse";
-
-const ComponentRender = (items) => {
-  const { t } = useTranslation("common");
-  const history = useHistory();
-  const { user_info } = useContext(AppContext);
-  return (
-    <>
-      <div className="SecondHeader">
-        <div className="Row">
-          {items.added ? (
-            <div className="RemoveButton" onClick={items.openModal}>
-              {t("quit_course")}
-            </div>
-          ) : (
-            <Button
-              className="StartButton"
-              onClick={() => items.updateCourse("add")}
-            >
-              {t("add_to_my_courses")}
-            </Button>
-          )}
-          {items.owner && (
-            <div
-              onClick={() =>
-                history.push(
-                  bindParams(COURSE_EDIT_PATH, {
-                    courseId: items.courseId,
-                  })
-                )
-              }
-              className="EditBtn"
-            >
-              {t("Chỉnh sửa khóa học")}
-            </div>
-          )}
-        </div>
-      </div>
-      {items.added && (
-        <div className="ProgressDiv">
-          <div className="WordsLearned">
-            {/* {items.wordsLearned} / {items.course.totalWords} {t("words_learn")} */}
-            {t("words_learn")}
-          </div>
-          <div className="ProgressBar">
-            <div style={items.progressWidth} className="Progress" />
-          </div>
-          {items.progress === 100 && (
-            <div className="CourseCompleted">{t("course_complete")}</div>
-          )}
-          <div onClick={items.learn} className="learnBtnClasses">
-            {t("learn")}
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
+import { ComponentRender } from "./item/ComponentRender";
+import { ExclamationCircleFilled } from "@ant-design/icons";
 
 const CourseDetail = (props) => {
   const { t } = useTranslation("common");
@@ -97,7 +42,6 @@ const CourseDetail = (props) => {
   const [course, setCourse] = useState({});
   const [owner, setOwner] = useState(false);
   const [added, setAdded] = useState(false);
-  const [modal, setModal] = useState(false);
   const [wordsLearned, setWordsLearned] = useState(0);
   const [showElement, setShowElement] = useState(false);
 
@@ -105,19 +49,28 @@ const CourseDetail = (props) => {
   const [progressWidth, setProgressWidth] = useState();
   const [progress, setProgress] = useState(0);
   const [myCourses, setMyCourses] = useState([]);
+  const [loadMyCourses, setLoadMyCourses] = useState(false);
   const userId = user_info?._id;
+  const { confirm } = Modal;
 
   useEffect(() => {
     loadCourse();
-    // checkIfAdded();
+    checkIfAdded();
   }, []);
+
+  useEffect(() => {
+    checkIfAdded();
+    return () => {
+      setLoadMyCourses(false);
+      setLoading(false)
+    }
+  }, [myCourses, loadMyCourses]);
 
   useEffect(() => {
     setLoading(true);
     postAxios(API_GET_MY_COURSE, { userId })
       .then((res) => {
-        console.log("in my course", res?.data);
-        setMyCourses(res?.data);
+        setMyCourses(res?.data?.courses);
       })
       .catch((error) => {
         notification.error({
@@ -125,7 +78,7 @@ const CourseDetail = (props) => {
         });
       })
       .then(() => setLoading(false));
-  }, [userId]);
+  }, [userId, loadMyCourses]);
 
   useEffect(() => {
     if (course) {
@@ -162,6 +115,7 @@ const CourseDetail = (props) => {
         }
       })
       .catch((error) => {
+        console.log("in detail", error);
         notification.error({
           message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
@@ -170,7 +124,7 @@ const CourseDetail = (props) => {
   };
 
   const checkIfOwner = (course = course) => {
-    if (course.owner._id === user_info._id) {
+    if (course?.owner._id === user_info._id) {
       setOwner(true);
     }
   };
@@ -180,38 +134,37 @@ const CourseDetail = (props) => {
       setLoading(false);
       let addedWord = false;
       let words = 0;
-
-      if (myCourses && myCourses.length !== 0) {
+      if (myCourses && myCourses.length > 0) {
         for (let c of myCourses) {
-          if (String(c.id) === courseId) {
+          if (String(c._id) === courseId) {
             addedWord = true;
             words = c.wordsLearned;
           }
         }
       }
-      setAdded(added);
-      setWordsLearned(words);
+      setAdded(addedWord);
+      setWordsLearned(words ? words : 0);
     }
   };
 
   const openModal = () => {
-    setModal(true);
-  };
-
-  const closeModal = () => {
-    setModal(false);
+    confirm({
+      title: `${t("Bạn có chắc chắn muốn rời khỏi khóa học?")}`,
+      icon: <ExclamationCircleFilled />,
+      onOk: () => updateCourse("remove"),
+      onCancel: () => {},
+    });
   };
 
   const updateCourse = (action) => {
     setLoading(true);
+    setLoadMyCourses(false);
     postAxios(`${API_ACTION_MY_COURSE}/${action}`, {
       courseId: courseId,
       userId: user_info._id,
     })
       .then((res) => {
-        if (action === "remove") {
-          closeModal();
-        }
+        setLoadMyCourses(true);
       })
       .catch((error) => {
         notification.error({
@@ -226,7 +179,7 @@ const CourseDetail = (props) => {
       Number(course.totalWords) !== 0 &&
       wordsLearned !== Number(course.totalWords)
     ) {
-      history.push("/learn/" + courseId);
+      history.push(bindParams(COURSE_LEARN_PATH, {courseId: courseId}));
     }
   };
 
@@ -247,14 +200,6 @@ const CourseDetail = (props) => {
         <Layout className="Course-detail">
           {showElement ? (
             <div>
-              {modal && (
-                <Suspense fallback={null}>
-                  <QuitCourseModal
-                    closeModal={closeModal}
-                    quitCourse={() => updateCourse("remove")}
-                  />
-                </Suspense>
-              )}
               <CourseHead {...course} />
               <ComponentRender
                 course={course}

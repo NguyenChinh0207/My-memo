@@ -44,7 +44,7 @@
     .Row {
         margin: auto;
         padding: 20px 0px;
-        max-width: 960px;
+        max-width: 950px;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -89,6 +89,7 @@
     .LearnBtn {
         margin-top: 15px;
         max-width: 120px;
+        line-height: 14px;
         text-align: center;
         text-decoration: none;
         background-color: #4cd137;

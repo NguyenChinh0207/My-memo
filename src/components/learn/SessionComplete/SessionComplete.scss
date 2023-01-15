@@ -1,6 +1,6 @@
 .SessionComplete{
 .Content {
-        padding-top: 180px;
+        padding-top: 122px;
         padding-bottom: 25px;
         display: flex;
         flex-direction: column;
@@ -16,10 +16,11 @@
         max-width: 170px;
         padding: 15px 10px 15px 20px;
         color: #fff;
-        border: 1px solid #aaa;
-        background-color: #bbb;
+        border: 1px solid #40a9ffbd;
+        background-color: #40a9ffbd;
         border-radius: 5px;
         font-weight: bold;
+        align-items: center;
         cursor: pointer;
         user-select: none;
         margin: 20px auto;

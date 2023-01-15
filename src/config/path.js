@@ -18,3 +18,5 @@ export const COURSES_PATH = `${BASE_PATH}/courses`;
 export const COURSE_CREATE_PATH = `${COURSES_PATH}/create`;
 export const COURSE_DETAIL_PATH = `${COURSES_PATH}/:courseId`;
 export const COURSE_EDIT_PATH = `${COURSES_PATH}/:courseId/edit`;
+export const COURSE_LIST_OWNER_PATH = `${COURSES_PATH}/owner`;
+export const COURSE_LEARN_PATH = `${COURSES_PATH}/learn/:courseId`;

@@ -6,7 +6,7 @@ import PrivateLayout from "../../layout/PrivateLayout";
 import img from "../../assets/img/space.png";
 import { Button, Form, Input, notification } from "antd";
 import validator from "validator";
-import { API_REGISTER } from "../../config/endpointApi";
+import { API_POST_PROGRESS, API_REGISTER } from "../../config/endpointApi";
 import { postAxios } from "../../Http";
 import { USER_LOGIN } from "../../config/path";
 import { CODE_EMAIL_ALREADY, CODE_USERNAME_ALREADY } from "../../config/const";
@@ -38,7 +38,13 @@ const Signup = () => {
     }
     setLoading(true);
     postAxios(API_REGISTER, data)
-      .then(() => {
+      .then((res) => {
+        if (res?.data?._id) {
+          postAxios(API_POST_PROGRESS, {
+            progress: "{}",
+            userId: res?.data?._id,
+          });
+        }
         notification.success({
           message: t("Bạn đã đăng kí thành công!"),
         });

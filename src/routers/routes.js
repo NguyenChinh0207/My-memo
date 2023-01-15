@@ -8,6 +8,8 @@ import {
   COURSE_CREATE_PATH,
   COURSE_DETAIL_PATH,
   COURSE_EDIT_PATH,
+  COURSE_LIST_OWNER_PATH,
+  COURSE_LEARN_PATH,
 } from "../config/path";
 
 const routes = [
@@ -54,6 +56,13 @@ const routes = [
     restricted: false,
   },
   {
+    path: COURSE_LIST_OWNER_PATH,
+    exact: true,
+    isPrivate: true,
+    component: import("../containers/courses/CoursesOwner"),
+    restricted: false,
+  },
+  {
     path: COURSE_CREATE_PATH,
     exact: true,
     isPrivate: true,
@@ -72,6 +81,13 @@ const routes = [
     exact: true,
     isPrivate: true,
     component: import("../containers/courses/course/CourseEdit"),
+    restricted: false,
+  },
+  {
+    path: COURSE_LEARN_PATH,
+    exact: true,
+    isPrivate: true,
+    component: import("../containers/learn/Learn"),
     restricted: false,
   },
 ];

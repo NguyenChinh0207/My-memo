@@ -10,19 +10,19 @@ const Header = (props) => {
   return (
     <div className="HeaderLearn">
       <div className="Header">
-        <div className="HeaderRow">
-          <div className="LeftColumn">
+        <div className="HeaderRowLearn">
+          <div className="LeftColumnLearn">
             <div className="LearningIcon" />
           </div>
-          <div className="CenterColumn">
+          <div className="CenterColumnLearn">
             <div className="HeaderText">
               {props.name} - {t("learn_new_words")}
             </div>
-            <div className="ProgressBar">
+            <div className="ProgressBarLearn">
               <div style={progressWidth} className="Progress" />
             </div>
           </div>
-          <div className="RightColumn">
+          <div className="RightColumnLearn">
             <div onClick={props.close} className="CloseButton" />
           </div>
         </div>

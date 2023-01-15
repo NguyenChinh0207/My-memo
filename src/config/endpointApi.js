@@ -4,6 +4,7 @@ export const API_SAVE_USER = `${API_BASE_AUTH}/save/user`;
 export const API_REGISTER = `${API_BASE_AUTH}/register`;
 const API_BASE = `${process.env.REACT_APP_BASE_URL}/api`
 export const API_COURSE_LIST = `${API_BASE}/courses`;
+export const API_COURSE_OWNER_LIST = `${API_BASE}/courses/list/owner`;
 export const API_COURSE_CREATE = `${API_BASE}/courses/create`;
 export const API_COURSE_DETAIL = `${API_COURSE_LIST}/detail`;
 export const API_ACTION_MY_COURSE = `${API_COURSE_LIST}/wishlist`;
@@ -15,3 +16,7 @@ export const API_COURSE_EDIT = `${API_COURSE_LIST}/edit`;
 export const API_CREATE_WORD = `${API_WORD_LIST}/create`;
 export const API_DELETE_WORD = `${API_WORD_LIST}/delete`;
 export const API_UPDATE_WORDS = `${API_WORD_LIST}/update`;
+
+export const API_GET_PROGRESS = `${API_BASE}/progress/detail`;
+export const API_UPDATE_PROGRESS = `${API_BASE}/progress/update`;
+export const API_POST_PROGRESS = `${API_BASE}/progress/create`;

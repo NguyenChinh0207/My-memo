@@ -124,7 +124,7 @@ const Courses = () => {
                     }}
                     dataSource={courses}
                     renderItem={(item) => (
-                      <List.Item key={item.id}>
+                      <List.Item key={item._id}>
                         <div
                           onClick={() =>
                             history.push(

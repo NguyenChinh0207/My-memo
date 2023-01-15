@@ -99,7 +99,6 @@ const CourseEdit = () => {
       words: JSON.stringify(words),
     })
       .then((res) => {
-        console.log();
       })
       .catch((error) => {
         notification.error({
@@ -107,7 +106,7 @@ const CourseEdit = () => {
         });
       });
   };
-  console.log("in tab", tab);
+
   return (
     <PrivateLayout>
       {loading ? (

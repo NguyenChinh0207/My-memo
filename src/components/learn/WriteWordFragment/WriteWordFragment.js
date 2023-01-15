@@ -1,69 +1,72 @@
-import React, { Component, useState } from "react";
+import React, { Component, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import "./WriteWordFragment.scss";
+import { useTranslation } from "react-i18next";
 
 const WriteWordFragment = (props) => {
+  const {t} = useTranslation("common")
   const [inputValue, setInputValue] = useState("");
+  const inputRef = useRef(null);
 
-  // componentDidMount() {
-  // 	this.input.focus();
-  // }
-
-  // componentDidUpdate(prevProps, prevState) {
-  // 	if (this.props.result === 'learning' && this.props.result !== prevProps.result) {
-  // 		this.clearInput();
-  // 	}
-  // }
+  useEffect(() => {
+    inputRef.current.focus();
+  }, [])
+  
+  useEffect(() => {
+    	if (props.result === 'Learning') {
+    		clearInput();
+    	}
+  },[props.result])
 
   const inputChange = event => {
   	setInputValue(event.target.value);
   };
 
   const onKeyDown = e => {
-  	if (e.key === 'Enter' && props.result === 'learning') {
+  	if (e.key === 'Enter' && props.result === 'Learning') {
   		onNext();
   	}
   };
 
   const onNext = () => {
-  	if (props.result === 'learning') {
-  		props.userWrote(this.state.inputValue);
+  	if (props.result === 'Learning') {
+  		props.userWrote(inputValue);
   	}
   };
 
   const clearInput = () => {
-  	// this.input.focus();
+  	inputRef.current.focus();
   	setInputValue('')
   };
 
   let inputClasses = "Input";
 
-  if (this.props.result === "correct") {
+  if (props.result === "Correct") {
     inputClasses += " " + "InputCorrect";
-  } else if (this.props.result === "wrong") {
+  } else if (props.result === "Wrong") {
     inputClasses += " " + "InputWrong";
   }
 
   return (
-    <div className="Content">
-      <div className="Main">
-        <div className="Word">{props.pair.description}</div>
-        {/* {input} */}
-        <input
-          ref={(input) => {
-            this.input = input;
-          }}
-          readOnly={props.result !== "learning"}
-          value={inputValue}
-          onChange={inputChange}
-          onKeyDown={onKeyDown}
-          className={inputClasses}
-        />
-      </div>
-      <div className="RightColumn">
-        <div onClick={onNext} className="NextButton">
-          <div className="RightArrow" />
-          <div>Next</div>
+    <div className="WriteWord">
+      <div className="ContentWriteWord">
+        <div className="Main">
+          <div className="Word">{props.pair.description}</div>
+          {/* {input} */}
+          <input
+            ref={inputRef}
+            readOnly={props.result !== "Learning"}
+            value={inputValue}
+            onChange={inputChange}
+            onKeyDown={onKeyDown}
+            className={inputClasses}
+          />
+        </div>
+        <div className="RightColumnWriteWord">
+          <div onClick={onNext} className="NextButton">
+            <div className="RightArrow" />
+            <div>{t("Tiếp tục")}</div>
+          </div>
         </div>
       </div>
     </div>

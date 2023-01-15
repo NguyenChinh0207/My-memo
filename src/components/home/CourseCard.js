@@ -1,38 +1,38 @@
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import "./CourseCard.scss";
 import img from "../../assets/img/lean.jpg";
-import { COURSE_DETAIL_PATH } from "../../config/path";
+import { COURSE_DETAIL_PATH, COURSE_LEARN_PATH } from "../../config/path";
 import { bindParams } from "../../config/function";
-const QuitCourseModal = React.lazy(() =>
-  import("../quit-course-modal/QuitCourseModal")
-);
+import { ExclamationCircleFilled } from "@ant-design/icons";
+import { Modal } from "antd";
+
 const CourseCard = (props) => {
   const { t } = useTranslation("common");
-  const { loading, course } = props;
-  const [modal, setModal] = useState(false);
+  const { loading, course, courseId } = props;
   const history = useHistory();
+  const {confirm} = Modal
 
   const openModal = () => {
-    setModal(true);
-  };
-
-  const closeModal = () => {
-    setModal(false);
+    confirm({
+      title: `${t("Bạn có chắc chắn muốn rời khỏi khóa học?")}`,
+      icon: <ExclamationCircleFilled />,
+      onOk: () => props.quitCourse(course?._id),
+      onCancel: () => {},
+    });
   };
 
   const learnClick = () => {
+    console.log("in vào đây course card ", course);
     if (Number(course.totalWords) !== 0) {
-      history.push(`/learn/${course.id}`);
+      history.push(bindParams(COURSE_LEARN_PATH, {courseId: courseId}));
     }
   };
 
   if (loading) {
-    return (
-      <div className={"CourseCard LoadingBox"} />
-    );
+    return <div className={"CourseCard LoadingBox"} />;
   } else {
     let progress = 0;
     let nextUpButtonClasses = "NextUpButton Disabled";
@@ -47,25 +47,16 @@ const CourseCard = (props) => {
 
     return (
       <div className={"CourseCard"}>
-        {modal && (
-          <Suspense fallback={null}>
-            <QuitCourseModal
-              closeModal={closeModal}
-              quitCourse={() => quitCourse(course.id)}
-            />
-          </Suspense>
-        )}
         <div className={"CardTop"}>
           <div className={"ImgWrapper"}>
             <img src={img} className={"Image"} alt="" />
           </div>
           <div className={"CardMainContainer"}>
             <div className={"TitleRow"}>
-              "Title"
               <Link
                 className={"CourseTitle"}
                 to={bindParams(COURSE_DETAIL_PATH, {
-                  courseId: course.id,
+                  courseId: courseId,
                 })}
               >
                 {course.name}
@@ -78,7 +69,7 @@ const CourseCard = (props) => {
                       <Link
                         className={"TooltipLink"}
                         to={bindParams(COURSE_DETAIL_PATH, {
-                          courseId: course.id,
+                          courseId: course._id,
                         })}
                       >
                         {t("course_detail")}
@@ -94,13 +85,13 @@ const CourseCard = (props) => {
               </div>
             </div>
             <div className={"WordsLearned"}>
-              {course.wordsLearned}/{course.totalWords} words learned
+              {course.wordsLearned}/{course.totalWords} {t("words_learn")}
             </div>
             <div className={"ProgressBar"}>
               <div style={progressWidth} className={"Progress"} />
             </div>
             {progress === 100 && (
-              <div className={"CourseCompleted"}>Course completed!</div>
+              <div className={"CourseCompleted"}>{t("course_complete")}</div>
             )}
           </div>
         </div>
@@ -108,8 +99,8 @@ const CourseCard = (props) => {
           <div onClick={learnClick} className={nextUpButtonClasses}>
             <div className={"LearnIcon"} />
             <div className={"NextUpLabel"}>
-              <div className={"NextUpText"}>NEXT UP</div>
-              <div>Learn new words</div>
+              <div className={"NextUpText"}>{t("next_up")}</div>
+              <div>{t("learn_new_words")}</div>
             </div>
             <div className={"NextUpArrow"} />
           </div>
@@ -136,11 +127,9 @@ const conditionalCheck = function (props, propName, componentName) {
 CourseCard.propTypes = {
   loading: PropTypes.bool,
   course: conditionalCheck,
-  learn: conditionalCheck,
   quitCourse: conditionalCheck,
 };
 
 CourseCard.defaultProps = {
   loading: false,
 };
-

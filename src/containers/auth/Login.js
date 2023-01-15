@@ -6,7 +6,7 @@ import PrivateLayout from "../../layout/PrivateLayout";
 import img from "../../assets/img/space.png";
 import { Button, Checkbox, Col, Form, Input, notification } from "antd";
 import validator from "validator";
-import { API_LOGIN, API_SAVE_USER } from "../../config/endpointApi";
+import { API_LOGIN, API_POST_PROGRESS, API_SAVE_USER } from "../../config/endpointApi";
 import { HOME_PATH, USER_FORGOT_PASSWORD } from "../../config/path";
 import { postAxios } from "../../Http";
 import { AUTH_TOKEN, E001, E002 } from "../../config/const";
@@ -45,6 +45,12 @@ const Login = () => {
         saveAccessToken(res?.accessToken);
         saveUserInfo(res?.data);
         setUserInfo(res?.data);
+         if (res?.data?._id) {
+           postAxios(API_POST_PROGRESS, {
+             progress: "{}",
+             userId: res.data._id,
+           });
+         }
         history.push(HOME_PATH);
       })
       .catch((error) => {

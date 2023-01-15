@@ -1,283 +1,270 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
 import "./Learn.scss";
-import Spinner from "../../components/Spinner/Spinner";
-import HeaderLearnComponent from "../../components/Learn/Header/Header";
-import Header from "../../components/Header/Header";
-import NewWordFragment from "../../components/Learn/NewWordFragment/NewWordFragment";
-import WriteWordFragment from "../../components/Learn/WriteWordFragment/WriteWordFragment";
-import SessionComplete from "../../components/Learn/SessionComplete/SessionComplete";
-import * as profileActions from "../../store/actions/profile";
-import { BASE_URL } from "../../config/const";
+import HeaderLearnComponent from "../../components/learn/Header/Header";
+import NewWordFragment from "../../components/learn/NewWordFragment/NewWordFragment";
+import WriteWordFragment from "../../components/learn/WriteWordFragment/WriteWordFragment";
+import SessionComplete from "../../components/learn/SessionComplete/SessionComplete";
+import { postAxios } from "../../Http";
+import {
+  API_COURSE_DETAIL,
+  API_GET_PROGRESS,
+  API_UPDATE_PROGRESS,
+} from "../../config/endpointApi";
+import { useHistory, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import PrivateLayout from "../../layout/PrivateLayout";
+import { Layout, notification, Spin } from "antd";
+import { bindParams } from "../../config/function";
+import { COURSE_DETAIL_PATH } from "../../config/path";
+import { AppContext } from "../../context/AppContext";
 
 const GOAL_SCORE = 2;
 const TOTAL_TURNS = 10;
 
-class Learn extends Component {
-  state = {
-    courseId: this.props.match.params.courseId,
-    course: null,
-    loading: true,
-    index: 0,
-    turns: TOTAL_TURNS,
-    result: "learning",
-    progress: null,
-    sessionWords: null,
-    wordsLearned: [],
-    currentWord: null,
-    courseFinished: false,
-  };
+const Learn = () => {
+  const { t } = useTranslation("common");
+  const history = useHistory();
+  const { user_info } = useContext(AppContext);
+  const { courseId } = useParams();
+  const [course, setCourse] = useState();
+  const [loading, setLoading] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [turns, setTurns] = useState(TOTAL_TURNS);
+  const [result, setResult] = useState(t("Learning"));
+  const [progress, setProgress] = useState();
+  const [sessionWords, setSessionWords] = useState();
+  const [wordsLearned, setWordsLearned] = useState([]);
+  const [currentWord, setCurrentWord] = useState();
+  const [courseFinished, setCourseFinished] = useState(false);
+  const [sessionCreated, setSessionCreated] = useState(false);
 
-  componentDidMount() {
-    this.loadCourse();
-    if (!this.props.profile.loading) {
-      this.loadProgress();
+  useEffect(() => {
+    loadCourse();
+    loadProgress();
+  }, []);
+
+  useEffect(() => {
+    if (!sessionCreated && progress && course) {
+      setSessionCreated(true);
+      createLearningSession();
     }
-  }
+  });
 
-  componentDidUpdate(prevProps, prevState) {
-    if (!this.props.profile.loading && prevProps.profile.loading) {
-      this.loadProgress();
-    }
-    if (!this.sessionCreated && this.state.progress && this.state.course) {
-      this.sessionCreated = true;
-      this.createLearningSession();
-    }
-  }
-
-  createLearningSession = (state = this.state) => {
-    const course = state.course;
-    const sessionWords = [];
-    const wordsLearned = [];
-
+  const createLearningSession = () => {
+    const sessionWordsArr = [];
+    const wordsLearnedArr = [];
     for (let pair of course.words) {
-      let score = state.progress.wordsInProgress[pair.word] || 0;
+      let score = progress.wordsInProgress[pair.name] || 0;
       if (score !== GOAL_SCORE) {
         pair.score = score;
-        sessionWords.push(pair);
+        sessionWordsArr.push(pair);
       } else {
-        wordsLearned.push(pair.word);
+        wordsLearnedArr.push(pair.name);
       }
     }
 
-    if (sessionWords.length === 0) {
-      this.props.history.goBack();
+    if (sessionWordsArr.length === 0) {
+      history.goBack();
     } else {
-      const currentWord = sessionWords[0];
-      this.setState({
-        loading: false,
-        wordsLearned: wordsLearned,
-        sessionWords: sessionWords,
-        currentWord: currentWord,
-      });
+      const currentWordData = sessionWordsArr[0];
+      setLoading(false);
+      setWordsLearned(wordsLearnedArr);
+      setCurrentWord(currentWordData);
+      setSessionWords(sessionWordsArr);
     }
   };
 
-  loadProgress = (props = this.props) => {
-    if (!props.profile.loading) {
-      let progress = props.profile.progress[this.state.courseId];
-
-      if (!progress) {
-        progress = { wordsLearned: 0, wordsInProgress: {} };
-      } else {
-        progress = JSON.parse(JSON.stringify(progress));
-      }
-      this.setState({ progress: progress });
-    }
-  };
-
-  loadCourse = () => {
-    axios.defaults.xsrfCookieName = "csrftoken";
-    axios.defaults.xsrfHeaderName = "X-CSRFToken";
-
-    axios
-      .get(BASE_URL + "courses-api/" + this.state.courseId + "/")
+  const loadProgress = () => {
+    setLoading(true);
+    postAxios(API_GET_PROGRESS, { userId: user_info?._id })
       .then((res) => {
-        const course = res.data;
-        course.words = JSON.parse(course.words);
-        if (course.words.length === 0) {
-          this.props.history.goBack();
+        setLoading(false);
+        let data = JSON.parse(res?.data);
+        let progressData = data?.progress[courseId] ? data.progress[courseId]: {};
+        if (Object.keys(progressData).length === 0) {
+          progressData = {
+            wordsLearned: 0,
+            wordsInProgress: {},
+          };
+        } else {
+          progressData = progressData;
+          console.log("in vao day2", progressData);
         }
-        this.setState({
-          course: course,
+        setProgress(progressData);
+      })
+      .catch((error) => {
+        console.log("in ", error);
+        notification.error({
+          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
-      });
+      })
+      .then(() => setLoading(false));
   };
 
-  nextClick = () => {
-    const turns = this.state.turns - 1;
-    if (turns === 0) {
-      this.setState({ turns: 0 });
+  const loadCourse = () => {
+    setLoading(true);
+    postAxios(API_COURSE_DETAIL, { id: courseId })
+      .then((res) => {
+        const course = res?.data;
+        if (course) {
+          setLoading(false);
+          course.words = course.words ? JSON.parse(course.words) : [];
+          if (course.words.length === 0) {
+            history.goBack();
+          }
+          setCourse(course);
+        }
+      })
+      .catch((error) => {
+        notification.error({
+          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+        });
+      })
+      .then(() => setLoading(false));
+  };
+
+  const nextClick = () => {
+    const turnsNumber = turns - 1;
+    if (turnsNumber === 0) {
+      setTurns(0);
     } else {
-      const sessionWords = JSON.parse(JSON.stringify(this.state.sessionWords));
-      sessionWords[this.state.index].score++;
+      const sessionWordsArr = JSON.parse(JSON.stringify(sessionWords));
+      console.log("in sessionWordsArr", sessionWordsArr);
+      sessionWordsArr[index].score++;
       let idx = 0;
-      if (sessionWords.length > 1) {
+      if (sessionWordsArr.length > 1) {
         do {
-          idx = Math.floor(Math.random() * sessionWords.length);
-        } while (idx === this.state.index);
+          idx = Math.floor(Math.random() * sessionWordsArr.length);
+        } while (idx === index);
       }
-      this.setState({
-        turns: turns,
-        index: idx,
-        sessionWords: sessionWords,
-        currentWord: sessionWords[idx],
-      });
+      setTurns(turnsNumber);
+      setIndex(idx);
+      setSessionWords(sessionWordsArr);
+      setCurrentWord(sessionWordsArr[idx]);
     }
   };
 
-  goToCourse = () => {
-    this.props.history.push("/course/" + this.state.courseId);
+  const goToCourse = () => {
+    history.push(bindParams(COURSE_DETAIL_PATH, { courseId: courseId }));
   };
 
-  userWrote = (word) => {
-    let sessionWords = JSON.parse(JSON.stringify(this.state.sessionWords));
-    const wordsLearned = [...this.state.wordsLearned];
-    const currentWord = {
-      word: this.state.currentWord.word,
-      description: this.state.currentWord.description,
-      score: this.state.currentWord.score,
+  const userWrote = (word) => {
+    let sessionWordsArr = JSON.parse(JSON.stringify(sessionWords));
+    const wordsLearnedArr = [...wordsLearned];
+    const currentWordObj = {
+      name: currentWord.name,
+      description: currentWord.description,
+      score: currentWord.score,
     };
 
-    if (currentWord.word === word.trim()) {
-      currentWord.score++;
-      if (currentWord.score === GOAL_SCORE) {
-        wordsLearned.push(currentWord.word);
-        sessionWords.splice(this.state.index, 1);
+    if (currentWordObj.name === word.trim()) {
+      currentWordObj.score++;
+      if (currentWordObj.score === GOAL_SCORE) {
+        wordsLearnedArr.push(currentWordObj.name);
+        sessionWordsArr.splice(index, 1);
       }
-      this.postProgress(sessionWords, wordsLearned);
-      this.setState({
-        result: "correct",
-        sessionWords: sessionWords,
-        wordsLearned: wordsLearned,
-        currentWord: currentWord,
-      });
+      postProgress(sessionWordsArr, wordsLearnedArr);
+      setResult(t("Correct"));
+      setSessionWords(sessionWordsArr);
+      setWordsLearned(wordsLearnedArr);
+      setCurrentWord(currentWordObj);
     } else {
-      sessionWords[this.state.index].score = 0;
-      currentWord.score = 0;
-      this.setState({
-        result: "wrong",
-        sessionWords: sessionWords,
-        currentWord: currentWord,
-      });
+      sessionWordsArr[index].score = 0;
+      currentWordObj.score = 0;
+      setResult(t("Wrong"));
+      setSessionWords(sessionWordsArr);
+      setCurrentWord(currentWordObj);
     }
-    setTimeout(this.setResultToLearning, 1000);
+    setTimeout(setResultToLearning, 500);
   };
 
-  postProgress = (words, wordsLearned) => {
-    let progress = { wordsLearned: 0, wordsInProgress: {} };
+  const postProgress = (words, wordsLearned) => {
+    let progressObj = { wordsLearned: 0, wordsInProgress: {} };
     console.log("in word score", words);
     for (let pair of words) {
-      progress.wordsInProgress[pair.word] = pair.score;
+      progressObj.wordsInProgress[pair.name] = pair.score;
     }
     for (let word of wordsLearned) {
-      progress.wordsInProgress[word] = GOAL_SCORE;
-      progress.wordsLearned++;
+      progressObj.wordsInProgress[word] = GOAL_SCORE;
+      progressObj.wordsLearned++;
     }
-    const profileProgress = JSON.parse(
-      JSON.stringify(this.props.profile.progress)
-    );
-    profileProgress[this.state.courseId] = progress;
+    let profileProgress = JSON.parse(JSON.stringify(progress));
+    console.log("in profile progress", profileProgress);
+    profileProgress[courseId] = progressObj;
+    console.log("in profile progress2", profileProgress);
+    const data = JSON.stringify({ progress: profileProgress });
 
-    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
-    axios.defaults.xsrfCookieName = "csrftoken";
-
-    axios.defaults.headers = {
-      "Content-Type": "application/json",
-      Authorization: "Token " + this.props.token,
-    };
-
-    const progress_json = JSON.stringify(profileProgress);
-
-    axios
-      .put(BASE_URL + "profiles-api/update-progress/", progress_json)
-      .then((res) => this.props.updateProfile());
+    postAxios(API_UPDATE_PROGRESS, {
+      data,
+      userId: user_info?._id,
+    }).then((res) => {loadProgress();});
   };
 
-  setResultToLearning = () => {
-    if (this.state.result === "wrong") {
-      this.setState({ result: "learning" });
+  const setResultToLearning = () => {
+    if (result === t("Wrong")) {
+      setResult(t("Learning"));
     } else {
-      const turns = this.state.turns - 1;
-      const sessionWords = this.state.sessionWords;
-      if (turns === 0) {
-        this.setState({ turns: 0 });
-      } else if (sessionWords.length === 0) {
-        this.setState({ courseFinished: true });
+      const turnsNumber = turns - 1;
+      const sessionWordsArr = sessionWords;
+      if (turnsNumber === 0) {
+        setTurns(0);
+      } else if (sessionWordsArr.length === 0) {
+        setCourseFinished(true);
       } else {
         let idx = 0;
-        if (sessionWords.length > 1) {
+        if (sessionWordsArr.length > 1) {
           do {
-            idx = Math.floor(Math.random() * sessionWords.length);
-          } while (idx === this.state.index);
+            idx = Math.floor(Math.random() * sessionWordsArr.length);
+          } while (idx === index);
         }
-        const currentWord = sessionWords[idx];
-        this.setState({
-          result: "learning",
-          index: idx,
-          turns: turns,
-          currentWord: currentWord,
-        });
+        const currentWordObj = sessionWordsArr[idx];
+        setResult(t("Learning"));
+        setIndex(idx);
+        setTurns(turnsNumber);
+        setCurrentWord(currentWordObj);
       }
     }
   };
 
-  render() {
-    if (this.state.course && !this.state.loading) {
-      const pair = this.state.currentWord;
-      let content = <NewWordFragment next={this.nextClick} {...pair} />;
-      if (this.state.turns === 0 || this.state.courseFinished) {
-        content = (
-          <SessionComplete
-            courseFinished={this.state.courseFinished}
-            home={this.goToCourse}
-          />
-        );
-      } else if (pair.score > 0 || this.state.result === "wrong") {
-        content = (
-          <WriteWordFragment
-            result={this.state.result}
-            userWrote={this.userWrote}
-            pair={pair}
-          />
-        );
-      }
-      return (
-        <React.Fragment>
-          <Header url={this.props.match.url} />
+  if (course && !loading) {
+    const pair = currentWord;
+    let content = <NewWordFragment next={nextClick} {...pair} />;
+    if (turns === 0 || courseFinished) {
+      content = (
+        <SessionComplete courseFinished={courseFinished} home={goToCourse} />
+      );
+    } else if (pair?.score > 0 || result === t("Wrong")) {
+      content = (
+        <WriteWordFragment result={result} userWrote={userWrote} pair={pair} />
+      );
+    }
+    return (
+      <PrivateLayout>
+        <div style={{ minWidth: "100vh" }} className="CourseLearn">
           <HeaderLearnComponent
-            turns={this.state.turns}
+            turns={turns}
             totalTurns={TOTAL_TURNS}
-            close={this.props.history.goBack}
-            name={this.state.course.name}
+            close={() => history.goBack()}
+            name={course.name}
           />
           {content}
-        </React.Fragment>
-      );
-    } else {
-      return (
-        <React.Fragment>
-          <div className={styles.SpinnerWrapper}>
-            <Spinner />
-          </div>
-        </React.Fragment>
-      );
-    }
+        </div>
+      </PrivateLayout>
+    );
+  } else {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        <Spin size={"large"} />
+      </div>
+    );
   }
-}
-
-const mapStateToProps = (state) => {
-  return {
-    profile: state.profile,
-    token: state.auth.token,
-  };
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    updateProfile: () => dispatch(profileActions.profileLoad()),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Learn);
+export default React.memo(Learn);

@@ -18,6 +18,7 @@ import "./PrivateLayout.scss";
 import {
   COURSES_PATH,
   COURSE_DETAIL_PATH,
+  COURSE_LIST_OWNER_PATH,
   DASHBOARD_PATH,
   HOME_PATH,
   USER_LOGIN,
@@ -33,7 +34,7 @@ const PrivateLayout = (props) => {
   const [visible, setVisible] = useState(false);
   const [visibleLogout, setVisibleLogout] = useState(false);
   const [visibleNotify, setVisibleNotify] = useState(false);
-  console.log("user info", user_info, user_info?.username);
+  console.log("user info----------------", user_info?._id);
   const locale = getCurrentLanguage();
 
   const handleChangeLanguage = (e) => {
@@ -50,6 +51,10 @@ const PrivateLayout = (props) => {
     history.push(USER_LOGIN);
   };
 
+  const handleCourses = () => {
+    history.push(COURSE_LIST_OWNER_PATH);
+  };
+
   const menu = (
     <Menu onClick={handleChangeLanguage} selectedKeys={locale}>
       <Menu.Item key={VI}>
@@ -63,7 +68,11 @@ const PrivateLayout = (props) => {
 
   const menuUser = (
     <Menu>
-      <Menu.Item key={"courseCreated"} icon={<FolderOpenOutlined />}>
+      <Menu.Item
+        key={"courseCreated"}
+        icon={<FolderOpenOutlined />}
+        onClick={handleCourses}
+      >
         {t("Khóa học đã tạo")}
       </Menu.Item>
       <Menu.Item
@@ -201,7 +210,7 @@ const PrivateLayout = (props) => {
   }
 
   return (
-    <Layout style={{ minWidth: "100vh" }}>
+    <Layout style={{ minWidth: "100vh" }} className="PrivateLayout">
       <div className="Header">
         <div className="HeaderWrap">
           <div className="HeaderRow">
