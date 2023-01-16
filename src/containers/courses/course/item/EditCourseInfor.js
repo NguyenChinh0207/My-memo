@@ -196,10 +196,10 @@ const EditCourseInfor = (props) => {
       </Form>
       <div className="imgWrapper">
         <Image className="imgCourseEdit" alt="example" src={logoCourses} />
-        {/* <Button style={{ marginTop: "15px" }}>
+        <Button style={{ marginTop: "15px" }}>
           <UploadOutlined />
           {t("Tải ảnh lên")}
-        </Button> */}
+        </Button>
       </div>
     </div>
   );

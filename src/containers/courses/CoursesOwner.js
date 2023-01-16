@@ -105,8 +105,8 @@ const CoursesOwner = () => {
         grid={{
           gutter: 16,
           xs: 1,
-          sm: 3,
-          md: 4,
+          sm: 2,
+          md: 3,
           lg: 4,
           xl: 4,
           xxl: 4,

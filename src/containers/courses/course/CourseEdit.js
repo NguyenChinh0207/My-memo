@@ -31,6 +31,7 @@ import EditingNavBar from "../../../components/EditCourse/EditingNavBar/EditingN
 import AddWordsRow from "../../../components/EditCourse/AddWordsRow/AddWordsRow";
 import { bindParams } from "../../../config/function";
 import EditCourseInfor from "./item/EditCourseInfor";
+import QuestionExams from "./item/QuestionExams";
 
 const CourseEdit = () => {
   const { t } = useTranslation("common");
@@ -139,6 +140,7 @@ const CourseEdit = () => {
             </WordsTable>
           )}
           {tab === "1" && <EditCourseInfor course={course} />}
+          {tab === "2" && <QuestionExams course={course} />}
         </Layout>
       )}
     </PrivateLayout>

@@ -25,7 +25,6 @@ const CourseCard = (props) => {
   };
 
   const learnClick = () => {
-    console.log("in vào đây course card ", course);
     if (Number(course.totalWords) !== 0) {
       history.push(bindParams(COURSE_LEARN_PATH, {courseId: courseId}));
     }
@@ -85,7 +84,7 @@ const CourseCard = (props) => {
               </div>
             </div>
             <div className={"WordsLearned"}>
-              {course.wordsLearned}/{course.totalWords} {t("words_learn")}
+              {course.wordsLearned}0/{course.totalWords} {t("words_learn")}
             </div>
             <div className={"ProgressBar"}>
               <div style={progressWidth} className={"Progress"} />

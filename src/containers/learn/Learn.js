@@ -88,12 +88,10 @@ const Learn = () => {
           };
         } else {
           progressData = progressData;
-          console.log("in vao day2", progressData);
         }
         setProgress(progressData);
       })
       .catch((error) => {
-        console.log("in ", error);
         notification.error({
           message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
@@ -129,7 +127,6 @@ const Learn = () => {
       setTurns(0);
     } else {
       const sessionWordsArr = JSON.parse(JSON.stringify(sessionWords));
-      console.log("in sessionWordsArr", sessionWordsArr);
       sessionWordsArr[index].score++;
       let idx = 0;
       if (sessionWordsArr.length > 1) {
@@ -180,7 +177,6 @@ const Learn = () => {
 
   const postProgress = (words, wordsLearned) => {
     let progressObj = { wordsLearned: 0, wordsInProgress: {} };
-    console.log("in word score", words);
     for (let pair of words) {
       progressObj.wordsInProgress[pair.name] = pair.score;
     }
@@ -189,9 +185,7 @@ const Learn = () => {
       progressObj.wordsLearned++;
     }
     let profileProgress = JSON.parse(JSON.stringify(progress));
-    console.log("in profile progress", profileProgress);
     profileProgress[courseId] = progressObj;
-    console.log("in profile progress2", profileProgress);
     const data = JSON.stringify({ progress: profileProgress });
 
     postAxios(API_UPDATE_PROGRESS, {

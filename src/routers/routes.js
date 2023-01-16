@@ -10,6 +10,8 @@ import {
   COURSE_EDIT_PATH,
   COURSE_LIST_OWNER_PATH,
   COURSE_LEARN_PATH,
+  GROUPS_PATH,
+  EXAM_EDIT_PATH,
 } from "../config/path";
 
 const routes = [
@@ -88,6 +90,20 @@ const routes = [
     exact: true,
     isPrivate: true,
     component: import("../containers/learn/Learn"),
+    restricted: false,
+  },
+  {
+    path: EXAM_EDIT_PATH,
+    exact: true,
+    isPrivate: true,
+    component: import("../containers/exams/ExamEdit"),
+    restricted: false,
+  },
+  {
+    path: GROUPS_PATH,
+    exact: true,
+    isPrivate: true,
+    component: import("../containers/groups/GroupList"),
     restricted: false,
   },
 ];

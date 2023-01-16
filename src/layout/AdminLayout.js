@@ -1,9 +1,9 @@
 import React, { useState, useContext } from "react";
-import { Layout, Menu, Avatar, Space, Dropdown, Tooltip } from "antd";
+import { Layout, Menu, Avatar, Space, Dropdown } from "antd";
 import { IconEng, IconVi } from "../common/Icon/Icon";
 import { NavLink, useHistory, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AUTH_TOKEN, EN, KEY_LANGUAGE, USER_INFO, VI } from "../config/const";
+import { AUTH_TOKEN, EN, KEY_LANGUAGE, ROLE_ADMIN, USER_INFO, VI } from "../config/const";
 import { getCurrentLanguage } from "../config/function";
 import i18n from "i18next";
 import avatar from "../assets/img/avatar.png";
@@ -20,13 +20,13 @@ import {
   COURSE_DETAIL_PATH,
   COURSE_LIST_OWNER_PATH,
   DASHBOARD_PATH,
-  GROUPS_PATH,
   HOME_PATH,
   USER_LOGIN,
   USER_REGISTER,
 } from "../config/path";
+import Sider from "antd/lib/layout/Sider";
 
-const PrivateLayout = (props) => {
+const AdminLayout = (props) => {
   const { children } = props;
   const { handleSelectLanguage, user_info } = useContext(AppContext);
   const history = useHistory();
@@ -35,7 +35,6 @@ const PrivateLayout = (props) => {
   const [visible, setVisible] = useState(false);
   const [visibleLogout, setVisibleLogout] = useState(false);
   const [visibleNotify, setVisibleNotify] = useState(false);
-  console.log("user info----------------", user_info?._id);
   const locale = getCurrentLanguage();
 
   const handleChangeLanguage = (e) => {
@@ -114,9 +113,7 @@ const PrivateLayout = (props) => {
         <NavButton to={COURSES_PATH} isActive={url === "courses"}>
           {t("courses")}
         </NavButton>
-        <NavButton to={GROUPS_PATH} isActive={url === "groups"}>
-          {t("Các nhóm")}
-        </NavButton>
+        {/* <NavButton to='/groups' isActive={url === 'groups'}>Groups</NavButton> */}
       </div>
       <div>
         <Space size={"large"}>
@@ -155,18 +152,12 @@ const PrivateLayout = (props) => {
                 <Avatar width={26} height={26} src={avatar} />
                 <span className="avatar-status-online"></span>
               </div>
-              <Tooltip
-                title={user_info?.username}
-                color={"#c5c4c4"}
-                placement="right"
+              <span
+                style={{ marginLeft: "4px" }}
+                className="textColor username"
               >
-                <span
-                  style={{ marginLeft: "4px" }}
-                  className="textColor username"
-                >
-                  {user_info?.username}
-                </span>
-              </Tooltip>
+                {user_info?.username}
+              </span>
             </div>
           </Dropdown>
         </Space>
@@ -219,27 +210,123 @@ const PrivateLayout = (props) => {
   }
 
   return (
-    <Layout style={{ minWidth: "100vh" }} className="PrivateLayout">
-      <div className="Header">
-        <div className="HeaderWrap">
-          <div className="HeaderRow">
-            <NavLink to={HOME_PATH} className="LogoWrapper" />
-            {buttons}
-          </div>
-        </div>
-      </div>
-      <Layout.Content style={{ marginTop: 62, minHeight: "100vh" }}>
-        {children}
-      </Layout.Content>
-      <Layout.Footer
-        style={{
-          textAlign: "center",
-        }}
+    <Layout style={{ minHeight: "100vh" }}>
+      <Sider
+        theme={"dark"}
+        breakpoint="lg"
+        collapsedWidth="0"
+        width={272}
+        defaultCollapsed={window.innerWidth < "992"}
       >
-        My memo ©2022 Created by Chinh Nguyen
-      </Layout.Footer>
+        <div
+          className="logo"
+        >
+          image
+        </div>
+        {role === ROLE_ADMIN ? (
+          <Menu
+            defaultSelectedKeys={[
+              `/${location.pathname.split("/")[1]}/${
+                location.pathname.split("/")[2]
+              }`,
+            ]}
+            mode="inline"
+          >
+            {menus.map((item) => (
+              <Menu.Item key={item.key}>
+                <NavLink to={item.key}>{item.name}</NavLink>
+              </Menu.Item>
+            ))}
+          </Menu>
+        ) : (
+          <Menu
+            defaultSelectedKeys={[
+              `/${location.pathname.split("/")[1]}/${
+                location.pathname.split("/")[2]
+              }`,
+            ]}
+            mode="inline"
+            defaultOpenKeys={defaultOpenKeys}
+            className="main-menu"
+            onOpenChange={(openKeys) => setOpenMenus(openKeys)}
+          >
+            {menus.map((menu) => {
+              return (
+                <SubMenu key={menu.key} icon={menu.icon} title={menu.name}>
+                  {menu.children.map((item) => {
+                    const linkSplitted = item.key.split("/");
+                    return (
+                      <Menu.Item
+                        key={[
+                          linkSplitted[0],
+                          linkSplitted[1],
+                          linkSplitted[2],
+                        ].join("/")}
+                      >
+                        <NavLink to={item.key}>{item.name}</NavLink>
+                      </Menu.Item>
+                    );
+                  })}
+                </SubMenu>
+              );
+            })}
+          </Menu>
+        )}
+      </Sider>
+
+      <Layout className="site-layout">
+        {role && (
+          <Layout.Header className="site-layout-header">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <Breadcrumb style={{ margin: "16px 0" }}>
+                  {breadcrumbs.map((item, key) => (
+                    <Breadcrumb.Item
+                      key={key}
+                      className={
+                        key === breadcrumbs.length - 2
+                          ? "breadcrumb-separator-before-last"
+                          : ""
+                      }
+                    >
+                      {item}
+                    </Breadcrumb.Item>
+                  ))}
+                </Breadcrumb>
+              </div>
+              <div>
+                <Space size={"large"}>
+                  <Dropdown
+                    overlay={menu}
+                    trigger={["click"]}
+                    onVisibleChange={(flag) => setVisible(flag)}
+                    visible={visible}
+                  >
+                    <Avatar src={locale === VI ? <IconVi /> : <IconEng />} />
+                  </Dropdown>
+                  <Dropdown
+                    overlay={menuUser}
+                    trigger={["click"]}
+                    onVisibleChange={(flag) => setVisibleLogout(flag)}
+                    visible={visibleLogout}
+                  >
+                    <Avatar width={30} height={30} src={avatar} />
+                  </Dropdown>
+                </Space>
+              </div>
+            </div>
+          </Layout.Header>
+        )}
+        <Layout.Content style={{ margin: 16 }}>{children}</Layout.Content>
+      </Layout>
     </Layout>
   );
 };
 
-export default PrivateLayout;
+export default AdminLayout;

@@ -115,7 +115,6 @@ const CourseDetail = (props) => {
         }
       })
       .catch((error) => {
-        console.log("in detail", error);
         notification.error({
           message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });

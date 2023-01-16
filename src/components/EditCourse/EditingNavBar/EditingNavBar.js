@@ -10,7 +10,7 @@ const EditingNavBar = (props) => {
   const [loading, setLoading] = useState(false);
   const { setTab } = props;
 
-  const data = [{ title: "Từ" }, { title: "Chi tiết" }];
+  const data = [{ title: "Từ" }, { title: "Chi tiết" }, {title: "Bộ câu hỏi trắc nghiệm"}];
 
   const handleTabChange = (tab) => {
     setTab(tab);
