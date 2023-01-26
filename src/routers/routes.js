@@ -102,17 +102,17 @@ const routes = [
     restricted: false,
   },
   {
-    path: EXAM_DETAIL_PATH,
-    exact: true,
-    isPrivate: true,
-    component: import("../containers/exams/ExamDetail"),
-    restricted: false,
-  },
-  {
     path: EXAM_ONLINE_PATH,
     exact: true,
     isPrivate: true,
     component: import("../containers/exams/ExamOnline"),
+    restricted: false,
+  },
+  {
+    path: EXAM_DETAIL_PATH,
+    exact: true,
+    isPrivate: true,
+    component: import("../containers/exams/ExamDetail"),
     restricted: false,
   },
   {

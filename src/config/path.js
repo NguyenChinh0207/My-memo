@@ -27,4 +27,4 @@ export const COURSE_LEARN_PATH = `${COURSES_PATH}/learn/:courseId`;
 // Exam
 export const EXAM_DETAIL_PATH = `${EXAMS_PATH}/:examId`;
 export const EXAM_EDIT_PATH = `${EXAMS_PATH}/:examId/edit`;
-export const EXAM_ONLINE_PATH = `${BASE_PATH}/exam/online`;
+export const EXAM_ONLINE_PATH = `${EXAMS_PATH}/online`;

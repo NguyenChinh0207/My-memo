@@ -66,7 +66,13 @@ const CourseHead = (props) => {
                         <Button
                           type="default"
                           className="examBtn"
-                          onClick={() => history.push(EXAM_ONLINE_PATH)}
+                          onClick={() =>
+                            history.push(
+                              bindParams(EXAM_ONLINE_PATH, {
+                                courseId: props._id,
+                              })
+                            )
+                          }
                         >
                           {t("Kiểm tra trắc nghiệm")}
                         </Button>
