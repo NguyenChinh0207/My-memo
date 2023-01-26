@@ -2,18 +2,74 @@ import { notification } from "antd";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { API_COURSE_DETAIL, API_GET_MY_COURSE } from "../config/endpointApi";
+import { getUserInfo } from "../config/function";
 import { postAxios } from "../Http";
 
-const useGetMyCourse = (userId) => {
+const useGetMyCourse = (loadMyCourses = false) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [myCourses, setMyCourses] = useState([]);
   const { t } = useTranslation("common");
+  const userId = getUserInfo()?._id;
+  const [myCourses, setMyCourses] = useState([]);
+  const [progress, setProgress] = useState();
+  const [level, setLevel] = useState(1);
+  const [points, setPoints] = useState(0);
+  const [wordsLearned, setWordsLearned] = useState(0);
 
   useEffect(() => {
     setIsLoading(true);
+    loadData();
+  }, [userId]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    if (loadMyCourses) {
+      loadData();
+    }
+  }, [loadMyCourses]);
+
+  const loadData = () => {
     postAxios(API_GET_MY_COURSE, { userId })
       .then((res) => {
-        setMyCourses(res?.data);
+        if (res.data) {
+          const obj = res.data;
+          const courses = obj.courses;
+          let progress = {};
+          if (obj.progress !== "") {
+            try {
+              progress = JSON.parse(obj.progress);
+            } catch (e) {
+              progress = {};
+            }
+          }
+          let totalWordsLearned = 0;
+          const coursesF = [];
+          for (let c of courses) {
+            const words = c?.words ? JSON.parse(c.words) : [];
+            const totalWords = words.length;
+            let wordsLearned = 0;
+            if (progress?.[c._id]) {
+              wordsLearned = progress[c._id].wordsLearned;
+            }
+            if (wordsLearned > totalWords) {
+              wordsLearned = totalWords;
+            }
+            const course = {
+              _id: c._id,
+              name: c.name,
+              wordsLearned: wordsLearned,
+              totalWords: totalWords,
+            };
+            coursesF.push(course);
+            totalWordsLearned += wordsLearned;
+          }
+          const level = 1;
+          const points = totalWordsLearned * 100;
+          setMyCourses(coursesF);
+          setLevel(level);
+          setPoints(points);
+          setProgress(progress);
+          setWordsLearned(totalWordsLearned);
+        }
       })
       .catch((error) => {
         notification.error({
@@ -21,8 +77,9 @@ const useGetMyCourse = (userId) => {
         });
       })
       .then(() => setIsLoading(false));
-  }, [userId]);
+  };
 
-  return [isLoading, myCourses];
+  const data = { myCourses, progress, wordsLearned, level, points };
+  return [isLoading, data];
 };
 export default useGetMyCourse;

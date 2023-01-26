@@ -52,7 +52,7 @@ const Signup = () => {
       })
       .catch((error) => {
         const { response } = error;
-        if (response?.data?.code === CODE_USERNAME_ALREADY )
+        if (response?.data?.code === CODE_USERNAME_ALREADY)
           notification.error({
             message: t("Tên đăng nhập đã được sử dụng."),
           });

@@ -7,16 +7,16 @@ import SessionComplete from "../../components/learn/SessionComplete/SessionCompl
 import { postAxios } from "../../Http";
 import {
   API_COURSE_DETAIL,
-  API_GET_PROGRESS,
   API_UPDATE_PROGRESS,
 } from "../../config/endpointApi";
 import { useHistory, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import PrivateLayout from "../../layout/PrivateLayout";
-import { Layout, notification, Spin } from "antd";
+import { notification, Spin } from "antd";
 import { bindParams } from "../../config/function";
 import { COURSE_DETAIL_PATH } from "../../config/path";
 import { AppContext } from "../../context/AppContext";
+import useGetMyCourse from "../../hook/useGetMyCourse";
 
 const GOAL_SCORE = 2;
 const TOTAL_TURNS = 10;
@@ -30,27 +30,35 @@ const Learn = () => {
   const [loading, setLoading] = useState(false);
   const [index, setIndex] = useState(0);
   const [turns, setTurns] = useState(TOTAL_TURNS);
-  const [result, setResult] = useState(t("Learning"));
+  const [resultStr, setResultStr] = useState(t("Learning"));
   const [progress, setProgress] = useState();
   const [sessionWords, setSessionWords] = useState();
   const [wordsLearned, setWordsLearned] = useState([]);
   const [currentWord, setCurrentWord] = useState();
   const [courseFinished, setCourseFinished] = useState(false);
-  const [sessionCreated, setSessionCreated] = useState(false);
+  // const [sessionCreated, setSessionCreated] = useState(false);
+  const [loadMyCourses, setLoadMyCourses] = useState(false);
+  const [isLoading, data] = useGetMyCourse(loadMyCourses);
 
   useEffect(() => {
     loadCourse();
-    loadProgress();
+    if (!isLoading) {
+      loadProgress();
+    }
   }, []);
 
   useEffect(() => {
-    if (!sessionCreated && progress && course) {
-      setSessionCreated(true);
+    loadProgress();
+  }, [data.progress?.[courseId]]);
+
+  useEffect(() => {
+    if (progress && course) {
       createLearningSession();
     }
-  });
+  }, [progress, course]);
 
   const createLearningSession = () => {
+    console.log("in tạo learning ", progress);
     const sessionWordsArr = [];
     const wordsLearnedArr = [];
     for (let pair of course.words) {
@@ -60,9 +68,10 @@ const Learn = () => {
         sessionWordsArr.push(pair);
       } else {
         wordsLearnedArr.push(pair.name);
+        console.log("in wordsLearnedArr", wordsLearnedArr);
       }
     }
-
+    console.log("in wordsLearnedArr 0", wordsLearnedArr);
     if (sessionWordsArr.length === 0) {
       history.goBack();
     } else {
@@ -75,28 +84,21 @@ const Learn = () => {
   };
 
   const loadProgress = () => {
-    setLoading(true);
-    postAxios(API_GET_PROGRESS, { userId: user_info?._id })
-      .then((res) => {
-        setLoading(false);
-        let data = JSON.parse(res?.data);
-        let progressData = data?.progress[courseId] ? data.progress[courseId]: {};
-        if (Object.keys(progressData).length === 0) {
-          progressData = {
-            wordsLearned: 0,
-            wordsInProgress: {},
-          };
-        } else {
-          progressData = progressData;
-        }
-        setProgress(progressData);
-      })
-      .catch((error) => {
-        notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-        });
-      })
-      .then(() => setLoading(false));
+    if (!isLoading) {
+      let progressData = {};
+      if (data.progress?.[courseId]) {
+        progressData = data.progress?.[courseId];
+      }
+      if (Object.keys(progressData).length === 0) {
+        progressData = {
+          wordsLearned: 0,
+          wordsInProgress: {},
+        };
+      } else {
+        progressData = progressData;
+      }
+      setProgress(progressData);
+    }
   };
 
   const loadCourse = () => {
@@ -127,6 +129,7 @@ const Learn = () => {
       setTurns(0);
     } else {
       const sessionWordsArr = JSON.parse(JSON.stringify(sessionWords));
+      console.log("in next click2", sessionWordsArr[index], index);
       sessionWordsArr[index].score++;
       let idx = 0;
       if (sessionWordsArr.length > 1) {
@@ -160,43 +163,48 @@ const Learn = () => {
         wordsLearnedArr.push(currentWordObj.name);
         sessionWordsArr.splice(index, 1);
       }
+
       postProgress(sessionWordsArr, wordsLearnedArr);
-      setResult(t("Correct"));
+      setResultStr(t("Correct"));
       setSessionWords(sessionWordsArr);
       setWordsLearned(wordsLearnedArr);
       setCurrentWord(currentWordObj);
     } else {
       sessionWordsArr[index].score = 0;
       currentWordObj.score = 0;
-      setResult(t("Wrong"));
+      setResultStr(t("Wrong"));
       setSessionWords(sessionWordsArr);
       setCurrentWord(currentWordObj);
     }
     setTimeout(setResultToLearning, 500);
   };
 
-  const postProgress = (words, wordsLearned) => {
+  const postProgress = (words, wordsLearnedList) => {
+    console.log("wordsLearnedList", wordsLearnedList);
     let progressObj = { wordsLearned: 0, wordsInProgress: {} };
     for (let pair of words) {
       progressObj.wordsInProgress[pair.name] = pair.score;
     }
-    for (let word of wordsLearned) {
+    for (let word of wordsLearnedList) {
       progressObj.wordsInProgress[word] = GOAL_SCORE;
       progressObj.wordsLearned++;
     }
-    let profileProgress = JSON.parse(JSON.stringify(progress));
+    let profileProgress = data.progress;
     profileProgress[courseId] = progressObj;
-    const data = JSON.stringify({ progress: profileProgress });
-
+    const dataParams = JSON.stringify(profileProgress);
+    setLoadMyCourses(false);
     postAxios(API_UPDATE_PROGRESS, {
-      data,
+      data: dataParams,
       userId: user_info?._id,
-    }).then((res) => {loadProgress();});
+    }).then((res) => {
+      setLoadMyCourses(true);
+    });
   };
 
   const setResultToLearning = () => {
-    if (result === t("Wrong")) {
-      setResult(t("Learning"));
+    if (resultStr === t("Wrong")) {
+      console.log("in vao wrong");
+      setResultStr(t("Learning"));
     } else {
       const turnsNumber = turns - 1;
       const sessionWordsArr = sessionWords;
@@ -212,7 +220,7 @@ const Learn = () => {
           } while (idx === index);
         }
         const currentWordObj = sessionWordsArr[idx];
-        setResult(t("Learning"));
+        setResultStr(t("Learning"));
         setIndex(idx);
         setTurns(turnsNumber);
         setCurrentWord(currentWordObj);
@@ -224,12 +232,18 @@ const Learn = () => {
     const pair = currentWord;
     let content = <NewWordFragment next={nextClick} {...pair} />;
     if (turns === 0 || courseFinished) {
+      console.log("in vào turn 0 hoặc course finish");
       content = (
         <SessionComplete courseFinished={courseFinished} home={goToCourse} />
       );
-    } else if (pair?.score > 0 || result === t("Wrong")) {
+    } else if (pair?.score > 0 || resultStr === t("Wrong")) {
+      console.log("in vào writewword");
       content = (
-        <WriteWordFragment result={result} userWrote={userWrote} pair={pair} />
+        <WriteWordFragment
+          result={resultStr}
+          userWrote={userWrote}
+          pair={pair}
+        />
       );
     }
     return (

@@ -4,11 +4,13 @@ import utf8 from "crypto-js/enc-utf8";
 import {
   AUTH_TOKEN,
   DEFAULT_LANGUAGE,
+  FILEBASE64,
   KEY_LANGUAGE,
   SECRET_KEY,
   USER_INFO,
 } from "./const";
 import { getAxios } from "../Http";
+import FileSaver from "file-saver";
 
 // get current language
 export const getCurrentLanguage = () => {
@@ -94,4 +96,25 @@ export const getRole = () =>
 export const fetchList = async (endpoint, params) => {
   const { data } = await getAxios(endpoint, params);
   return data;
+};
+
+export const handleDownload = () => {
+  let sliceSize = 1024;
+  let byteCharacters = window.atob(FILEBASE64);
+  let bytesLength = byteCharacters.length;
+  let slicesCount = Math.ceil(bytesLength / sliceSize);
+  let byteArrays = new Array(slicesCount);
+  for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+    let begin = sliceIndex * sliceSize;
+    let end = Math.min(begin + sliceSize, bytesLength);
+    let bytes = new Array(end - begin);
+    for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
+      bytes[i] = byteCharacters[offset].charCodeAt(0);
+    }
+    byteArrays[sliceIndex] = new Uint8Array(bytes);
+  }
+  FileSaver.saveAs(
+    new Blob(byteArrays, { type: "application/vnd.ms-excel" }),
+    "exam-template.xlsx"
+  );
 };

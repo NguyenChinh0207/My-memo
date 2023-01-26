@@ -1,6 +1,22 @@
 .Exam{
     $primaryColor: #7757a8;
-    
+    .label-upload{
+        cursor: pointer;
+        padding: 5px 20px;
+    }
+    .label-wrap{
+        display: flex;
+        justify-content: space-between;
+        width: 50%;
+    }
+    .labelName{
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .valueName{
+        font-weight: 500;
+        margin-left: 5px;
+    }
         .PageHead {
             background-color: white;
             /* height: 74px; */
@@ -274,11 +290,19 @@
         margin-bottom: 5px;
         width: 200px;
         border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .CreateExam {
         border-radius: 6px;
         width: 120px;
+    }
+    
+    .ExamEdit{
+        border-radius: 6px;
+        width: 150px;
     }
 
     .FormCreate {

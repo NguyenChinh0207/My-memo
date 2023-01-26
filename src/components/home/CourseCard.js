@@ -13,20 +13,20 @@ const CourseCard = (props) => {
   const { t } = useTranslation("common");
   const { loading, course, courseId } = props;
   const history = useHistory();
-  const {confirm} = Modal
+  const { confirm } = Modal;
 
   const openModal = () => {
     confirm({
       title: `${t("Bạn có chắc chắn muốn rời khỏi khóa học?")}`,
       icon: <ExclamationCircleFilled />,
-      onOk: () => props.quitCourse(course?._id),
+      onOk: () => props.quitCourse(courseId),
       onCancel: () => {},
     });
   };
 
   const learnClick = () => {
     if (Number(course.totalWords) !== 0) {
-      history.push(bindParams(COURSE_LEARN_PATH, {courseId: courseId}));
+      history.push(bindParams(COURSE_LEARN_PATH, { courseId: courseId }));
     }
   };
 
@@ -43,6 +43,7 @@ const CourseCard = (props) => {
         progress === 100 ? "NextUpButton Disabled" : "NextUpButton";
     }
     const progressWidth = { width: progress + "%" };
+    console.log("in ", progress, progressWidth);
 
     return (
       <div className={"CourseCard"}>
@@ -84,7 +85,7 @@ const CourseCard = (props) => {
               </div>
             </div>
             <div className={"WordsLearned"}>
-              {course.wordsLearned}0/{course.totalWords} {t("words_learn")}
+              {course.wordsLearned}/{course.totalWords} {t("words_learn")}
             </div>
             <div className={"ProgressBar"}>
               <div style={progressWidth} className={"Progress"} />

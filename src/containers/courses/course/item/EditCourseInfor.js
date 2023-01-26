@@ -63,12 +63,12 @@ const EditCourseInfor = (props) => {
   }, [form, course]);
 
   const onFinish = async (data) => {
-      setLoading(true);
-      if (value) {
-          data.active = 1;
-      } else {
-          data.active = 0;
-      }
+    setLoading(true);
+    if (value) {
+      data.active = 1;
+    } else {
+      data.active = 0;
+    }
     data.id = course?._id;
     postAxios(API_COURSE_EDIT, data)
       .then((res) => {

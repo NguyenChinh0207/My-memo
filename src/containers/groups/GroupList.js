@@ -19,13 +19,13 @@ import {
   notification,
   Row,
   Spin,
+  Tabs,
 } from "antd";
 import { bindParams } from "../../config/function";
 import { SearchOutlined } from "@ant-design/icons";
 import FormItem from "antd/es/form/FormItem";
 import logoCourses from "../../assets/img/logoCourses.png";
 import { AppContext } from "../../context/AppContext";
-import GroupTab from "./items/GroupTab";
 
 const GroupList = () => {
   const { t } = useTranslation("common");
@@ -37,8 +37,22 @@ const GroupList = () => {
   const [total, setTotal] = useState(0);
   const [keyword, setKeyword] = useState("");
   const { Meta } = Card;
-  const LIMIT = 28;
-  const [tab, setTab] = useState("0");
+
+  const CoursesGroup = () => <div className="GroupCourses">toi la a</div>;
+  const MembersGroup = () => <div className="GroupMembers">toi la member</div>;
+
+  const items = [
+    {
+      key: "1",
+      label: `Khóa học`,
+      children: <CoursesGroup />,
+    },
+    {
+      key: "2",
+      label: `Thành viên(0)`,
+      children: <MembersGroup />,
+    },
+  ];
 
   const groups = [
     {
@@ -50,13 +64,6 @@ const GroupList = () => {
       owner: "",
     },
   ];
-  const CoursesGroup = () => (
-    <div className="GroupCourses">toi la a</div>
-  );
-  const MembersGroup = () => (
-    <div className="GroupMembers">toi la member</div>
-  );
-
   const ContentList = () => {
     return (
       <List
@@ -71,10 +78,10 @@ const GroupList = () => {
         }}
         loading={loading}
         dataSource={groups}
-        renderItem={(item) => (
+        renderItem={(item, index) => (
           <List.Item key={item?._id} className="listItemOwner">
             <div className="groupsList">
-              <div className="tilteCourseOwner">
+              <div className="tilteCourseOwnerGroup">
                 <img
                   className="imgCourseOwner"
                   alt="example"
@@ -88,14 +95,13 @@ const GroupList = () => {
                       <span style={{ color: "#15a1ec" }}> ChinhNT</span>{" "}
                     </p>
                   </div>
-                  <div style={{ marginLeft: "18px" }}>
-                    <GroupTab setTab={setTab} />
+                  <div style={{ marginLeft: "18px", width: "100%" }}>
+                    <Tabs defaultActiveKey="1" items={items} />
                   </div>
-                  {tab === "0" && <CoursesGroup />}
                 </div>
               </div>
               <div className={"MoreOptionsDiv InviteBtn"}>
-                <Button> {t("Mời")}</Button>
+                <Button className="btnInvite"> {t("Mời")}</Button>
               </div>
             </div>
           </List.Item>

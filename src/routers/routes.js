@@ -12,6 +12,8 @@ import {
   COURSE_LEARN_PATH,
   GROUPS_PATH,
   EXAM_EDIT_PATH,
+  EXAM_DETAIL_PATH,
+  EXAM_ONLINE_PATH,
 } from "../config/path";
 
 const routes = [
@@ -97,6 +99,20 @@ const routes = [
     exact: true,
     isPrivate: true,
     component: import("../containers/exams/ExamEdit"),
+    restricted: false,
+  },
+  {
+    path: EXAM_DETAIL_PATH,
+    exact: true,
+    isPrivate: true,
+    component: import("../containers/exams/ExamDetail"),
+    restricted: false,
+  },
+  {
+    path: EXAM_ONLINE_PATH,
+    exact: true,
+    isPrivate: true,
+    component: import("../containers/exams/ExamOnline"),
     restricted: false,
   },
   {

@@ -4,12 +4,17 @@ import PropTypes from "prop-types";
 import "./CourseHead.scss";
 import Spinner from "../../spinner/Spinner";
 import { useTranslation } from "react-i18next";
-import { Button, Image } from "antd";
+import { Button, Divider, Image } from "antd";
 import logoCourses from "../../../assets/img/logoCourses.png";
+import { useHistory } from "react-router-dom";
+import { bindParams } from "../../../config/function";
+import { EXAM_ONLINE_PATH } from "../../../config/path";
+import { RightOutlined } from "@ant-design/icons";
 
 const CourseHead = (props) => {
   const { t } = useTranslation("common");
-  const { name, description, owner, edit } = props;
+  const { name, description, owner, edit, added } = props;
+  const history = useHistory();
   return (
     <div className="CourseHead">
       {edit ? (
@@ -49,8 +54,24 @@ const CourseHead = (props) => {
                     src={logoCourses}
                   />
                   <div className="CourseDetails">
+                    <div className="breadcumb">
+                      {t("Khóa học")}
+                      <RightOutlined size={18} /> {name}
+                    </div>
+                    <Divider className="divider-custom" />
                     <h1 className="TitleCourse">{name}</h1>
                     <div className="Description">{description}</div>
+                    {added && (
+                      <div style={{ marginTop: "10px" }}>
+                        <Button
+                          type="default"
+                          className="examBtn"
+                          onClick={() => history.push(EXAM_ONLINE_PATH)}
+                        >
+                          {t("Kiểm tra trắc nghiệm")}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="CreatedByDiv">

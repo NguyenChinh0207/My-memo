@@ -34,6 +34,13 @@ const CreateCourse = () => {
   const { TextArea } = Input;
   const [value, setValue] = useState(false);
 
+  useEffect(() => {
+    return () => {
+      setValue(false);
+      setLoading(false);
+    };
+  }, []);
+
   const formItemLayout = {
     labelCol: {
       xs: { span: 24 },

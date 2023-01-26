@@ -89,6 +89,15 @@
 		text-align: end;
 			font-weight: bold;
 		}
+
+	.examBtn{
+		background-color: #ffc000;
+		color: #2c3445;
+		border: none;
+		border-radius: 6px;
+		width: 200px;
+		font-weight: bold;
+	}
 		
 	.imgCourseDetail {
 		height: 150px;
@@ -115,5 +124,13 @@
 		display: flex;
 		justify-content: start;
 		align-items: center;
+	}
+	.divider-custom{
+		margin-top: 8px !important;
+		margin-bottom: 10px !important;
+		border-top-color: #d0c5d5 !important;
+	}
+	.breadcumb{
+		color: #d0c5d5;
 	}
 }

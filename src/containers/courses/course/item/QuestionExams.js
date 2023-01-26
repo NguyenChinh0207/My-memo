@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import "../CourseDetail.scss";
 import { useTranslation } from "react-i18next";
 import {
@@ -12,35 +11,35 @@ import {
   InputNumber,
   notification,
   Popconfirm,
-  Popover,
-  Select,
   Table,
 } from "antd";
-import { LANGUAGES } from "../../../../config/const";
 import { AppContext } from "../../../../context/AppContext";
-import { useHistory } from "react-router-dom";
-import logoCourses from "../../../../assets/img/logoCourses.png";
-import {
-  CaretDownOutlined,
-  EyeOutlined,
-  UploadOutlined,
-} from "@ant-design/icons";
-import { API_COURSE_EDIT } from "../../../../config/endpointApi";
-import { COURSE_DETAIL_PATH, EXAM_EDIT_PATH } from "../../../../config/path";
+import { useHistory, useParams } from "react-router-dom";
+import { CaretDownOutlined, UploadOutlined } from "@ant-design/icons";
+import { EXAM_DETAIL_PATH, EXAM_EDIT_PATH } from "../../../../config/path";
 import { postAxios } from "../../../../Http";
-import { bindParams } from "../../../../config/function";
-import IconDelete from "../../../../common/Icon/IconDelete";
-import IconEye from "../../../../common/Icon/IconEye";
 import IconEdit from "../../../../common/Icon/IconEdit";
+import { bindParams, handleDownload } from "../../../../config/function";
+import * as xlsx from "xlsx";
+import {
+  API_EXAM_CREATE,
+  API_EXAM_DELETE,
+  API_EXAM_LIST,
+} from "../../../../config/endpointApi";
+import { CODE_ALREADY_EXIST } from "../../../../config/const";
 
 const QuestionExams = (props) => {
   const { t } = useTranslation("common");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
-  const { user_info } = useContext(AppContext);
+  const { courseId } = useParams();
   const course = props.course;
   const [showForm, setShowForm] = useState(false);
   const [form] = Form.useForm();
+  const [fileName, setFileName] = useState("");
+  const [questions, setQuestions] = useState([]);
+  const [exams, setExams] = useState([]);
+  const [validate, setValidate] = useState(false);
 
   const formItemLayout = {
     labelCol: {
@@ -53,6 +52,19 @@ const QuestionExams = (props) => {
     },
   };
 
+  const onCell = (record, rowIndex) => {
+    return {
+      onClick: (event) => {
+        history.push(
+          bindParams(EXAM_DETAIL_PATH, {
+            courseId: course._id,
+            examId: record._id,
+          })
+        );
+      },
+    };
+  };
+
   const columns = [
     {
       title: "#",
@@ -61,6 +73,7 @@ const QuestionExams = (props) => {
       render: (value, data, index) => {
         return index + 1;
       },
+      onCell,
     },
     {
       title: t("Tên chủ đề"),
@@ -68,6 +81,7 @@ const QuestionExams = (props) => {
       align: "left",
       ellipsis: "true",
       dataIndex: "name",
+      onCell,
     },
     {
       title: t("Thời gian trả lời"),
@@ -77,6 +91,7 @@ const QuestionExams = (props) => {
       render: (time_answer) => {
         return `${time_answer} ${t("giây")}`;
       },
+      onCell,
     },
     {
       title: t("Số câu hỏi xuất hiện"),
@@ -86,6 +101,7 @@ const QuestionExams = (props) => {
       render: (questions_appear) => {
         return `${questions_appear}`;
       },
+      onCell,
     },
     {
       title: t("Hành động"),
@@ -101,7 +117,8 @@ const QuestionExams = (props) => {
               justifyContent: "start",
             }}
           >
-            <div style={{display:"flex", alignItems:"center"}}
+            <div
+              style={{ display: "flex", alignItems: "center" }}
               onClick={() =>
                 history.push(
                   bindParams(EXAM_EDIT_PATH, {
@@ -119,7 +136,7 @@ const QuestionExams = (props) => {
               okText={t("Có")}
               cancelText={t("Không")}
             >
-              <div className="RemoveBtn" onClick={() => onClickDelete(_id)} />
+              <div className="RemoveBtn" />
             </Popconfirm>
           </div>
         );
@@ -127,22 +144,124 @@ const QuestionExams = (props) => {
     },
   ];
 
-  const data = [
-    {
-      _id: 1,
-      name: "test",
-      time_answer: 60,
-      questions_appear: 12,
-    },
-  ];
-
   useEffect(() => {
     setShowForm(false);
+    loadExams();
+    return () => {
+      setValidate(false);
+      setQuestions([]);
+    };
   }, []);
 
-  const onClickDelete = (id) => {};
+  const loadExams = () => {
+    setLoading(true);
+    postAxios(API_EXAM_LIST, { courseId: course._id })
+      .then((res) => {
+        console.log("in data", res?.data);
+        setExams(res?.data);
+      })
+      .catch((error) => {
+        notification.error({
+          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+        });
+      })
+      .then(() => setLoading(false));
+  };
 
-  const onFinish = (data) => {};
+  const readUploadFile = (e) => {
+    e.preventDefault();
+    if (e.target.files) {
+      setValidate(false);
+      setFileName(e.target.files[0].name);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const workbook = xlsx.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = xlsx.utils.sheet_to_json(worksheet);
+        let arrQuestion = [];
+        let question = {};
+        json.map((element) => {
+          question.content = element["Content"];
+          question.answer = [
+            element["Answer 1"],
+            element["Answer 2"],
+            element["Answer 3"],
+            element["Answer 4"],
+          ];
+          question.correct = element["Correct"];
+          arrQuestion.push(question);
+          question = {};
+        });
+        if (arrQuestion.length === 0) {
+          setValidate(true);
+        } else {
+          setValidate(false);
+        }
+        setQuestions(arrQuestion);
+      };
+      reader.readAsArrayBuffer(e.target.files[0]);
+    }
+  };
+
+  const onClickDelete = (id) => {
+    setLoading(true);
+    postAxios(API_EXAM_DELETE, { id })
+      .then((res) => {
+        loadExams();
+      })
+      .catch((error) => {
+        const { response } = error;
+        if (response?.data?.code === CODE_ALREADY_EXIST) {
+          notification.error({
+            message: `${t("Chủ đề")} ${t("không tồn tại")}`,
+          });
+          return;
+        }
+        notification.error({
+          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+        });
+      })
+      .then(() => setLoading(false));
+  };
+
+  const onFinish = (data) => {
+    setValidate(false);
+    if (questions.length === 0) {
+      setValidate(true);
+      return;
+    }
+    if (!validate || questions.length > 0) {
+      data.courseId = courseId;
+      data.questions = questions;
+      setLoading(true);
+      postAxios(API_EXAM_CREATE, data)
+        .then((res) => {
+          notification.success({
+            message: t("Tạo mới thành công."),
+          });
+          setShowForm(false);
+          setFileName("");
+          setQuestions([]);
+          form.resetFields(["name", "questions_appear", "time_answer"]);
+          loadExams();
+        })
+        .catch((error) => {
+          const { response } = error;
+          if (response?.data?.code === CODE_ALREADY_EXIST) {
+            notification.error({
+              message: `${t("Tên chủ đề")} ${t("đã tồn tại")}`,
+            });
+            return;
+          }
+          notification.error({
+            message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          });
+        })
+        .then(() => setLoading(false));
+    }
+  };
 
   return (
     <div className="formQuestions">
@@ -181,14 +300,57 @@ const QuestionExams = (props) => {
             rules={[
               {
                 required: true,
-                message: t("Đây là thông tin bắt buộc."),
+                validator: (_, value) => {
+                  if (!value) {
+                    return Promise.reject(
+                      new Error(t("Đây là thông tin bắt buộc."))
+                    );
+                  }
+                  if (Number(value) <= 0) {
+                    return Promise.reject(
+                      new Error(t("Số lượng phải lớn hơn 0"))
+                    );
+                  }
+                  form.setFieldsValue({ questions_appear: Number(value) });
+                  return Promise.resolve();
+                },
               },
             ]}
           >
-            <Input type="number" placeholder={t("Nhập số lượng...")} />
+            <Input
+              onKeyPress={(event) => {
+                if (!/[0-9]/.test(event.key)) {
+                  event.preventDefault();
+                }
+              }}
+              placeholder={t("Nhập số lượng")}
+            />
           </Form.Item>
-          <Form.Item label={t("Thời gian trả lời(giây)")} name="time_answer">
-            <Input type="number" placeholder={t("Nhập thời gian trả lời")} />
+          <Form.Item
+            label={t("Thời gian trả lời(giây)")}
+            name="time_answer"
+            rules={[
+              {
+                validator(_, value) {
+                  if (Number(value) <= 0) {
+                    return Promise.reject(
+                      new Error(t("Số lượng phải lớn hơn 0"))
+                    );
+                  }
+                  form.setFieldsValue({ time_answer: Number(value) });
+                  return Promise.resolve();
+                },
+              },
+            ]}
+          >
+            <Input
+              onKeyPress={(event) => {
+                if (!/[0-9]/.test(event.key)) {
+                  event.preventDefault();
+                }
+              }}
+              placeholder={t("Nhập thời gian trả lời")}
+            />
           </Form.Item>
           <Form.Item
             wrapperCol={{
@@ -197,10 +359,29 @@ const QuestionExams = (props) => {
             }}
           >
             <div className="ImportWrapper">
-              <Button type="default" className="ImportBtn">
-                {t("Tải lên danh sách câu hỏi")}
-              </Button>
-              <a href={"#"}>{t("Tải template câu hỏi tại đây")}</a>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Button type="default" className="ImportBtn">
+                  <label htmlFor="upload-photo" className="label-upload">
+                    <UploadOutlined size={24} style={{ marginRight: "3px" }} />
+                    {t("Tải lên danh sách câu hỏi")}
+                  </label>
+                </Button>
+                <span style={{ marginLeft: "5px" }}>{fileName}</span>
+              </div>
+              <input
+                type="file"
+                name="upload"
+                id="upload-photo"
+                onChange={readUploadFile}
+                style={{ display: "none" }}
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              />
+              {validate && (
+                <p style={{ color: "red" }}>{t("Đây là thông tin bắt buộc")}</p>
+              )}
+              <a href={"#"} onClick={handleDownload}>
+                {t("Tải template câu hỏi tại đây")}
+              </a>
             </div>
           </Form.Item>
           <Form.Item
@@ -223,14 +404,14 @@ const QuestionExams = (props) => {
       ) : (
         ""
       )}
-      {!showForm && data.length === 0 && (
-        <div style={{ textAlign: "center" }}>
-          {t("Khóa học này chưa có bộ câu hỏi nào")}
+      {!showForm && exams.length === 0 && (
+        <div style={{ textAlign: "center", marginBottom: "10px" }}>
+          {t("Khóa học này chưa có chủ đề trắc nghiệm nào")}
         </div>
       )}
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={exams}
         loading={loading}
         pagination={false}
       />

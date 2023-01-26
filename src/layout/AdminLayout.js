@@ -3,7 +3,14 @@ import { Layout, Menu, Avatar, Space, Dropdown } from "antd";
 import { IconEng, IconVi } from "../common/Icon/Icon";
 import { NavLink, useHistory, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AUTH_TOKEN, EN, KEY_LANGUAGE, ROLE_ADMIN, USER_INFO, VI } from "../config/const";
+import {
+  AUTH_TOKEN,
+  EN,
+  KEY_LANGUAGE,
+  ROLE_ADMIN,
+  USER_INFO,
+  VI,
+} from "../config/const";
 import { getCurrentLanguage } from "../config/function";
 import i18n from "i18next";
 import avatar from "../assets/img/avatar.png";
@@ -218,11 +225,7 @@ const AdminLayout = (props) => {
         width={272}
         defaultCollapsed={window.innerWidth < "992"}
       >
-        <div
-          className="logo"
-        >
-          image
-        </div>
+        <div className="logo">image</div>
         {role === ROLE_ADMIN ? (
           <Menu
             defaultSelectedKeys={[

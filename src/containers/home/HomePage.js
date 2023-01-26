@@ -1,56 +1,37 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
-import LeftColumn from "../../components/home/LeftColumn";
 import "./HomePage.scss";
 import PrivateLayout from "../../layout/PrivateLayout";
 import { Layout, notification, Spin } from "antd";
 import Welcome from "../../components/home/Welcome";
-import {
-  API_ACTION_MY_COURSE,
-  API_GET_MY_COURSE,
-} from "../../config/endpointApi";
+import { API_ACTION_MY_COURSE } from "../../config/endpointApi";
 import { AppContext } from "../../context/AppContext";
 import { postAxios } from "../../Http";
 import CourseCard from "../../components/home/CourseCard";
 import { bindParams } from "../../config/function";
 import { COURSE_LEARN_PATH } from "../../config/path";
+import useGetMyCourse from "../../hook/useGetMyCourse";
+import Profile from "../../components/home/Profile";
 
 const HomePage = () => {
   const { t } = useTranslation("common");
   const { user_info } = useContext(AppContext);
   const history = useHistory();
   const [loading, setLoading] = useState(false);
-  const [myCourses, setMyCourses] = useState([]);
-
-  useEffect(() => {
-    loadCourses();
-    return () => setMyCourses([]);
-  }, []);
-
-  const loadCourses = () => {
-    setLoading(true);
-    postAxios(API_GET_MY_COURSE, { userId: user_info?._id })
-      .then((res) => {
-        setMyCourses(res?.data?.courses);
-      })
-      .catch((error) => {
-        notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-        });
-      })
-      .then(() => setLoading(false));
-  };
+  const [loadMyCourses, setLoadMyCourses] = useState(false);
+  const [isLoading, data] = useGetMyCourse(loadMyCourses);
 
   const quitCourse = (courseId) => {
     setLoading(true);
+    setLoadMyCourses(false);
     postAxios(`${API_ACTION_MY_COURSE}/remove`, {
       userId: user_info?._id,
       courseId: courseId,
     })
       .then((res) => {
+        setLoadMyCourses(true);
         setLoading(false);
-        loadCourses();
       })
       .catch((error) => {
         notification.error({
@@ -66,7 +47,7 @@ const HomePage = () => {
 
   return (
     <PrivateLayout>
-      {loading ? (
+      {loading || isLoading ? (
         <div
           style={{
             position: "fixed",
@@ -81,10 +62,14 @@ const HomePage = () => {
         <Layout className="Layout-bg">
           <div className={"Content"}>
             <div className={"ContainerMain"}>
-              <LeftColumn profile={""} />
+              <Profile
+                level={data.level}
+                points={data.points}
+                wordsLearned={data.wordsLearned}
+              />
               <div className={"RightColumn"}>
-                {myCourses && myCourses.length > 0 ? (
-                  myCourses.map((course) => (
+                {data.myCourses && data.myCourses.length > 0 ? (
+                  data.myCourses.map((course) => (
                     <CourseCard
                       key={course._id}
                       courseId={course._id}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink, Redirect, useHistory } from 'react-router-dom'
+import { NavLink, Redirect, useHistory } from "react-router-dom";
 import './HomeWelcome.scss'
 import PrivateLayout from '../../layout/PrivateLayout'
 import { HOME_PATH, USER_LOGIN } from '../../config/path'

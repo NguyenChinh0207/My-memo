@@ -167,10 +167,17 @@ $primaryColor: #7757a8;
         justify-content: space-between;
         margin-bottom: 10px;
     }
-    .ImportBtn{
+    .ImportBtn {
         margin-bottom: 5px;
         width: 200px;
         border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .label-upload {
+        cursor: pointer;
+        padding: 5px 20px;
     }
     .CreateExam{
         border-radius: 6px;

@@ -1,38 +1,26 @@
-import React, { Suspense, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NavLink, useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import "./CourseDetail.scss";
 import PrivateLayout from "../../../layout/PrivateLayout";
-import { COURSE_CREATE_PATH, COURSE_EDIT_PATH, COURSE_LEARN_PATH } from "../../../config/path";
+import { COURSE_LEARN_PATH } from "../../../config/path";
 import Layout from "antd/lib/layout/layout";
-import {
-  Avatar,
-  Button,
-  Card,
-  Col,
-  Input,
-  List,
-  Modal,
-  notification,
-  Row,
-  Spin,
-} from "antd";
+import { Modal, notification, Spin } from "antd";
 import {
   API_ACTION_MY_COURSE,
-  API_ADD_MY_COURSE,
   API_COURSE_DETAIL,
   API_GET_MY_COURSE,
 } from "../../../config/endpointApi";
 import { postAxios } from "../../../Http";
-import QuitCourseModal from "../../../components/quit-course-modal/QuitCourseModal";
 import CourseHead from "../../../components/course/CourseHead/CourseHead";
 import WordsTable from "../../../components/course/WordsTable/WordsTable";
 import { AppContext } from "../../../context/AppContext";
 import { bindParams } from "../../../config/function";
 import { ComponentRender } from "./item/ComponentRender";
 import { ExclamationCircleFilled } from "@ant-design/icons";
+import useGetMyCourse from "../../../hook/useGetMyCourse";
 
-const CourseDetail = (props) => {
+const CourseDetail = () => {
   const { t } = useTranslation("common");
   const history = useHistory();
   const params = useParams();
@@ -44,14 +32,12 @@ const CourseDetail = (props) => {
   const [added, setAdded] = useState(false);
   const [wordsLearned, setWordsLearned] = useState(0);
   const [showElement, setShowElement] = useState(false);
-
-  const [learnBtnClasses, setLearnBtnClasses] = useState("LearnBtn Disabled");
+  const [loadMyCourses, setLoadMyCourses] = useState(false);
+  const [learnBtnClasses, setLearnBtnClasses] = useState("");
   const [progressWidth, setProgressWidth] = useState();
   const [progress, setProgress] = useState(0);
-  const [myCourses, setMyCourses] = useState([]);
-  const [loadMyCourses, setLoadMyCourses] = useState(false);
-  const userId = user_info?._id;
   const { confirm } = Modal;
+  const [isLoading, data] = useGetMyCourse(loadMyCourses);
 
   useEffect(() => {
     loadCourse();
@@ -59,38 +45,32 @@ const CourseDetail = (props) => {
   }, []);
 
   useEffect(() => {
-    checkIfAdded();
-    return () => {
-      setLoadMyCourses(false);
-      setLoading(false)
+    if (!isLoading && data?.myCourses.length > 0) {
+      checkIfAdded();
     }
-  }, [myCourses, loadMyCourses]);
+    return () => {
+      setLoading(false);
+    };
+  }, [isLoading]);
 
   useEffect(() => {
-    setLoading(true);
-    postAxios(API_GET_MY_COURSE, { userId })
-      .then((res) => {
-        setMyCourses(res?.data?.courses);
-      })
-      .catch((error) => {
-        notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-        });
-      })
-      .then(() => setLoading(false));
-  }, [userId, loadMyCourses]);
-
-  useEffect(() => {
-    if (course) {
+    if (course && !loading) {
+      let learnBtnClassesState;
+      let progressWidthState;
+      let progressState = 0;
       setShowElement(true);
       if (added) {
+        learnBtnClassesState = "LearnBtn Disabled";
         if (Number(course.totalWords) !== 0) {
-          setProgress((100 * Number(wordsLearned)) / Number(course.totalWords));
-          setLearnBtnClasses(
-            progress === 100 ? "LearnBtn Disabled" : "LearnBtn"
-          );
+          progressState =
+            (100 * Number(wordsLearned)) / Number(course.totalWords);
+          learnBtnClassesState =
+            progressState === 100 ? "LearnBtn Disabled" : "LearnBtn";
         }
-        setProgressWidth({ width: progress + "%" });
+        progressWidthState = { width: `${progressState}%` };
+        setProgress(progressState);
+        setProgressWidth(progressWidthState);
+        setLearnBtnClasses(learnBtnClassesState);
       }
     } else {
       setShowElement(false);
@@ -122,20 +102,22 @@ const CourseDetail = (props) => {
       .then(() => setLoading(false));
   };
 
-  const checkIfOwner = (course = course) => {
+  const checkIfOwner = (course) => {
     if (course?.owner._id === user_info._id) {
       setOwner(true);
     }
   };
 
   const checkIfAdded = () => {
-    if (!loading) {
+    if (!isLoading) {
       setLoading(false);
+      const courses = data?.myCourses;
       let addedWord = false;
       let words = 0;
-      if (myCourses && myCourses.length > 0) {
-        for (let c of myCourses) {
+      if (courses && courses.length > 0) {
+        for (let c of courses) {
           if (String(c._id) === courseId) {
+            console.log("in c", c);
             addedWord = true;
             words = c.wordsLearned;
           }
@@ -178,7 +160,7 @@ const CourseDetail = (props) => {
       Number(course.totalWords) !== 0 &&
       wordsLearned !== Number(course.totalWords)
     ) {
-      history.push(bindParams(COURSE_LEARN_PATH, {courseId: courseId}));
+      history.push(bindParams(COURSE_LEARN_PATH, { courseId: courseId }));
     }
   };
 
@@ -199,7 +181,7 @@ const CourseDetail = (props) => {
         <Layout className="Course-detail">
           {showElement ? (
             <div>
-              <CourseHead {...course} />
+              <CourseHead {...course} added={added} />
               <ComponentRender
                 course={course}
                 progress={progress}

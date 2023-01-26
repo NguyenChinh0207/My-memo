@@ -1,29 +1,16 @@
-import React, { Suspense, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NavLink, useHistory, useLocation, useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import "./CourseDetail.scss";
 import PrivateLayout from "../../../layout/PrivateLayout";
-import { COURSE_CREATE_PATH, COURSE_DETAIL_PATH } from "../../../config/path";
+import { COURSE_DETAIL_PATH } from "../../../config/path";
 import Layout from "antd/lib/layout/layout";
-import {
-  Avatar,
-  Button,
-  Card,
-  Col,
-  Input,
-  List,
-  notification,
-  Row,
-  Spin,
-} from "antd";
+import { notification, Spin } from "antd";
 import {
   API_COURSE_DETAIL,
-  API_CREATE_WORD,
-  API_DELETE_WORD,
   API_UPDATE_WORDS,
 } from "../../../config/endpointApi";
 import { postAxios } from "../../../Http";
-import QuitCourseModal from "../../../components/quit-course-modal/QuitCourseModal";
 import CourseHead from "../../../components/course/CourseHead/CourseHead";
 import WordsTable from "../../../components/course/WordsTable/WordsTable";
 import { AppContext } from "../../../context/AppContext";
@@ -99,8 +86,7 @@ const CourseEdit = () => {
       courseId: courseId,
       words: JSON.stringify(words),
     })
-      .then((res) => {
-      })
+      .then((res) => {})
       .catch((error) => {
         notification.error({
           message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),

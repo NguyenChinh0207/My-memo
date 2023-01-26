@@ -7,6 +7,7 @@ import { COURSE_EDIT_PATH } from "../../../../config/path";
 import "../CourseDetail.scss";
 
 export const ComponentRender = (items) => {
+  console.log("in item", items);
   const { t } = useTranslation("common");
   const history = useHistory();
 

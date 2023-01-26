@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
 import img from "../../assets/img/avatar.png";
 import "./Profile.scss";
 
@@ -8,25 +7,27 @@ const Profile = (props) => {
   const { t } = useTranslation("common");
 
   return (
-    <div className={"Profile"}>
-      <div className={"ProfileHeader"}>
-        <div className={"UserName"}>{props.username}</div>
-        <div className={"Level"}>
-          {t("level")} {props.level}
+    <div className={"LeftColumnProfile"}>
+      <div className={"Profile"}>
+        <div className={"ProfileHeader"}>
+          <div className={"UserName"}></div>
+          <div className={"Level"}>
+            {t("level")} {props.level}
+          </div>
+          <div className={"ImageWrapper"}>
+            <img src={img} className={"ProfileImage"} alt="" />
+          </div>
         </div>
-        <div className={"ImageWrapper"}>
-          <img src={img} className={"ProfileImage"} alt="" />
-        </div>
-      </div>
-      <div className={"ProfileStats"}>
-        <div className={"StatsWrapper"}>
-          <div className={"StatsNumber"}>0{props.wordsLearned}</div>
-          <div className={"StatsLabel"}>{t("words_learn")}</div>
-        </div>
-        <div className={"StatsSeparator"} />
-        <div className={"StatsWrapper"}>
-          <div className={"StatsNumber"}>0{props.points}</div>
-          <div className={"StatsLabel"}>0{t("point")}</div>
+        <div className={"ProfileStats"}>
+          <div className={"StatsWrapper"}>
+            <div className={"StatsNumber"}>{props.wordsLearned}</div>
+            <div className={"StatsLabel"}>{t("words_learn")}</div>
+          </div>
+          <div className={"StatsSeparator"} />
+          <div className={"StatsWrapper"}>
+            <div className={"StatsNumber"}>{props.points}</div>
+            <div className={"StatsLabel"}>{t("point")}</div>
+          </div>
         </div>
       </div>
     </div>
