@@ -14,6 +14,7 @@ import {
   EXAM_EDIT_PATH,
   EXAM_DETAIL_PATH,
   EXAM_ONLINE_PATH,
+  USER_LIST_PATH,
 } from "../config/path";
 
 const routes = [
@@ -121,6 +122,14 @@ const routes = [
     isPrivate: true,
     component: import("../containers/groups/GroupList"),
     restricted: false,
+  },
+  {
+    path: USER_LIST_PATH,
+    exact: true,
+    isPrivate: false,
+    component: import("../containers/admin/UserList"),
+    restricted: false,
+    isAdmin: true,
   },
 ];
 

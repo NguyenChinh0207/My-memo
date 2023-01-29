@@ -171,7 +171,6 @@ const ExamEdit = () => {
   const readUploadFile = (e) => {
     e.preventDefault();
     if (e.target.files) {
-      console.log("in ", e.target.files);
       setValidate(false);
       setFileName(e.target.files[0].name);
       const reader = new FileReader();
@@ -299,7 +298,7 @@ const ExamEdit = () => {
             />
           </Form.Item>
           <Form.Item
-            label={t("Thời gian trả lời(giây)")}
+            label={t("Thời gian trả lời(phút)")}
             name="time_answer"
             rules={[
               {

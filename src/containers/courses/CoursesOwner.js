@@ -27,8 +27,6 @@ import {
   List,
   Modal,
   notification,
-  Popconfirm,
-  Popover,
   Row,
   Spin,
 } from "antd";
@@ -135,7 +133,7 @@ const CoursesOwner = () => {
                   >
                     {item?.name}
                   </h3>
-                  <p>120 từ</p>
+                  <p>{`${JSON.parse(item?.words).length || 0} ${t("từ")}`}</p>
                   <p>
                     {item.active
                       ? `(${t("Công khai")})`

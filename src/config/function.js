@@ -89,13 +89,38 @@ export const scrollToErrorFieldByName = (name) => {
 };
 
 export const getRole = () =>
-  localStorage.getItem("user_info")
-    ? JSON.parse(localStorage.getItem("user_info")).role_id
-    : null; // ROLE_ADMIN
+  localStorage.getItem("roleId") ? localStorage.getItem("roleId") : 0;
 
 export const fetchList = async (endpoint, params) => {
   const { data } = await getAxios(endpoint, params);
   return data;
+};
+
+export const formatTime = (time) => {
+  let minutes = Math.floor(time / 60);
+  let seconds = Math.floor(time - minutes * 60);
+  if (minutes < 10) minutes = "0" + minutes;
+  if (seconds < 10) seconds = "0" + seconds;
+  return minutes + ":" + seconds;
+};
+
+export const shuffleArray = (array, arrLength) => {
+  let i = array.length - 1;
+  for (; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+  if (arrLength < array.length) {
+    let arrayRandom = [];
+    for (let index = 0; index < arrLength; index++) {
+      const element = array[index];
+      arrayRandom.push(element);
+    }
+    return arrayRandom;
+  }
+  return array;
 };
 
 export const handleDownload = () => {

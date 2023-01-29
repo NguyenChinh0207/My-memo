@@ -49,6 +49,7 @@ const PrivateLayout = (props) => {
   const handleLogout = () => {
     localStorage.removeItem(AUTH_TOKEN);
     localStorage.removeItem(USER_INFO);
+    localStorage.removeItem("roleId");
     history.push(USER_LOGIN);
   };
 

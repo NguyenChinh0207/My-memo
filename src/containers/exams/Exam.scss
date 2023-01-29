@@ -334,3 +334,85 @@
 
 }
 }
+.examOnline{
+    .examContentEmpty{
+        width: 100%;
+        margin: auto;
+        padding: 30px 30px;
+        max-width: 1008px;
+        background-color: #f0f2f5;
+        min-height: 100vh;
+        // z-index: 10;
+    }
+    .examOnlineContent{
+        width: 100%;
+        margin: auto;
+        padding: 30px 30px;
+        max-width: 1008px;
+        background-color: #f0f2f5;
+        min-height: 100vh;
+        margin-top: 108px;
+    }
+    .examOnlineContent1 {
+        width: 100%;
+        margin: auto;
+        padding: 30px 30px;
+        max-width: 1008px;
+        background-color: #f0f2f5;
+        min-height: 100vh;
+        // margin-top: 108px;
+    }
+    .radio-common{
+        display: flex;
+        flex-direction: column;
+    }
+    .answer{
+        margin-left: 30px;
+        font-size: 16px;
+    }
+    .question{
+        font-weight: bold;
+        font-size: 18px;
+        word-break: break-word;
+    }
+    .question p{
+        margin-bottom: 5px !important;
+    }
+    .question p:last-child {
+        margin-bottom: 5px !important;
+        margin-left: 10px;
+    }
+    .Radio-common {
+        margin-bottom: 5px;
+        .ant-radio-wrapper:hover .ant-radio,
+        .ant-radio:hover .ant-radio-inner,
+        .ant-radio-input:focus+.ant-radio-inner {
+            border-color: #6c4f74;
+        }
+        .ant-radio-checked {
+            .ant-radio-inner {
+                border-color: #6c4f74;
+
+                &:after {
+                    background-color: #6c4f74;
+                }
+            }
+        }
+    }
+    .correct{
+        color: green;
+        font-weight: bold;
+    }
+    .fail{
+        color: red;
+        font-weight: bold;
+    }
+    .failBorder{
+        border: 1px solid red;
+        padding: 5px;
+    }
+    .disableRadio{
+        pointer-events: none;
+        cursor: none;
+    }
+}

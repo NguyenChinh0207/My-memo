@@ -1,0 +1,99 @@
+.banner-wrapper {
+    background: #ffffff;
+    //max-width: 1200px;
+    padding: 20px;
+    margin: auto;
+
+    .ant-form-item {
+        margin-bottom: 0 !important;
+    }
+
+    .banner-form {
+        &--title {
+            font-style: normal;
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 20px;
+            color: #2D2D2D;
+        }
+
+        .ant-table-thead>tr>th {
+            background: rgba(179, 30, 141, 0.1) !important;
+        }
+
+        thead {
+            text-align: center !important;
+        }
+
+        td {
+            border: none !important;
+        }
+    }
+
+    .ant-upload-list {
+        display: none !important;
+    }
+        .banner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    
+        .tabbar-form {
+            display: flex;
+    
+            >* {
+                margin-left: 16px;
+                border-radius: 5px;
+            }
+    
+            .ant-row {
+                margin-left: 16px;
+                margin-bottom: 0;
+            }
+        }
+    
+        .tabbar-form-key {
+            margin-right: 8px;
+        }
+    
+        .btn_search {
+            background-color: #D13D9E;
+            border-color: #d13d9e;
+            color: white;
+    
+            &.ant-btn-icon-only.ant-btn-lg {
+                border-radius: 5px;
+            }
+    
+            &:hover {
+                background-color: #D13D9E;
+                color: white;
+                border-color: #d13d9e;
+            }
+    
+            * {
+                margin-top: 1px;
+                font-size: 24px;
+            }
+    
+            &:focus {
+                background-color: #D13D9E;
+                color: white;
+                border-color: #d13d9e;
+            }
+        }
+    
+        .custom-table {
+            margin-top: 30px;
+    
+            th {
+                background-color: rgba(179, 30, 141, 0.1) !important;
+            }
+    
+            table.fixed {
+                table-layout: fixed;
+            }
+        }
+}
+

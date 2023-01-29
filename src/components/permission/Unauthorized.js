@@ -9,7 +9,7 @@ const Unauthorized = () => {
 
   const { t } = useTranslation("common");
   return (
-    <PrivateLayout>
+    // <PrivateLayout>
       <Result
         status="403"
         title="403"
@@ -24,7 +24,7 @@ const Unauthorized = () => {
           </Button>
         }
       />
-    </PrivateLayout>
+    // </PrivateLayout>
   );
 };
 

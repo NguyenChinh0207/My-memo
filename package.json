@@ -12,7 +12,7 @@
     "fslightbox-react": "^1.6.2-2",
     "i18next": "^20.2.2",
     "jwt-decode": "^3.1.2",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "qs": "^6.10.1",
     "query-string": "^4.3.4",
     "react": "^18.2.0",

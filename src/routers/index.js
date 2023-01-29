@@ -5,14 +5,16 @@ import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 import routes from "./routes";
 import NotFound from "./../components/permission/NotFound";
+import { getRole } from "../config/function";
 
 const AppRouter = () => {
+  const role = getRole();
   return (
     <BrowserRouter>
       <Suspense fallback={<RouteLoader />}>
         <Switch>
           {routes.map((route, key) => {
-            const { path, exact, component, isPrivate, restricted } = route;
+            const { path, exact, component, isPrivate, restricted, isAdmin } = route;
             const props = {
               key,
               path,
@@ -25,9 +27,13 @@ const AppRouter = () => {
               ),
             };
             return isPrivate ? (
-              <PrivateRoute {...props} />
+              <PrivateRoute {...props} isAdmin={isAdmin} />
             ) : (
-              <PublicRoute restricted={restricted} {...props} />
+              <PublicRoute
+                restricted={restricted}
+                isAdmin={isAdmin}
+                {...props}
+              />
             );
           })}
           <Route component={NotFound} isPublicRoute />

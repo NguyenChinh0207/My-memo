@@ -89,14 +89,28 @@
 		text-align: end;
 			font-weight: bold;
 		}
+	.btnWrapCourse{
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
 
 	.examBtn{
 		background-color: #ffc000;
 		color: #2c3445;
 		border: none;
 		border-radius: 6px;
-		width: 200px;
-		font-weight: bold;
+		width: 160px;
+		// font-weight: bold;
+	}
+
+	.flashCardBtn{
+		background-color: #58ca5e;
+		color: #2c3445;
+		border: none;
+		border-radius: 6px;
+		width: 100px;
+		margin-left: 10px;
 	}
 		
 	.imgCourseDetail {
@@ -132,5 +146,20 @@
 	}
 	.breadcumb{
 		color: #d0c5d5;
+	}
+	
+}
+.formExamDetailSelect {
+	width: 100%;
+	margin: 10px 0px;
+
+	.itemFormExam {
+		margin-bottom: 4px !important;
+	}
+
+	.divider-custom-form {
+		margin-top: 8px !important;
+		margin-bottom: 10px !important;
+		border-top-color: #f0f2f5 !important;
 	}
 }

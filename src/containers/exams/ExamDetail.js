@@ -116,10 +116,10 @@ const ExamDetail = () => {
   ];
 
   useEffect(() => {
-    loadExams();
+    loadExam();
   }, []);
 
-  const loadExams = () => {
+  const loadExam = () => {
     setLoading(true);
     postAxios(API_EXAM_DETAIL, { id: examId })
       .then((res) => {
@@ -155,7 +155,7 @@ const ExamDetail = () => {
                   <span className="valueName">{exam?.questions_appear}</span>
                 </div>
                 <div className="labelName">
-                  {`${t("Thời gian trả lời(giây)")}:`}
+                  {`${t("Thời gian trả lời(phút)")}:`}
                   <span className="valueName">{exam?.time_answer}</span>
                 </div>
               </div>

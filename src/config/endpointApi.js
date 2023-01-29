@@ -26,3 +26,8 @@ export const API_EXAM_CREATE = `${API_EXAM_LIST}/create`;
 export const API_EXAM_EDIT = `${API_EXAM_LIST}/edit`;
 export const API_EXAM_DETAIL = `${API_EXAM_LIST}/detail`;
 export const API_EXAM_DELETE = `${API_EXAM_LIST}/delete`;
+
+// admin
+const API_ADMIN = `${API_BASE}/admin`;
+export const API_USERS_LIST = `${API_ADMIN}/users`;
+

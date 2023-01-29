@@ -327,7 +327,7 @@ const QuestionExams = (props) => {
             />
           </Form.Item>
           <Form.Item
-            label={t("Thời gian trả lời(giây)")}
+            label={t("Thời gian trả lời(phút)")}
             name="time_answer"
             rules={[
               {

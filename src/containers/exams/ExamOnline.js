@@ -1,43 +1,150 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./Exam.scss";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { notification, Spin } from "antd";
+import { Layout, notification, Radio, Spin } from "antd";
 import { AppContext } from "../../context/AppContext";
 import ExamHeader from "../../components/exam/ExamHeader";
-import { API_EXAM_LIST } from "../../config/endpointApi";
+import { API_EXAM_DETAIL, API_EXAM_LIST } from "../../config/endpointApi";
 import { postAxios } from "../../Http";
+import { bindParams, shuffleArray } from "../../config/function";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 
 const ExamOnline = () => {
   const { t } = useTranslation("common");
   const history = useHistory();
-  const { courseId } = useParams();
+  const { courseId, examId } = useParams();
+  const location = useLocation();
   const { user_info } = useContext(AppContext);
-  const [loading, setLoading] = useState(false);
-  const [exams, setExams] = useState([]);
+  const [exam, setExam] = useState({});
+  const [questions, setQuestions] = useState([]);
+  const [answer, setAnswer] = useState({});
+  const [corrects, setCorrects] = useState([]);
+  const [status, setStatus] = useState("");
 
   useEffect(() => {
-    loadExams();
-  }, []);
+    const detail = location.state.detail;
+    if (detail) {
+      setExam(detail);
+      const arrShuffle = shuffleArray(
+        detail.questions,
+        Number(detail.questions_appear)
+      );
+      setQuestions(arrShuffle);
+      let arr = [];
+      arrShuffle.map((item) => {
+        arr.push(item.correct);
+      });
+      setCorrects(arr);
+    }
+  }, [location]);
 
-  const loadExams = () => {
-    setLoading(true);
-    postAxios(API_EXAM_LIST, { courseId })
-      .then((res) => {
-        setExams(res?.data);
-      })
-      .catch((error) => {
-        notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-        });
-      })
-      .then(() => setLoading(false));
+  const onRadioChange = (e) => {
+    setAnswer({
+      ...answer,
+      [e.target.name]: e.target.value,
+    });
   };
-
+  console.log("answer", answer, answer[`answer5`]);
   return (
-    <div>
-      <ExamHeader />
-    </div>
+    <Layout style={{ minWidth: "100vh" }} className="examOnline">
+      <ExamHeader
+        exam={exam}
+        user={user_info}
+        answer={answer}
+        corrects={corrects}
+        status={status}
+        setStatus={setStatus}
+      />
+      {status !== "" ? (
+        <div className="examOnlineContent1">
+          <div>
+            {questions.map((item, index) => (
+              <div key={index}>
+                <div className="question">
+                  <p>
+                    {`${t("Câu hỏi số")} ${index + 1}:`}{" "}
+                    <span>
+                      {!String(answer[`answer${index + 1}`]) ||
+                      answer[`answer${index + 1}`] === undefined ? (
+                        <span className="fail">Miss</span>
+                      ) : String(item.correct) ===
+                        String(answer[`answer${index + 1}`]) ? (
+                        <CheckOutlined className="correct" />
+                      ) : (
+                        <CloseOutlined className="fail" />
+                      )}
+                    </span>
+                  </p>
+                  <p>{item.content}</p>
+                </div>
+                <div className="answer">
+                  <Radio.Group
+                    className="radio-common"
+                    name={`answer${index + 1}`}
+                  >
+                    {item.answer.map((value, i) => (
+                      <Radio
+                        value={value}
+                        key={i}
+                        className={`${
+                          String(value) === String(item.correct)
+                            ? "correct"
+                            : String(value) ===
+                              String(answer[`answer${index + 1}`])
+                            ? "fail failBorder"
+                            : ""
+                        } Radio-common disableRadio`}
+                      >
+                        {i === 0
+                          ? `A. ${value}`
+                          : i === 1
+                          ? `B. ${value}`
+                          : i === 2
+                          ? `C. ${value}`
+                          : `D. ${value}`}
+                      </Radio>
+                    ))}
+                  </Radio.Group>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="examOnlineContent">
+          <div>
+            {questions.map((item, index) => (
+              <div key={index}>
+                <div className="question">
+                  <p>{`${t("Câu hỏi số")} ${index + 1}:`} </p>
+                  <p>{item.content}</p>
+                </div>
+                <div className="answer">
+                  <Radio.Group
+                    className="radio-common"
+                    onChange={onRadioChange}
+                    name={`answer${index + 1}`}
+                  >
+                    {item.answer.map((value, index) => (
+                      <Radio value={value} key={index} className="Radio-common">
+                        {index === 0
+                          ? `A. ${value}`
+                          : index === 1
+                          ? `B. ${value}`
+                          : index === 2
+                          ? `C. ${value}`
+                          : `D. ${value}`}
+                      </Radio>
+                    ))}
+                  </Radio.Group>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </Layout>
   );
 };
 

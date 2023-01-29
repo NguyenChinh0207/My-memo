@@ -11,7 +11,11 @@ import {
   API_POST_PROGRESS,
   API_SAVE_USER,
 } from "../../config/endpointApi";
-import { HOME_PATH, USER_FORGOT_PASSWORD } from "../../config/path";
+import {
+  HOME_PATH,
+  USER_FORGOT_PASSWORD,
+  USER_LIST_PATH,
+} from "../../config/path";
 import { postAxios } from "../../Http";
 import { AUTH_TOKEN, E001, E002 } from "../../config/const";
 import { saveAccessToken, saveUserInfo } from "../../config/function";
@@ -31,7 +35,10 @@ const Login = () => {
         saveAccessToken(res?.accessToken);
         saveUserInfo(res?.data);
         setUserInfo(res?.data);
-        history.push(HOME_PATH);
+        localStorage.setItem("roleId", res?.data.role);
+        if (res?.data.role === 1) {
+          history.push(USER_LIST_PATH);
+        } else history.push(HOME_PATH);
       })
       .catch((error) => {
         const { response } = error;
@@ -49,6 +56,7 @@ const Login = () => {
         saveAccessToken(res?.accessToken);
         saveUserInfo(res?.data);
         setUserInfo(res?.data);
+        localStorage.setItem("roleId", 0);
         if (res?.data?._id) {
           postAxios(API_POST_PROGRESS, {
             progress: "{}",
@@ -130,7 +138,7 @@ const Login = () => {
             <Form.Item>
               <ReactFacebookLogin
                 appId="906729733674195"
-                autoLoad={true}
+                autoLoad={false}
                 fields="name,email,picture"
                 callback={responseFacebook}
                 cssClass="my-facebook-button-class"
