@@ -40,6 +40,9 @@ const Courses = () => {
 
   useEffect(() => {
     loadCourses();
+    return () => {
+      setCourses([]);
+    };
   }, [skip, keyword]);
 
   const loadCourses = () => {
@@ -47,8 +50,8 @@ const Courses = () => {
     postAxios(API_COURSE_LIST, { skip: skip, limit: LIMIT, keyword: keyword })
       .then((res) => {
         setTotal(res?.total);
-        const arr = res?.data;
-        setCourses((prev) => [...prev, ...arr]);
+        let arr = [...courses, ...res?.data];
+        setCourses(arr.filter((item, index) => arr.indexOf(item) === index));
       })
       .catch((error) => {
         notification.error({
@@ -88,20 +91,41 @@ const Courses = () => {
             <div className="PageHeadRow">
               <div className="Title">{t("Các khóa học")}</div>
               <div className="create-search">
-                <Form
-                  className="tabbar-form"
-                  onFinish={onSearch}
-                  initialValues={{ keyword: keyword }}
-                >
-                  <FormItem name={"keyword"}>
-                    <Input placeholder={t("Nhập từ khóa...")} />
-                  </FormItem>
-                  <Button
-                    loading={loading}
-                    icon={<SearchOutlined />}
-                    htmlType="submit"
-                  />
-                </Form>
+                <div className="search-wrap" style={{ marginRight: "10px" }}>
+                  <Form
+                    className="tabbar-form"
+                    style={{ display: "flex" }}
+                    onFinish={onSearch}
+                    initialValues={{ keyword: keyword }}
+                  >
+                    <Form.Item
+                      name={"keyword"}
+                      className="input-search-discount"
+                    >
+                      <Input
+                        allowClear
+                        placeholder={t("Nhập từ khoá...")}
+                        size={"large"}
+                        style={{
+                          borderTopLeftRadius: "6px",
+                          borderBottomLeftRadius: "6px",
+                        }}
+                      />
+                    </Form.Item>
+                    <Button
+                      size={"large"}
+                      loading={loading}
+                      icon={<SearchOutlined />}
+                      className="button-search"
+                      style={{
+                        borderLeft: "none",
+                        borderTopRightRadius: "6px",
+                        borderBottomRightRadius: "6px",
+                      }}
+                      htmlType="submit"
+                    />
+                  </Form>
+                </div>
                 <NavLink className="CreateButton" to={COURSE_CREATE_PATH}>
                   {t("Tạo khóa học")}
                 </NavLink>

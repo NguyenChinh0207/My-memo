@@ -181,11 +181,11 @@
             color: $primaryColor;
         }
     
-        .tabbar-form {
-            display: flex;
-            align-items: center;
-            margin-right: 20px;
-        }
+        // .tabbar-form {
+        //     display: flex;
+        //     align-items: center;
+        //     margin-right: 20px;
+        // }
     
         .tabbar-form .ant-form-item {
             margin: 0px !important;
@@ -390,6 +390,33 @@
         @media only screen and (max-width: 600px) {
             .MoreButton {
                 display: none;
+            }
+        }
+        .search-wrap {
+            display: flex;
+            justify-content: end;
+            align-items: center;
+        }
+
+        .input-search-discount {
+            margin: 0 !important;
+        }
+
+        .button-search {
+            margin: 0px !important
+        }
+
+        .tabbar-form {
+            display: flex;
+
+            >* {
+                margin-left: 16px;
+                // border-radius: 5px;
+            }
+
+            .ant-row {
+                margin-left: 16px;
+                margin-bottom: 0;
             }
         }
 }

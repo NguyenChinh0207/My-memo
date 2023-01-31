@@ -115,9 +115,6 @@ const PrivateLayout = (props) => {
         <NavButton to={COURSES_PATH} isActive={url === "courses"}>
           {t("courses")}
         </NavButton>
-        <NavButton to={GROUPS_PATH} isActive={url === "groups"}>
-          {t("Các nhóm")}
-        </NavButton>
       </div>
       <div>
         <Space size={"large"}>

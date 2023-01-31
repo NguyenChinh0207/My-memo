@@ -106,7 +106,7 @@ const AdminLayout = (props) => {
         width={272}
         defaultCollapsed={window.innerWidth < "992"}
       >
-        <div className="LogoWrapper">
+        <div className="LogoWrapperAdmin">
           <Image src={img} className="Logo" />
         </div>
         <Menu
@@ -123,7 +123,7 @@ const AdminLayout = (props) => {
           {menus &&
             menus.map((menu) => {
               return !menu?.children ? (
-                <Menu.Item key={menu.key} icon={menu.icon} >
+                <Menu.Item key={menu.key} icon={menu.icon}>
                   <NavLink to={menu.key}>{menu.name}</NavLink>
                 </Menu.Item>
               ) : (

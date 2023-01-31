@@ -23,6 +23,7 @@ export const COURSE_DETAIL_PATH = `${COURSES_PATH}/:courseId`;
 export const COURSE_EDIT_PATH = `${COURSES_PATH}/:courseId/edit`;
 export const COURSE_LIST_OWNER_PATH = `${COURSES_PATH}/owner`;
 export const COURSE_LEARN_PATH = `${COURSES_PATH}/learn/:courseId`;
+export const FLASH_CARD_PATH = `${COURSES_PATH}/:courseId/flashcard`;
 
 // Exam
 export const EXAM_DETAIL_PATH = `${EXAMS_PATH}/:examId`;
@@ -31,3 +32,4 @@ export const EXAM_ONLINE_PATH = `${EXAMS_PATH}/:examId/online`;
 
 // Admin
 export const USER_LIST_PATH = `${ADMIN_PATH}/users`;
+export const USER_DETAIL_PATH = `${ADMIN_PATH}/users/:userId`;

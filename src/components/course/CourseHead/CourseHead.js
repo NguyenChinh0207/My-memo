@@ -27,7 +27,7 @@ const { Option } = Select;
 
 const CourseHead = (props) => {
   const { t } = useTranslation("common");
-  const { name, description, owner, edit, added } = props;
+  const { name, description, owner, edit, added, setShowCard } = props;
   const history = useHistory();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [exams, setExams] = useState([]);
@@ -157,7 +157,7 @@ const CourseHead = (props) => {
                           <Button
                             type="default"
                             className="flashCardBtn"
-                            onClick={() => setIsModalOpen(true)}
+                            onClick={() => setShowCard(true)}
                           >
                             {t("FlashCard")}
                           </Button>

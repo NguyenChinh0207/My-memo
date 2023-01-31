@@ -5,7 +5,7 @@ import "./CourseDetail.scss";
 import PrivateLayout from "../../../layout/PrivateLayout";
 import { COURSE_LEARN_PATH } from "../../../config/path";
 import Layout from "antd/lib/layout/layout";
-import { Modal, notification, Spin } from "antd";
+import { Button, Modal, notification, Spin } from "antd";
 import {
   API_ACTION_MY_COURSE,
   API_COURSE_DETAIL,
@@ -15,10 +15,15 @@ import { postAxios } from "../../../Http";
 import CourseHead from "../../../components/course/CourseHead/CourseHead";
 import WordsTable from "../../../components/course/WordsTable/WordsTable";
 import { AppContext } from "../../../context/AppContext";
-import { bindParams } from "../../../config/function";
+import { bindParams, shuffleArray } from "../../../config/function";
 import { ComponentRender } from "./item/ComponentRender";
-import { ExclamationCircleFilled } from "@ant-design/icons";
+import {
+  DoubleLeftOutlined,
+  DoubleRightOutlined,
+  ExclamationCircleFilled,
+} from "@ant-design/icons";
 import useGetMyCourse from "../../../hook/useGetMyCourse";
+import { FlashCard } from "./item/FlashCard";
 
 const CourseDetail = () => {
   const { t } = useTranslation("common");
@@ -38,6 +43,10 @@ const CourseDetail = () => {
   const [progress, setProgress] = useState(0);
   const { confirm } = Modal;
   const [isLoading, data] = useGetMyCourse(loadMyCourses);
+  const [showCard, setShowCard] = useState(false);
+  const [curCardId, setCurCardId] = useState(1);
+  const [wordsData, setWordsData] = useState();
+  const [loadingCard, setLoadingCard] = useState();
 
   useEffect(() => {
     loadCourse();
@@ -91,6 +100,7 @@ const CourseDetail = () => {
           }
           course.totalWords = words.length;
           checkIfOwner(course);
+          setWordsData(course.words);
           setCourse(course);
         }
       })
@@ -164,6 +174,47 @@ const CourseDetail = () => {
     }
   };
 
+  // flashcard
+  const RenderHeaderCard = () => {
+    return (
+      <div className="SecondHeader">
+        <div className="Row" style={{ display: "flex", justifyContent: "end" }}>
+          <div onClick={() => setShowCard(false)} className="EditBtn">
+            {t("Quay lại")}
+            <DoubleRightOutlined />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const goToPrev = () => {
+    if (isValidId(curCardId - 1)) {
+      setCurCardId(curCardId - 1);
+    } else {
+      setCurCardId(wordsData.length);
+    }
+  };
+
+  const goToNext = () => {
+    if (isValidId(curCardId + 1)) {
+      setCurCardId(curCardId + 1);
+    } else {
+      setCurCardId(1);
+    }
+  };
+
+  function isValidId(id) {
+    return id <= wordsData.length && id >= 1;
+  }
+
+  const shuffleFunc = () => {
+    setLoadingCard(true);
+    const arr = shuffleArray(course.words, course.words.length);
+    setWordsData(arr);
+    setLoadingCard(false);
+  };
+
   return (
     <PrivateLayout>
       {loading ? (
@@ -181,21 +232,63 @@ const CourseDetail = () => {
         <Layout className="Course-detail">
           {showElement ? (
             <div>
-              <CourseHead {...course} added={added} />
-              <ComponentRender
-                course={course}
-                progress={progress}
-                progressWidth={progressWidth}
-                learnBtnClasses={learnBtnClasses}
-                added={added}
-                owner={owner}
-                courseId={courseId}
-                wordsLearned={wordsLearned}
-                openModal={openModal}
-                learn={learn}
-                updateCourse={updateCourse}
-              />
-              <WordsTable {...course} />
+              <CourseHead {...course} added={added} setShowCard={setShowCard} />
+              {!showCard ? (
+                <>
+                  <ComponentRender
+                    course={course}
+                    progress={progress}
+                    progressWidth={progressWidth}
+                    learnBtnClasses={learnBtnClasses}
+                    added={added}
+                    owner={owner}
+                    courseId={courseId}
+                    wordsLearned={wordsLearned}
+                    openModal={openModal}
+                    learn={learn}
+                    updateCourse={updateCourse}
+                  />
+                  <WordsTable {...course} />
+                </>
+              ) : (
+                <>
+                  <RenderHeaderCard />
+                  <div className="FlashCardWrap">
+                    <Button
+                      type="default"
+                      className="me-4 prev-next-btns"
+                      onClick={goToPrev}
+                    >
+                      <DoubleLeftOutlined />
+                      {t("Trước")}
+                    </Button>
+                    <FlashCard
+                      {...wordsData.find(
+                        (item, index) => index + 1 === curCardId
+                      )}
+                      curCardId={curCardId}
+                      loadingCard={loadingCard}
+                    ></FlashCard>
+                    <Button
+                      // type="primary"
+                      className="ms-4 prev-next-btns"
+                      onClick={goToNext}
+                    >
+                      {t("Tiếp")}
+                      <DoubleRightOutlined />
+                    </Button>
+                  </div>
+                  <div className="action-buttons">
+                    <Button
+                      type="primary"
+                      className="ms-4 prev-next-btns"
+                      onClick={shuffleFunc}
+                    >
+                      {t("Trộn thẻ")}
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <CourseHead />

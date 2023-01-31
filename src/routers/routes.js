@@ -15,6 +15,7 @@ import {
   EXAM_DETAIL_PATH,
   EXAM_ONLINE_PATH,
   USER_LIST_PATH,
+  USER_DETAIL_PATH,
 } from "../config/path";
 
 const routes = [
@@ -127,7 +128,15 @@ const routes = [
     path: USER_LIST_PATH,
     exact: true,
     isPrivate: false,
-    component: import("../containers/admin/UserList"),
+    component: import("../containers/admin/users/UserList"),
+    restricted: false,
+    isAdmin: true,
+  },
+  {
+    path: USER_DETAIL_PATH,
+    exact: true,
+    isPrivate: false,
+    component: import("../containers/admin/users/UserDetail"),
     restricted: false,
     isAdmin: true,
   },

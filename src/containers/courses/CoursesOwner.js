@@ -133,7 +133,9 @@ const CoursesOwner = () => {
                   >
                     {item?.name}
                   </h3>
-                  <p>{`${JSON.parse(item?.words).length || 0} ${t("từ")}`}</p>
+                  <p>{`${item?.words ? JSON.parse(item?.words).length : 0} ${t(
+                    "từ"
+                  )}`}</p>
                   <p>
                     {item.active
                       ? `(${t("Công khai")})`
