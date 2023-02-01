@@ -5,7 +5,12 @@ import { SolutionOutlined, UserOutlined } from "@ant-design/icons";
 import Sider from "antd/es/layout/Sider";
 import { IconEng, IconVi } from "../common/Icon/Icon";
 import { NavLink, useHistory, useLocation } from "react-router-dom";
-import { COURSES_PATH, USER_LOGIN, USER_LIST_PATH } from "../config/path";
+import {
+  COURSES_PATH,
+  USER_LOGIN,
+  USER_LIST_PATH,
+  ADMIN_COURSE_LIST_PATH,
+} from "../config/path";
 import { useTranslation } from "react-i18next";
 import { AUTH_TOKEN, EN, KEY_LANGUAGE, USER_INFO, VI } from "../config/const";
 import { getCurrentLanguage, getRole } from "../config/function";
@@ -39,9 +44,8 @@ const AdminLayout = (props) => {
       icon: <UserOutlined />,
     },
     {
-      key: "courses",
-      name: t("Quản lý khóa học"),
-      children: [{ key: COURSES_PATH, name: t("Quản lý khóa học") }],
+      key: ADMIN_COURSE_LIST_PATH,
+      name: t("Danh sách khóa học"),
       icon: <SolutionOutlined />,
     },
   ];
@@ -116,36 +120,13 @@ const AdminLayout = (props) => {
             }`,
           ]}
           mode="inline"
-          defaultOpenKeys={defaultOpenKeys}
-          className="main-menu"
-          onOpenChange={(openKeys) => setOpenMenus(openKeys)}
         >
-          {menus &&
-            menus.map((menu) => {
-              return !menu?.children ? (
-                <Menu.Item key={menu.key} icon={menu.icon}>
-                  <NavLink to={menu.key}>{menu.name}</NavLink>
-                </Menu.Item>
-              ) : (
-                <SubMenu key={menu.key} icon={menu.icon} title={menu.name}>
-                  {menu?.children &&
-                    menu.children.map((item) => {
-                      const linkSplitted = item.key.split("/");
-                      return (
-                        <Menu.Item
-                          key={[
-                            linkSplitted[0],
-                            linkSplitted[1],
-                            linkSplitted[2],
-                          ].join("/")}
-                        >
-                          <NavLink to={item.key}>{item.name}</NavLink>
-                        </Menu.Item>
-                      );
-                    })}
-                </SubMenu>
-              );
-            })}
+          {/* {menuItems.map((item) => ( */}
+          {menus.map((item) => (
+            <Menu.Item key={item.key}>
+              <NavLink to={item.key}>{item.name}</NavLink>
+            </Menu.Item>
+          ))}
         </Menu>
       </Sider>
 

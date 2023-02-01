@@ -116,8 +116,11 @@ const Learn = () => {
         }
       })
       .catch((error) => {
+        const { response } = error;
         notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
       })
       .then(() => setLoading(false));
@@ -138,6 +141,7 @@ const Learn = () => {
         } while (idx === index);
       }
       setTurns(turnsNumber);
+      console.log("in idx next click", idx);
       setIndex(idx);
       setSessionWords(sessionWordsArr);
       setCurrentWord(sessionWordsArr[idx]);
@@ -150,27 +154,35 @@ const Learn = () => {
 
   const userWrote = (word) => {
     let sessionWordsArr = JSON.parse(JSON.stringify(sessionWords));
+    console.log("in session word 1", sessionWordsArr);
     const wordsLearnedArr = [...wordsLearned];
     const currentWordObj = {
       name: currentWord.name,
       description: currentWord.description,
       score: currentWord.score,
     };
-
+    console.log("in current word", currentWordObj.name, index);
     if (currentWordObj.name === word.trim()) {
+      console.log("check viết bằng nhau", currentWordObj.name, word.trim(), index);
       currentWordObj.score++;
       if (currentWordObj.score === GOAL_SCORE) {
         wordsLearnedArr.push(currentWordObj.name);
         sessionWordsArr.splice(index, 1);
       }
-
+      console.log("in session word 3", sessionWordsArr, index);
       postProgress(sessionWordsArr, wordsLearnedArr);
       setResultStr(t("Correct"));
       setSessionWords(sessionWordsArr);
       setWordsLearned(wordsLearnedArr);
       setCurrentWord(currentWordObj);
     } else {
-      sessionWordsArr[index].score = 0;
+      console.log("check viết sai", currentWordObj.name, word.trim());
+      console.log(
+        "in session word 4, viết sai",
+        sessionWordsArr,
+        sessionWordsArr[index]
+      );
+      if (sessionWordsArr[index]) sessionWordsArr[index].score = 0;
       currentWordObj.score = 0;
       setResultStr(t("Wrong"));
       setSessionWords(sessionWordsArr);

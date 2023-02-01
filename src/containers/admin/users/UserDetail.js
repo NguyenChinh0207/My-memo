@@ -10,6 +10,7 @@ import {
   Input,
   Modal,
   notification,
+  Popover,
   Row,
   Space,
   Spin,
@@ -22,10 +23,13 @@ import { SearchOutlined } from "@ant-design/icons";
 import { postAxios } from "../../../Http";
 import {
   API_COURSE_OWNER_LIST,
+  API_GET_EXAM_BY_COURSEID,
+  API_GET_MY_COURSE,
   API_USERS_LIST,
 } from "../../../config/endpointApi";
 import { bindParams } from "../../../config/function";
 import { USER_DETAIL_PATH } from "../../../config/path";
+import IconMoreInfo from "../../../common/Icon/IconMoreInfo";
 
 const Label = (props) => (
   <span className="common-label--black">{props.children} :</span>
@@ -39,21 +43,23 @@ const Text = ({ pink, children, lightGray, ...restProps }) => {
   );
 };
 
-const UserList = () => {
+const UserDetail = () => {
   const { t } = useTranslation("common");
-  const history = useHistory();
   const location = useLocation();
+  const {userId} = useParams()
   const [loading, setLoading] = useState(false);
-  const { userId } = useParams();
   const [data, setData] = useState([]);
   const [coursesOwner, setCoursesOwner] = useState([]);
-  const [dataMyCourses, setDataMyCourses] = useState([]);
-  const [isLoadingMyCourses, setIsLoadingMyCourses] = useState([])
+  const [progress, setProgress] = useState();
+  const [myCourses, setMyCourses] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [exams, setExams] = useState([]);
 
   const columnsOwner = [
     {
       title: "#",
       dataIndex: "key",
+      width: "5%",
       render: (value, data, index) => {
         return index + 1;
       },
@@ -70,7 +76,7 @@ const UserList = () => {
     {
       title: t("Mô tả"),
       dataIndex: "description",
-      width: "35%",
+      width: "30%",
       ellipsis: true,
       render: (description) => {
         return description;
@@ -90,6 +96,14 @@ const UserList = () => {
       width: "15%",
       render: (my_language) => {
         return my_language;
+      },
+    },
+    {
+      title: t("Số từ vựng"),
+      dataIndex: "words",
+      width: "10%",
+      render: (words) => {
+        return words ? JSON.parse(words).length : 0;
       },
     },
     {
@@ -97,7 +111,7 @@ const UserList = () => {
       dataIndex: "active",
       width: "10%",
       render: (active) => {
-        return active === 1 ? "Công khai" : "Không công khai";
+        return active === 1 ? t("Công khai") : t("Không công khai");
       },
     },
   ];
@@ -105,6 +119,7 @@ const UserList = () => {
     {
       title: "#",
       dataIndex: "key",
+      width: "5%",
       render: (value, data, index) => {
         return index + 1;
       },
@@ -141,6 +156,110 @@ const UserList = () => {
       width: "15%",
       render: (my_language) => {
         return my_language;
+      },
+    },
+    {
+      title: t("Số từ vựng"),
+      dataIndex: "words",
+      width: "10%",
+      render: (words) => {
+        return words ? JSON.parse(words).length : 0;
+      },
+    },
+    {
+      title: t("Số từ đã học"),
+      dataIndex: "_id",
+      width: "10%",
+      render: (id, record) => {
+        return progress[id].wordsLearned;
+      },
+    },
+    {
+      title: "",
+      dataIndex: "_id",
+      width: "5%",
+      render: (id) => (
+        <div className="moreIcon" onClick={() => action(id)}>
+          <IconMoreInfo />
+        </div>
+      ),
+    },
+  ];
+  const columnsExam = [
+    {
+      title: "#",
+      dataIndex: "key",
+      width: "5%",
+      render: (value, data, index) => {
+        return index + 1;
+      },
+    },
+    {
+      title: t("Tên chủ đề"),
+      dataIndex: "name",
+      ellipsis: true,
+      width: "15%",
+      render: (name) => {
+        return name;
+      },
+    },
+    {
+      title: t("Thời gian trả lời"),
+      dataIndex: "time_answer",
+      width: "15%",
+      ellipsis: true,
+      render: (time_answer) => {
+        return time_answer;
+      },
+    },
+    {
+      title: t("Số lượng câu hỏi xuất hiện"),
+      dataIndex: "questions_appear",
+      width: "20%",
+      render: (questions_appear) => {
+        return questions_appear;
+      },
+    },
+    {
+      title: t("Số câu hỏi"),
+      dataIndex: "questions",
+      width: "10%",
+      render: (questions) => {
+        return questions.length;
+      },
+    },
+    {
+      title: t("Số câu đúng"),
+      dataIndex: "result",
+      width: "10%",
+      render: (result, record) => {
+        let resultData;
+        if (result) resultData = JSON.parse(result);
+        return resultData[userId] && resultData[userId].answerCorrects;
+      },
+    },
+    {
+      title: t("Kết quả"),
+      dataIndex: "result",
+      width: "10%",
+      render: (result, record) => {
+        let resultData;
+        let status;
+        if (result) resultData = JSON.parse(result);
+        if (
+          resultData[userId] &&
+          resultData[userId].answerCorrects >
+            Math.ceil(record.questions_appear.length / 2)
+        )
+          status = 1;
+        else status = 2;
+        return status === 1 ? (
+          <span style={{ color: "green", fontWeight: "bold" }}>Pass</span>
+        ) : status === 2 ? (
+          <span style={{ color: "red", fontWeight: "bold" }}>Fail</span>
+        ) : (
+          ""
+        );
       },
     },
   ];
@@ -150,9 +269,11 @@ const UserList = () => {
     const detail = location.state.detail;
     if (detail) {
       loadCoursesOwner(detail._id);
+      loadMyCourses(detail._id);
       setData(detail);
+      if (detail?.progress) setProgress(JSON.parse(detail?.progress));
     }
-  }, [location]);
+  }, [location.state.detail]);
 
   const loadCoursesOwner = (id) => {
     setLoading(true);
@@ -164,26 +285,57 @@ const UserList = () => {
         setCoursesOwner(arr);
       })
       .catch((error) => {
+        const { response } = error;
         notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
       })
       .then(() => setLoading(false));
   };
 
-  //   const loadUser = () => {
-  //     setLoading(true);
-  //     postAxios(API_USERS_LIST, { userId })
-  //       .then((res) => {
-  //         setData(res?.data);
-  //       })
-  //       .catch((error) => {
-  //         notification.error({
-  //           message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-  //         });
-  //       })
-  //       .then(() => setLoading(false));
-  //   };
+  const loadMyCourses = (id) => {
+    setLoading(true);
+    postAxios(API_GET_MY_COURSE, { userId: id })
+      .then((res) => {
+        setMyCourses(res?.data?.courses);
+      })
+      .catch((error) => {
+        const { response } = error;
+        notification.error({
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+        });
+      })
+      .then(() => setLoading(false));
+  };
+
+  const loadExamsByCourseId = (id) => {
+    setLoading(true);
+    postAxios(API_GET_EXAM_BY_COURSEID, {
+      courseId: id,
+    })
+      .then((res) => {
+        const arr = res?.data;
+        setExams(arr);
+      })
+      .catch((error) => {
+        const { response } = error;
+        notification.error({
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+        });
+      })
+      .then(() => setLoading(false));
+  };
+
+  const action = (id) => {
+    setOpenModal(true);
+    loadExamsByCourseId(id);
+  };
 
   return (
     <AdminLayout breadcrumbs={[t("Danh sách người dùng"), data?.username]}>
@@ -238,7 +390,7 @@ const UserList = () => {
               <Row>
                 <Col span={24}>
                   <div style={{ marginTop: "10px" }}>{`${t(
-                    "Danh sách khóa học đã tạo"
+                    t("Danh sách khóa học đã tạo")
                   )}:`}</div>
                   <Table
                     className="custom-table"
@@ -252,17 +404,34 @@ const UserList = () => {
               <Row>
                 <Col span={24}>
                   <div style={{ marginTop: "10px" }}>{`${t(
-                    "Danh sách khóa học của tôi"
+                    t("Danh sách khóa học của tôi")
                   )}:`}</div>
                 </Col>
                 <Table
                   className="custom-table"
                   columns={columnsMyCourses}
-                  dataSource={dataMyCourses}
+                  dataSource={myCourses}
                   rowKey="id"
                   loading={loading}
                 />
               </Row>
+              <Modal
+                title={t("Lịch sử kiểm tra")}
+                open={openModal}
+                onCancel={() => setOpenModal(false)}
+                footer={false}
+                width="80%"
+              >
+                <Row style={{ width: "100%" }}>
+                  <Table
+                    className="custom-table"
+                    columns={columnsExam}
+                    dataSource={exams}
+                    rowKey="id"
+                    loading={loading}
+                  />
+                </Row>
+              </Modal>
             </div>
           </Space>
         </Layout>
@@ -271,4 +440,4 @@ const UserList = () => {
   );
 };
 
-export default UserList;
+export default UserDetail;

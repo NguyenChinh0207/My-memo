@@ -65,8 +65,11 @@ const CoursesOwner = () => {
         setCourses(arr);
       })
       .catch((error) => {
+        const { response } = error;
         notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
       })
       .then(() => setLoading(false));
@@ -81,8 +84,11 @@ const CoursesOwner = () => {
         setIsChange(true);
       })
       .catch((error) => {
+        const { response } = error;
         notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
       })
       .then(() => setLoading(false));

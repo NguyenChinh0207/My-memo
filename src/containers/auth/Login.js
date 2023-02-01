@@ -46,6 +46,10 @@ const Login = () => {
           notification.error({
             message: t("Tên đăng nhập hoặc mật khẩu không đúng."),
           });
+        if (response?.data?.code === E002)
+          notification.error({
+            message: t("Mật khẩu không đúng."),
+          });
       })
       .then(() => setLoading(false));
   };
@@ -67,10 +71,9 @@ const Login = () => {
       })
       .catch((error) => {
         const { response } = error;
-        if (response?.data?.code === E001)
-          notification.error({
-            message: t("Đã có lỗi xảy ra, vui lòng thử lại sau!"),
-          });
+        notification.error({
+          message: response.data.message,
+        });
       });
   };
 
@@ -121,9 +124,9 @@ const Login = () => {
               >
                 <Checkbox>{t("Ghi nhớ mật khẩu")}</Checkbox>
               </Form.Item>
-              <NavLink className="login-form-forgot" to={USER_FORGOT_PASSWORD}>
+              {/* <NavLink className="login-form-forgot" to={USER_FORGOT_PASSWORD}>
                 {t("Quên mật khẩu?")}
-              </NavLink>
+              </NavLink> */}
             </Form.Item>
             <Form.Item>
               <Button
@@ -143,9 +146,10 @@ const Login = () => {
                 callback={responseFacebook}
                 cssClass="my-facebook-button-class"
                 icon="fa-facebook"
+                textButton={t("login_title")}
                 render={(renderProps) => (
                   <Button onClick={renderProps.onClick}>
-                    {t("login:login_title")}
+                    {t("login_title")}
                   </Button>
                 )}
               />

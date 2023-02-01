@@ -33,3 +33,4 @@ export const EXAM_ONLINE_PATH = `${EXAMS_PATH}/:examId/online`;
 // Admin
 export const USER_LIST_PATH = `${ADMIN_PATH}/users`;
 export const USER_DETAIL_PATH = `${ADMIN_PATH}/users/:userId`;
+export const ADMIN_COURSE_LIST_PATH = `${ADMIN_PATH}/courses`;

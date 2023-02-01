@@ -131,7 +131,7 @@ const QuestionExams = (props) => {
               <IconEdit style={{ color: "grey", width: "40px" }} />
             </div>
             <Popconfirm
-              title={t("Bạn có chắc chắn muốn xóa bộ câu hỏi này?")}
+              title={t("Bạn có chắc chắn muốn xóa chủ đề này?")}
               onConfirm={() => onClickDelete(_id)}
               okText={t("Có")}
               cancelText={t("Không")}
@@ -161,8 +161,11 @@ const QuestionExams = (props) => {
         setExams(res?.data);
       })
       .catch((error) => {
+        const { response } = error;
         notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
       })
       .then(() => setLoading(false));
@@ -239,7 +242,7 @@ const QuestionExams = (props) => {
       postAxios(API_EXAM_CREATE, data)
         .then((res) => {
           notification.success({
-            message: t("Tạo mới thành công."),
+            message: t("Tạo mới chủ đề thành công"),
           });
           setShowForm(false);
           setFileName("");
@@ -282,7 +285,7 @@ const QuestionExams = (props) => {
           {...formItemLayout}
         >
           <Form.Item
-            label={t("Tên chủ đề ")}
+            label={t("Tên chủ đề")}
             name="name"
             rules={[
               {
@@ -323,7 +326,7 @@ const QuestionExams = (props) => {
                   event.preventDefault();
                 }
               }}
-              placeholder={t("Nhập số lượng")}
+              placeholder={t("Nhập số lượng...")}
             />
           </Form.Item>
           <Form.Item
@@ -349,7 +352,7 @@ const QuestionExams = (props) => {
                   event.preventDefault();
                 }
               }}
-              placeholder={t("Nhập thời gian trả lời")}
+              placeholder={t("Nhập thời gian trả lời...")}
             />
           </Form.Item>
           <Form.Item
@@ -377,7 +380,7 @@ const QuestionExams = (props) => {
                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
               />
               {validate && (
-                <p style={{ color: "red" }}>{t("Đây là thông tin bắt buộc")}</p>
+                <p style={{ color: "red" }}>{t("Đây là thông tin bắt buộc.")}</p>
               )}
               <a href={"#"} onClick={handleDownload}>
                 {t("Tải template câu hỏi tại đây")}

@@ -1,13 +1,15 @@
 import { notification } from "antd";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { API_COURSE_DETAIL, API_GET_MY_COURSE } from "../config/endpointApi";
+import { API_COURSE_DETAIL, API_GET_MY_COURSE, API_USER_EDIT } from "../config/endpointApi";
 import { getUserInfo } from "../config/function";
+import { AppContext } from "../context/AppContext";
 import { postAxios } from "../Http";
 
 const useGetMyCourse = (loadMyCourses = false) => {
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation("common");
+  const {user_info} = useContext(AppContext)
   const userId = getUserInfo()?._id;
   const [myCourses, setMyCourses] = useState([]);
   const [progress, setProgress] = useState();
@@ -26,6 +28,23 @@ const useGetMyCourse = (loadMyCourses = false) => {
       loadData();
     }
   }, [loadMyCourses]);
+
+  const updateUser = (wordsLearned, points) => {
+    postAxios(API_USER_EDIT, {
+      _id: user_info?._id,
+      wordsLearned: wordsLearned,
+      points: points,
+    })
+      .then((res) => {})
+      .catch((error) => {
+        const { response } = error;
+        notification.error({
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+        });
+      });
+  };
 
   const loadData = () => {
     postAxios(API_GET_MY_COURSE, { userId })
@@ -64,6 +83,7 @@ const useGetMyCourse = (loadMyCourses = false) => {
           }
           const level = 1;
           const points = totalWordsLearned * 100;
+          updateUser(totalWordsLearned, points);
           setMyCourses(coursesF);
           setLevel(level);
           setPoints(points);
@@ -72,8 +92,11 @@ const useGetMyCourse = (loadMyCourses = false) => {
         }
       })
       .catch((error) => {
+        const { response } = error;
         notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
       })
       .then(() => setIsLoading(false));

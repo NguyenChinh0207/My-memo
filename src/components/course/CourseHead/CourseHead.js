@@ -55,8 +55,11 @@ const CourseHead = (props) => {
         setExams(res?.data);
       })
       .catch((error) => {
+        const { response } = error;
         notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
       });
   };
@@ -68,8 +71,11 @@ const CourseHead = (props) => {
         setExam(res?.data);
       })
       .catch((error) => {
+        const { response } = error;
         notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
       })
       .then(() => setLoading(false));
@@ -136,7 +142,7 @@ const CourseHead = (props) => {
                   />
                   <div className="CourseDetails">
                     <div className="breadcumb">
-                      {t("Khóa học")}
+                      {t("course")}
                       <RightOutlined size={18} /> {name}
                     </div>
                     <Divider className="divider-custom" />
@@ -192,7 +198,7 @@ const CourseHead = (props) => {
       >
         <Select
           size="large"
-          placeholder={t("Chọn chủ để kiểm tra")}
+          placeholder={t("Chọn chủ đề kiểm tra")}
           style={{ width: "100%" }}
           onChange={handleSelect}
         >

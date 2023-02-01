@@ -15,33 +15,38 @@ import {
   Table,
 } from "antd";
 import AdminLayout from "../../../layout/AdminLayout";
-import "./UserList.scss";
+import "./CourseList.scss";
 import { SearchOutlined } from "@ant-design/icons";
 import { postAxios } from "../../../Http";
-import { API_USERS_LIST } from "../../../config/endpointApi";
+import {
+  API_COURSES_LIST_ALL,
+  API_COURSE_LIST,
+  API_USERS_LIST,
+} from "../../../config/endpointApi";
 import { bindParams } from "../../../config/function";
-import { USER_DETAIL_PATH } from "../../../config/path";
+import { COURSE_DETAIL_PATH, USER_DETAIL_PATH } from "../../../config/path";
 
-const UserList = () => {
+const CourseList = () => {
   const { t } = useTranslation("common");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
   const [keyword, setKeyword] = useState("");
+  const [active, setActive] = useState();
 
   const LIMIT = 15;
 
   const onCell = (record) => {
-      return {
-        onClick: () =>
-          history.push({
-            pathname: `${bindParams(USER_DETAIL_PATH, {
-              userId: record._id,
-            })}`,
-            state: { detail: record },
-          }),
-      };
+    return {
+      onClick: () =>
+        history.push({
+          pathname: `${bindParams(COURSE_DETAIL_PATH, {
+            courseId: record._id,
+          })}`,
+          state: { detail: record },
+        }),
+    };
   };
 
   const columns = [
@@ -54,54 +59,54 @@ const UserList = () => {
       onCell,
     },
     {
-      title: t("Tên đăng nhập"),
-      dataIndex: "username",
-      render: (username) => {
-        return username;
+      title: t("Tên khóa học"),
+      dataIndex: "name",
+      render: (name) => {
+        return name;
       },
       onCell,
     },
     {
-      title: t("Email"),
-      dataIndex: "email",
-      render: (email) => {
-        return email;
+      title: t("Ngôn ngữ dạy"),
+      dataIndex: "language",
+      render: (language) => {
+        return language;
       },
       onCell,
     },
     {
-      title: t("Số từ đã học"),
-      dataIndex: "wordsLearned",
-      render: (wordsLearned) => {
-        return wordsLearned;
+      title: t("Ngôn ngữ của người học"),
+      dataIndex: "my_language",
+      render: (my_language) => {
+        return my_language;
       },
       onCell,
     },
     {
-      title: t("Điểm"),
-      dataIndex: "points",
-      render: (points) => {
-        return points;
+      title: t("Trạng thái"),
+      dataIndex: "active",
+      render: (active) => {
+        return active === 1 ? t("Công khai") : t("Không công khai");
       },
       onCell,
     },
     {
-      title: t("Role"),
-      dataIndex: "role",
-      render: (role) => {
-        return role === 1 ? "Admin" : "User";
+      title: t("Người tạo"),
+      dataIndex: "owner",
+      render: (owner) => {
+        return owner.username;
       },
       onCell,
     },
   ];
 
   useEffect(() => {
-    loadUsers();
+    loadCoursesAll();
   }, [keyword]);
 
-  const loadUsers = () => {
+  const loadCoursesAll = () => {
     setLoading(true);
-    postAxios(API_USERS_LIST, { keyword: keyword })
+    postAxios(API_COURSES_LIST_ALL, { keyword: keyword })
       .then((res) => {
         setTotal(res?.total);
         setData(res?.data);
@@ -123,7 +128,7 @@ const UserList = () => {
   };
 
   return (
-    <AdminLayout breadcrumbs={[t("Danh sách người dùng")]}>
+    <AdminLayout breadcrumbs={[t("Danh sách Khóa học")]}>
       {loading ? (
         <div
           style={{
@@ -142,7 +147,7 @@ const UserList = () => {
               <div className="banner--title">
                 <div className="banner-header">
                   <div style={{ fontWeight: "bold" }}>
-                    {[t("Danh sách người dùng")]}
+                    {[t("Danh sách các khóa học")]}
                   </div>
                   <div className="search-wrap">
                     <Form
@@ -200,4 +205,4 @@ const UserList = () => {
   );
 };
 
-export default UserList;
+export default CourseList;

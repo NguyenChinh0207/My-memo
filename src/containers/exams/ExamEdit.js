@@ -161,8 +161,11 @@ const ExamEdit = () => {
         setExam(res?.data);
       })
       .catch((error) => {
+        const { response } = error;
         notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
         });
       })
       .then(() => setLoading(false));
@@ -218,7 +221,7 @@ const ExamEdit = () => {
       postAxios(API_EXAM_EDIT, data)
         .then((res) => {
           notification.success({
-            message: t("Chỉnh sửa thành công."),
+            message: t("Chỉnh sửa chủ đề thành công."),
           });
           history.push(
             bindParams(EXAM_DETAIL_PATH, {
@@ -230,7 +233,9 @@ const ExamEdit = () => {
         .catch((error) => {
           const { response } = error;
           notification.error({
-            message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            message: response?.data?.message
+              ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+              : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
           });
         })
         .then(() => setLoading(false));
@@ -348,7 +353,7 @@ const ExamEdit = () => {
                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
               />
               {validate && (
-                <p style={{ color: "red" }}>{t("Đây là thông tin bắt buộc")}</p>
+                <p style={{ color: "red" }}>{t("Đây là thông tin bắt buộc.")}</p>
               )}
               <a href={"#"} onClick={handleDownload}>
                 {t("Tải template câu hỏi tại đây")}
