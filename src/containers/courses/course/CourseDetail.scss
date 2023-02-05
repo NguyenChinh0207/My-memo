@@ -221,10 +221,10 @@ $primaryColor: #7757a8;
     margin: 0px 10px !important;
 }
 .FlashCard{
-    .card-holder {
-        display: flex;
-        justify-content: center;
-    }
+    // .card-holder {
+    //     display: flex;
+    //     justify-content: center;
+    // }
 
     .card {
         margin: 40px;
@@ -243,10 +243,14 @@ $primaryColor: #7757a8;
         transform: perspective(5000px) rotateY(var(--rotate-y, 0)) translateY(var(--translate-y, 0));
     }
 
-    .card:hover {
-        --translate-y: -2px;
+    // .card:hover {
+    //     --translate-y: -2px;
+    //     --rotate-y: 180deg;
+    //     box-shadow: 0 0 5px 2px rgba(0, 0, 0, .5);
+    // }
+
+    .flip {
         --rotate-y: 180deg;
-        box-shadow: 0 0 5px 2px rgba(0, 0, 0, .5);
     }
 
     .front,
@@ -270,7 +274,7 @@ $primaryColor: #7757a8;
         text-align: center;
     }
 
-    .front p:first-child {
+    .front .p-front {
         background-color: green;
         color: white;
         width: 50px;
@@ -311,4 +315,24 @@ $primaryColor: #7757a8;
     align-items: center;
     width: 40%;
     margin: auto;
+}
+.label-upload {
+    cursor: pointer;
+    padding: 5px 20px;
+}
+
+.soundBtn{
+    float: right;
+    margin-top: -88%;
+    margin-right: 14%;
+    font-size: 24px;
+    backface-visibility: hidden;
+    transform: rotateX(0deg);
+}
+.blockSound{
+    opacity: 100;
+    transition: opacity 5000ms;
+}
+.hiddenSound{
+    opacity: 0;
 }

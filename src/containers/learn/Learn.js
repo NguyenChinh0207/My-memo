@@ -27,18 +27,19 @@ const Learn = () => {
   const { user_info } = useContext(AppContext);
   const { courseId } = useParams();
   const [course, setCourse] = useState();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [index, setIndex] = useState(0);
   const [turns, setTurns] = useState(TOTAL_TURNS);
-  const [resultStr, setResultStr] = useState(t("Learning"));
+  const [resultStr, setResultStr] = useState("learning");
   const [progress, setProgress] = useState();
   const [sessionWords, setSessionWords] = useState();
   const [wordsLearned, setWordsLearned] = useState([]);
   const [currentWord, setCurrentWord] = useState();
   const [courseFinished, setCourseFinished] = useState(false);
-  // const [sessionCreated, setSessionCreated] = useState(false);
+  const [sessionCreated, setSessionCreated] = useState();
   const [loadMyCourses, setLoadMyCourses] = useState(false);
   const [isLoading, data] = useGetMyCourse(loadMyCourses);
+  const [flag, setFlag] = useState(false);
 
   useEffect(() => {
     loadCourse();
@@ -52,13 +53,21 @@ const Learn = () => {
   }, [data.progress?.[courseId]]);
 
   useEffect(() => {
+    if (flag && sessionWords !== undefined) {
+      console.log("in vào useEfffect");
+      setTimeout(setResultToLearning, 1000);
+    }
+  }, [flag]);
+
+  useEffect(() => {
     if (progress && course) {
+      console.log("in progress", progress);
+      // setSessionCreated(true);
       createLearningSession();
     }
   }, [progress, course]);
 
   const createLearningSession = () => {
-    console.log("in tạo learning ", progress);
     const sessionWordsArr = [];
     const wordsLearnedArr = [];
     for (let pair of course.words) {
@@ -68,15 +77,15 @@ const Learn = () => {
         sessionWordsArr.push(pair);
       } else {
         wordsLearnedArr.push(pair.name);
-        console.log("in wordsLearnedArr", wordsLearnedArr);
       }
     }
-    console.log("in wordsLearnedArr 0", wordsLearnedArr);
+    console.log("in create learnig1", wordsLearnedArr);
     if (sessionWordsArr.length === 0) {
       history.goBack();
     } else {
       const currentWordData = sessionWordsArr[0];
       setLoading(false);
+      console.log("in create learnig2", wordsLearnedArr);
       setWordsLearned(wordsLearnedArr);
       setCurrentWord(currentWordData);
       setSessionWords(sessionWordsArr);
@@ -127,12 +136,12 @@ const Learn = () => {
   };
 
   const nextClick = () => {
+    console.log("in index nextClick", index, sessionWords[index]);
     const turnsNumber = turns - 1;
     if (turnsNumber === 0) {
       setTurns(0);
     } else {
       const sessionWordsArr = JSON.parse(JSON.stringify(sessionWords));
-      console.log("in next click2", sessionWordsArr[index], index);
       sessionWordsArr[index].score++;
       let idx = 0;
       if (sessionWordsArr.length > 1) {
@@ -141,7 +150,6 @@ const Learn = () => {
         } while (idx === index);
       }
       setTurns(turnsNumber);
-      console.log("in idx next click", idx);
       setIndex(idx);
       setSessionWords(sessionWordsArr);
       setCurrentWord(sessionWordsArr[idx]);
@@ -153,46 +161,41 @@ const Learn = () => {
   };
 
   const userWrote = (word) => {
+    setFlag(false);
+    console.log("in index userWrote", index, sessionWords[index]);
     let sessionWordsArr = JSON.parse(JSON.stringify(sessionWords));
-    console.log("in session word 1", sessionWordsArr);
     const wordsLearnedArr = [...wordsLearned];
     const currentWordObj = {
       name: currentWord.name,
       description: currentWord.description,
       score: currentWord.score,
     };
-    console.log("in current word", currentWordObj.name, index);
     if (currentWordObj.name === word.trim()) {
-      console.log("check viết bằng nhau", currentWordObj.name, word.trim(), index);
       currentWordObj.score++;
       if (currentWordObj.score === GOAL_SCORE) {
         wordsLearnedArr.push(currentWordObj.name);
         sessionWordsArr.splice(index, 1);
       }
-      console.log("in session word 3", sessionWordsArr, index);
       postProgress(sessionWordsArr, wordsLearnedArr);
-      setResultStr(t("Correct"));
+      setResultStr("correct");
       setSessionWords(sessionWordsArr);
+      console.log("in wordlerans", sessionWordsArr, wordsLearnedArr);
       setWordsLearned(wordsLearnedArr);
       setCurrentWord(currentWordObj);
+      setFlag(true);
     } else {
-      console.log("check viết sai", currentWordObj.name, word.trim());
-      console.log(
-        "in session word 4, viết sai",
-        sessionWordsArr,
-        sessionWordsArr[index]
-      );
+      console.log("in vào set wrong", sessionWordsArr[index], index);
       if (sessionWordsArr[index]) sessionWordsArr[index].score = 0;
       currentWordObj.score = 0;
-      setResultStr(t("Wrong"));
+      setResultStr("wrong");
       setSessionWords(sessionWordsArr);
       setCurrentWord(currentWordObj);
+      setFlag(true);
     }
-    setTimeout(setResultToLearning, 500);
+    // setTimeout(setResultToLearning, 1000);
   };
 
   const postProgress = (words, wordsLearnedList) => {
-    console.log("wordsLearnedList", wordsLearnedList);
     let progressObj = { wordsLearned: 0, wordsInProgress: {} };
     for (let pair of words) {
       progressObj.wordsInProgress[pair.name] = pair.score;
@@ -214,12 +217,14 @@ const Learn = () => {
   };
 
   const setResultToLearning = () => {
-    if (resultStr === t("Wrong")) {
-      console.log("in vao wrong");
-      setResultStr(t("Learning"));
+    console.log("in set result learning", index, resultStr);
+    if (resultStr === "wrong") {
+      console.log("vào wrong", index);
+      setResultStr("learning");
     } else {
       const turnsNumber = turns - 1;
       const sessionWordsArr = sessionWords;
+      console.log("in sessionWords", sessionWords);
       if (turnsNumber === 0) {
         setTurns(0);
       } else if (sessionWordsArr.length === 0) {
@@ -229,27 +234,35 @@ const Learn = () => {
         if (sessionWordsArr.length > 1) {
           do {
             idx = Math.floor(Math.random() * sessionWordsArr.length);
+            console.log("in index setResultToLearning1", idx, index);
           } while (idx === index);
         }
         const currentWordObj = sessionWordsArr[idx];
-        setResultStr(t("Learning"));
+        console.log(
+          "in index setResultToLearning",
+          idx,
+          index,
+          sessionWordsArr[idx]
+        );
+        setResultStr("learning");
         setIndex(idx);
         setTurns(turnsNumber);
         setCurrentWord(currentWordObj);
       }
     }
+    setFlag(false);
   };
 
   if (course && !loading) {
+    console.log("In vào content1", resultStr);
     const pair = currentWord;
     let content = <NewWordFragment next={nextClick} {...pair} />;
     if (turns === 0 || courseFinished) {
-      console.log("in vào turn 0 hoặc course finish");
       content = (
         <SessionComplete courseFinished={courseFinished} home={goToCourse} />
       );
-    } else if (pair?.score > 0 || resultStr === t("Wrong")) {
-      console.log("in vào writewword");
+    } else if (pair?.score > 0 || resultStr === "wrong") {
+      console.log("In vào content", resultStr);
       content = (
         <WriteWordFragment
           result={resultStr}

@@ -147,4 +147,22 @@
         }
     }
 }
+.create-center {
+    float: right;
+    margin-bottom: 19px;
+    display: flex;
+    justify-content: end;
+}
 
+.btnBack{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-admin-course{
+    padding: 30px 100px !important;
+}
+.activeCheck .ant-form-item-control{
+    margin: 0px !important;
+}

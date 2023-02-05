@@ -43,7 +43,7 @@ const CourseCard = (props) => {
         progress === 100 ? "NextUpButton Disabled" : "NextUpButton";
     }
     const progressWidth = { width: progress + "%" };
-    console.log("in ", progress, progressWidth);
+    // console.log("in ", progress, progressWidth);
 
     return (
       <div className={"CourseCard"}>

@@ -13,7 +13,7 @@ const WriteWordFragment = (props) => {
   }, [])
   
   useEffect(() => {
-    	if (props.result === 'Learning') {
+    	if (props.result === 'learning') {
     		clearInput();
     	}
   },[props.result])
@@ -23,13 +23,13 @@ const WriteWordFragment = (props) => {
   };
 
   const onKeyDown = e => {
-  	if (e.key === 'Enter' && props.result === 'Learning') {
+  	if (e.key === 'Enter' && props.result === 'learning') {
   		onNext();
   	}
   };
 
   const onNext = () => {
-  	if (props.result === 'Learning') {
+  	if (props.result === 'learning') {
   		props.userWrote(inputValue);
   	}
   };
@@ -41,9 +41,9 @@ const WriteWordFragment = (props) => {
 
   let inputClasses = "Input";
 
-  if (props.result === "Correct") {
+  if (props.result === "correct") {
     inputClasses += " " + "InputCorrect";
-  } else if (props.result === "Wrong") {
+  } else if (props.result === "wrong") {
     inputClasses += " " + "InputWrong";
   }
 
@@ -55,7 +55,7 @@ const WriteWordFragment = (props) => {
           {/* {input} */}
           <input
             ref={inputRef}
-            readOnly={props.result !== "Learning"}
+            readOnly={props.result !== "learning"}
             value={inputValue}
             onChange={inputChange}
             onKeyDown={onKeyDown}

@@ -6,6 +6,8 @@ import {
   DEFAULT_LANGUAGE,
   FILEBASE64,
   KEY_LANGUAGE,
+  LANGUAGES,
+  LANGUAGES_VOICES,
   SECRET_KEY,
   USER_INFO,
 } from "./const";
@@ -143,3 +145,13 @@ export const handleDownload = () => {
     "exam-template.xlsx"
   );
 };
+
+export const optionLanguages = LANGUAGES.map((item) => ({
+  value: item,
+  label: item,
+}));
+
+export const optionVoices = LANGUAGES_VOICES.map((item) => ({
+  value: item.id,
+  label: item.name,
+}));

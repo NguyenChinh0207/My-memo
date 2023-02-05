@@ -10,6 +10,7 @@ import {
   USER_LOGIN,
   USER_LIST_PATH,
   ADMIN_COURSE_LIST_PATH,
+  ADMIN_MY_COURSE_LIST_PATH,
 } from "../config/path";
 import { useTranslation } from "react-i18next";
 import { AUTH_TOKEN, EN, KEY_LANGUAGE, USER_INFO, VI } from "../config/const";
@@ -46,6 +47,11 @@ const AdminLayout = (props) => {
     {
       key: ADMIN_COURSE_LIST_PATH,
       name: t("Danh sách khóa học"),
+      icon: <SolutionOutlined />,
+    },
+    {
+      key: ADMIN_MY_COURSE_LIST_PATH,
+      name: t("Khóa học của tôi"),
       icon: <SolutionOutlined />,
     },
   ];

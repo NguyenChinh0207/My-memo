@@ -22,6 +22,7 @@ import { EXAM_ONLINE_PATH } from "../../../config/path";
 import { RightOutlined } from "@ant-design/icons";
 import { API_EXAM_DETAIL, API_EXAM_LIST } from "../../../config/endpointApi";
 import { postAxios } from "../../../Http";
+import { ADMIN_ID } from "../../../config/const";
 
 const { Option } = Select;
 
@@ -150,6 +151,15 @@ const CourseHead = (props) => {
                     <div className="Description">{description}</div>
                     {added && (
                       <div className="btnWrapCourse">
+                        {/* <div style={{ marginTop: "10px" }}>
+                          <Button
+                            type="default"
+                            className="unitBtn"
+                            onClick={() => setIsModalOpen(true)}
+                          >
+                            {t("Hệ thống bài học")}
+                          </Button>
+                        </div> */}
                         <div style={{ marginTop: "10px" }}>
                           <Button
                             type="default"
@@ -159,15 +169,17 @@ const CourseHead = (props) => {
                             {t("Kiểm tra trắc nghiệm")}
                           </Button>
                         </div>
-                        <div style={{ marginTop: "10px" }}>
-                          <Button
-                            type="default"
-                            className="flashCardBtn"
-                            onClick={() => setShowCard(true)}
-                          >
-                            {t("FlashCard")}
-                          </Button>
-                        </div>
+                        {owner._id !== ADMIN_ID && (
+                          <div style={{ marginTop: "10px" }}>
+                            <Button
+                              type="default"
+                              className="flashCardBtn"
+                              onClick={() => setShowCard(true)}
+                            >
+                              {t("FlashCard")}
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

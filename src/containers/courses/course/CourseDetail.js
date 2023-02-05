@@ -24,6 +24,7 @@ import {
 } from "@ant-design/icons";
 import useGetMyCourse from "../../../hook/useGetMyCourse";
 import { FlashCard } from "./item/FlashCard";
+import { ADMIN_ID } from "../../../config/const";
 
 const CourseDetail = () => {
   const { t } = useTranslation("common");
@@ -223,7 +224,7 @@ const CourseDetail = () => {
 
   return (
     <PrivateLayout>
-      {loading ? (
+      {loading || isLoading ? (
         <div
           style={{
             position: "fixed",
@@ -241,20 +242,24 @@ const CourseDetail = () => {
               <CourseHead {...course} added={added} setShowCard={setShowCard} />
               {!showCard ? (
                 <>
-                  <ComponentRender
-                    course={course}
-                    progress={progress}
-                    progressWidth={progressWidth}
-                    learnBtnClasses={learnBtnClasses}
-                    added={added}
-                    owner={owner}
-                    courseId={courseId}
-                    wordsLearned={wordsLearned}
-                    openModal={openModal}
-                    learn={learn}
-                    updateCourse={updateCourse}
-                  />
-                  <WordsTable {...course} />
+                  {course.owner._id !== ADMIN_ID && (
+                    <>
+                      <ComponentRender
+                        course={course}
+                        progress={progress}
+                        progressWidth={progressWidth}
+                        learnBtnClasses={learnBtnClasses}
+                        added={added}
+                        owner={owner}
+                        courseId={courseId}
+                        wordsLearned={wordsLearned}
+                        openModal={openModal}
+                        learn={learn}
+                        updateCourse={updateCourse}
+                      />
+                      <WordsTable {...course} />
+                    </>
+                  )}
                 </>
               ) : (
                 <>
@@ -274,6 +279,7 @@ const CourseDetail = () => {
                       )}
                       curCardId={curCardId}
                       loadingCard={loadingCard}
+                      voiceId={course.voice}
                     ></FlashCard>
                     <Button
                       // type="primary"

@@ -11,7 +11,6 @@ import {
   notification,
   Select,
 } from "antd";
-import { LANGUAGES } from "../../../../config/const";
 import { AppContext } from "../../../../context/AppContext";
 import { useHistory } from "react-router-dom";
 import logoCourses from "../../../../assets/img/logoCourses.png";
@@ -19,16 +18,16 @@ import { UploadOutlined } from "@ant-design/icons";
 import { API_COURSE_EDIT } from "../../../../config/endpointApi";
 import { COURSE_DETAIL_PATH } from "../../../../config/path";
 import { postAxios } from "../../../../Http";
-import { bindParams } from "../../../../config/function";
+import { bindParams, optionLanguages, optionVoices } from "../../../../config/function";
 
 const EditCourseInfor = (props) => {
   const { t } = useTranslation("common");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
   const { user_info } = useContext(AppContext);
-  const languages = LANGUAGES;
   const { TextArea } = Input;
   const [value, setValue] = useState(false);
+  const [image, setImage] = useState("");
   const course = props.course;
   const [form] = Form.useForm();
 
@@ -42,11 +41,6 @@ const EditCourseInfor = (props) => {
       sm: { span: 18 },
     },
   };
-
-  const optionLanguages = languages.map((item) => ({
-    value: item,
-    label: item,
-  }));
 
   useEffect(() => {
     if (course) {
@@ -62,6 +56,11 @@ const EditCourseInfor = (props) => {
     };
   }, [form, course]);
 
+  const uploadFile = (e) => {
+    console.log("in", e.target.files[0]);
+    setImage(e.target.files[0].name);
+  };
+
   const onFinish = async (data) => {
     setLoading(true);
     if (value) {
@@ -70,6 +69,7 @@ const EditCourseInfor = (props) => {
       data.active = 0;
     }
     data.id = course?._id;
+    data.image = image;
     postAxios(API_COURSE_EDIT, data)
       .then((res) => {
         notification.success({
@@ -151,6 +151,16 @@ const EditCourseInfor = (props) => {
             options={optionLanguages}
           />
         </Form.Item>
+        <Form.Item label={t("Thanh âm")} name="voice">
+          <Select
+            showSearch
+            placeholder={t("Chọn thanh âm")}
+            filterOption={(input, option) =>
+              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            }
+            options={optionVoices}
+          />
+        </Form.Item>
         <Form.Item
           label={t("Mô tả")}
           name="description"
@@ -200,10 +210,20 @@ const EditCourseInfor = (props) => {
       <div className="imgWrapper">
         <Image className="imgCourseEdit" alt="example" src={logoCourses} />
         <Button style={{ marginTop: "15px" }}>
-          <UploadOutlined />
-          {t("Tải ảnh lên")}
+          <label htmlFor="upload-photo-course" className="label-upload">
+            <UploadOutlined size={24} style={{ marginRight: "3px" }} />
+            {t("Tải ảnh lên")}
+          </label>
         </Button>
       </div>
+      <input
+        type="file"
+        name="image"
+        id="upload-photo-course"
+        onChange={uploadFile}
+        style={{ display: "none" }}
+        accept="image/*"
+      />
     </div>
   );
 };

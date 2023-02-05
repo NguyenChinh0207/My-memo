@@ -2,6 +2,7 @@ import { Button } from "antd";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
+import { ADMIN_ID } from "../../../../config/const";
 import { bindParams } from "../../../../config/function";
 import { COURSE_EDIT_PATH } from "../../../../config/path";
 import "../CourseDetail.scss";
@@ -43,7 +44,7 @@ export const ComponentRender = (items) => {
           )}
         </div>
       </div>
-      {items.added && (
+      {items.added && items.course.owner._id !== ADMIN_ID && (
         <div className="ProgressDiv">
           <div className="WordsLearned">
             {items.wordsLearned} / {items.course.totalWords} {t("words_learn")}

@@ -21,16 +21,14 @@ import {
   Select,
   Spin,
 } from "antd";
-import { LANGUAGES } from "../../config/const";
 import { AppContext } from "../../context/AppContext";
-import { bindParams } from "../../config/function";
+import { bindParams, optionLanguages, optionVoices } from "../../config/function";
 
 const CreateCourse = () => {
   const { t } = useTranslation("common");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
   const { user_info } = useContext(AppContext);
-  const languages = LANGUAGES;
   const { TextArea } = Input;
   const [value, setValue] = useState(false);
 
@@ -51,11 +49,6 @@ const CreateCourse = () => {
       sm: { span: 18 },
     },
   };
-
-  const optionLanguages = languages.map((item) => ({
-    value: item,
-    label: item,
-  }));
 
   const onFinish = async (data) => {
     setLoading(true);
@@ -155,6 +148,18 @@ const CreateCourse = () => {
                   .includes(input.toLowerCase())
               }
               options={optionLanguages}
+            />
+          </Form.Item>
+          <Form.Item label={t("Thanh âm")} name="voice">
+            <Select
+              showSearch
+              placeholder={t("Chọn thanh âm")}
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              options={optionVoices}
             />
           </Form.Item>
           <Form.Item

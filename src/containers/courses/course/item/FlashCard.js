@@ -1,12 +1,19 @@
+import { SoundOutlined } from "@ant-design/icons";
 import { Button, Spin } from "antd";
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
-import { bindParams } from "../../../../config/function";
-import { COURSE_EDIT_PATH } from "../../../../config/path";
 import "../CourseDetail.scss";
 
 export const FlashCard = (props) => {
+  const [flip, setFlip] = useState(false);
+  let msg = new SpeechSynthesisUtterance();
+  let synth = speechSynthesis;
+
+  const speechHandler = (msg) => {
+    msg.text = props.name;
+    msg.voice = synth.getVoices()[props.voiceId || 13];
+    window.speechSynthesis.speak(msg);
+    console.log(synth.getVoices());
+  };
   return (
     <div className="FlashCard">
       {props.loadingCard ? (
@@ -22,14 +29,28 @@ export const FlashCard = (props) => {
         </div>
       ) : (
         <div className="card-holder">
-          <div className="card">
+          <div
+            className={`card ${flip ? "flip" : ""}`}
+            onClick={() => setFlip(!flip)}
+          >
+            {/* <div className="soundBtn" onClick={() => speechHandler(msg)}>
+              <SoundOutlined />
+            </div> */}
             <div className="front">
-              <p>{props.curCardId}</p>
+              <p className="p-front">{props.curCardId}</p>
               <p>{props.name}</p>
             </div>
             <div className="back">
               <p>{props.description}</p>
             </div>
+          </div>
+          <div
+            className={`soundBtn ${
+              !flip ? "blockSound" : "hiddenSound"
+            }`}
+            onClick={() => speechHandler(msg)}
+          >
+            <SoundOutlined />
           </div>
         </div>
       )}
