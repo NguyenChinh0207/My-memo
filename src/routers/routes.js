@@ -19,6 +19,9 @@ import {
   ADMIN_MY_COURSE_LIST_PATH,
   ADMIN_MY_COURSE_CREATE_PATH,
   ADMIN_MY_COURSE_EDIT_PATH,
+  ADMIN_MY_COURSE_DETAIL_PATH,
+  ADMIN_CREATE_UNIT_PATH,
+  ADMIN_EDIT_UNIT_PATH,
 } from "../config/path";
 
 const routes = [
@@ -165,6 +168,30 @@ const routes = [
     exact: true,
     isPrivate: false,
     component: import("../containers/admin/courses/MyCourseAction"),
+    restricted: false,
+    isAdmin: true,
+  },
+  {
+    path: ADMIN_MY_COURSE_DETAIL_PATH,
+    exact: true,
+    isPrivate: false,
+    component: import("../containers/admin/courses/MyCourseDetail"),
+    restricted: false,
+    isAdmin: true,
+  },
+  {
+    path: ADMIN_CREATE_UNIT_PATH,
+    exact: true,
+    isPrivate: false,
+    component: import("../containers/admin/courses/units/UnitAction"),
+    restricted: false,
+    isAdmin: true,
+  },
+  {
+    path: ADMIN_EDIT_UNIT_PATH,
+    exact: true,
+    isPrivate: false,
+    component: import("../containers/admin/courses/units/UnitAction"),
     restricted: false,
     isAdmin: true,
   },

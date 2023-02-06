@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Row from "antd/es/grid/row";
 import {
   Button,
@@ -10,12 +10,37 @@ import {
   Checkbox,
   Select,
   Spin,
+  notification,
+  Table,
+  Popover,
 } from "antd";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router-dom";
 import "./CourseList";
 import AdminLayout from "../../../layout/AdminLayout";
-import { optionLanguages, optionVoices } from "../../../config/function";
+import {
+  bindParams,
+  optionLanguages,
+  optionVoices,
+} from "../../../config/function";
+import { postAxios } from "../../../Http";
+import {
+  API_COURSE_CREATE,
+  API_COURSE_EDIT,
+  API_UNIT_DELETE,
+  API_UNIT_LIST_BY_COURSE,
+} from "../../../config/endpointApi";
+import {
+  ADMIN_COURSE_LIST_PATH,
+  ADMIN_CREATE_UNIT_PATH,
+  ADMIN_EDIT_UNIT_PATH,
+  ADMIN_MY_COURSE_LIST_PATH,
+} from "../../../config/path";
+import { AppContext } from "../../../context/AppContext";
+import IconMoreInfo from "../../../common/Icon/IconMoreInfo";
+import moment from "moment";
+import IconEdit from "../../../common/Icon/IconEdit";
+import { CODE_ALREADY_EXIST } from "../../../config/const";
 
 const MyCourseAction = () => {
   const [form] = Form.useForm();
@@ -27,51 +52,178 @@ const MyCourseAction = () => {
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState(false);
   const { TextArea } = Input;
+  const { user_info } = useContext(AppContext);
+  const [units, setUnits] = useState([])
+
+  const action = (record) => {
+    return (
+      <div>
+        <div
+          className="d-flex align-items-center pointer"
+          onClick={() =>
+            history.push({
+              pathname: `${bindParams(ADMIN_EDIT_UNIT_PATH, {
+                courseId: courseId,
+                unitId: record?._id,
+              })}`,
+              state: { detail: record },
+            })
+          }
+        >
+          <IconEdit />
+          <div className="pl-1">{t("Chỉnh sửa")}</div>
+        </div>
+        <div
+          className="d-flex align-items-center pointer"
+        >
+          <Popconfirm
+            title={t("Bạn có chắc chắn muốn xóa bài học này?")}
+            onConfirm={() => onClickDelete(record._id)}
+            okText={t("Có")}
+            cancelText={t("Không")}
+          >
+            <div className="RemoveBtn" />
+          </Popconfirm>
+        </div>
+      </div>
+    );
+  }
+
+    const columns = [
+      {
+        title: "#",
+        dataIndex: "key",
+        render: (value, data, index) => {
+          return index + 1;
+        },
+      },
+      {
+        title: t("Tên bài học"),
+        dataIndex: "name",
+        render: (name) => {
+          return name;
+        },
+      },
+      {
+        title: t("Mô tả"),
+        dataIndex: "description",
+        ellipsis: true,
+        render: (description) => {
+          return description;
+        },
+      },
+      {
+        title: t("Số bài giảng"),
+        dataIndex: "",
+        render: (_, record) => {
+          return record?.lessons.length + record?.skills.length || 0;
+        },
+      },
+      {
+        title: t("Thời gian tạo"),
+        dataIndex: "createdAt",
+        render: (createdAt) => {
+          return createdAt ? moment(createdAt).format("YYYY-MM-DD") : "";
+        },
+      },
+      {
+        title: "",
+        dataIndex: "",
+        width: "5%",
+        align: "center",
+        render: (record) => (
+          <Popover
+            placement="bottom"
+            content={() => action(record)}
+            title=""
+            trigger="click"
+          >
+            <div className="moreIcon">
+              <IconMoreInfo />
+            </div>
+          </Popover>
+        ),
+      },
+    ];
 
   useEffect(() => {
     if (courseId && location.state.detail) {
       const detail = location.state.detail;
       form.setFieldsValue(detail);
+      detail.active === 1 ? setValue(true) : setValue(false);
+      loadUnits();
     }
+    return () => {
+      setValue(false);
+    };
   }, [location, form]);
+
+  const loadUnits = () => {
+    setLoading(true);
+    postAxios(API_UNIT_LIST_BY_COURSE, { courseId })
+      .then((res) => {
+        const list = res?.data;
+        setUnits(list);
+      })
+      .catch((error) => {
+        const { response } = error;
+        notification.error({
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+        });
+      })
+      .then(() => setLoading(false));
+  };
+
+  const onClickDelete = (id) => {
+    setLoading(true);
+    postAxios(API_UNIT_DELETE, { id })
+      .then((res) => {
+        loadUnits();
+      })
+      .catch((error) => {
+        const { response } = error;
+        if (response?.data?.code === CODE_ALREADY_EXIST) {
+          notification.error({
+            message: `${t("Bài học")} ${t("không tồn tại")}`,
+          });
+          return;
+        }
+        notification.error({
+          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+        });
+      })
+      .then(() => setLoading(false));
+  };
 
   const onFinish = (data) => {
     data.id = courseId;
     setLoading(true);
-    // postAxios(!id ? API_BRAND_CREATE : API_BRAND_EDIT, data)
-    //   .then((res) => {
-    //     notification.success({
-    //       message: id ? t("message_update") : t("message_create"),
-    //     });
-    //     queryClient.invalidateQueries("brandList");
-    //     history.push(BRAND_PATH);
-    //   })
-    //   .catch((error) => {
-    //     const { response } = error;
-    //     if (error.message === NETWORK_ERROR) {
-    //       notification.error({
-    //         message: t("common:network_error"),
-    //       });
-    //       return;
-    //     }
-    //     notification.error({
-    //       message: ` (${
-    //         error.response?.data?.message || t("common:error_server")
-    //       })`,
-    //     });
-    //     if (response?.data?.validation) {
-    //       const validation = response?.data?.validation;
-    //       const fields = [];
-    //       for (let name in validation) {
-    //         fields.push({
-    //           name,
-    //           errors: validation[name],
-    //         });
-    //       }
-    //       form.setFields(fields);
-    //     }
-    //   })
-    //   .then(() => setLoading(false));
+    data.owner = user_info?._id;
+    if (value) {
+      data.active = 1;
+    } else {
+      data.active = 0;
+    }
+    postAxios(!courseId ? API_COURSE_CREATE : API_COURSE_EDIT, data)
+      .then((res) => {
+        notification.success({
+          message: !courseId
+            ? t("Tạo mới khóa học thành công.")
+            : t("Chỉnh sửa khóa học thành công."),
+        });
+        history.push(ADMIN_MY_COURSE_LIST_PATH);
+      })
+      .catch((error) => {
+        const { response } = error;
+        notification.error({
+          message: response?.data?.message
+            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+        });
+      })
+      .then(() => setLoading(false));
   };
 
   const renderForm = () => {
@@ -200,6 +352,44 @@ const MyCourseAction = () => {
                   {t("Công khai")}
                 </Checkbox>
               </Form.Item>
+              {courseId && (
+                <Row>
+                  <Col span={24}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <h4 style={{ marginTop: "10px" }}>{`${t(
+                        t("Danh sách các bài học")
+                      )}:`}</h4>
+                      <Button
+                        size={"large"}
+                        className={"btn btn-common"}
+                        onClick={() =>
+                          history.push(
+                            bindParams(ADMIN_CREATE_UNIT_PATH, {
+                              courseId: courseId,
+                            })
+                          )
+                        }
+                      >
+                        {t("Tạo bài học")}
+                      </Button>
+                    </div>
+                    <Table
+                      className="custom-table"
+                      columns={columns}
+                      dataSource={units}
+                      rowKey="id"
+                      loading={loading}
+                    />
+                  </Col>
+                </Row>
+              )}
             </Col>
             <Col span={24} className={"area-button"}>
               <Space>
@@ -231,7 +421,7 @@ const MyCourseAction = () => {
   return (
     <AdminLayout
       breadcrumbs={[
-        t("Danh sách Khóa học của tôi"),
+        t("Danh sách khóa học đã tạo"),
         !courseId ? t("Tạo mới") : t("Chỉnh sửa"),
       ]}
     >

@@ -9,6 +9,7 @@ import {
   Input,
   Modal,
   notification,
+  Popover,
   Row,
   Space,
   Spin,
@@ -25,8 +26,10 @@ import {
   API_USERS_LIST,
 } from "../../../config/endpointApi";
 import { bindParams } from "../../../config/function";
-import { ADMIN_MY_COURSE_CREATE_PATH, ADMIN_MY_COURSE_EDIT_PATH, COURSE_DETAIL_PATH, USER_DETAIL_PATH } from "../../../config/path";
+import { ADMIN_MY_COURSE_CREATE_PATH, ADMIN_MY_COURSE_DETAIL_PATH, ADMIN_MY_COURSE_EDIT_PATH, COURSE_DETAIL_PATH, USER_DETAIL_PATH } from "../../../config/path";
 import { ADMIN_ID } from "../../../config/const";
+import IconMoreInfo from "../../../common/Icon/IconMoreInfo";
+import IconEdit from "../../../common/Icon/IconEdit";
 
 const MyCourseList = () => {
   const { t } = useTranslation("common");
@@ -35,7 +38,6 @@ const MyCourseList = () => {
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
   const [keyword, setKeyword] = useState("");
-  const [active, setActive] = useState();
 
   const LIMIT = 15;
 
@@ -43,12 +45,33 @@ const MyCourseList = () => {
     return {
       onClick: () =>
         history.push({
-          pathname: `${bindParams(ADMIN_MY_COURSE_EDIT_PATH, {
+          pathname: `${bindParams(ADMIN_MY_COURSE_DETAIL_PATH, {
             courseId: record._id,
           })}`,
           state: { detail: record },
         }),
     };
+  };
+
+  const action = (record) => {
+    return (
+      <div>
+        <div
+          className="d-flex align-items-center pointer"
+          onClick={() =>
+            history.push({
+              pathname: `${bindParams(ADMIN_MY_COURSE_EDIT_PATH, {
+                courseId: record._id,
+              })}`,
+              state: { detail: record },
+            })
+          }
+        >
+          <IconEdit />
+          <div className="pl-1">{t("Chỉnh sửa")}</div>
+        </div>
+      </div>
+    );
   };
 
   const columns = [
@@ -100,6 +123,24 @@ const MyCourseList = () => {
       },
       onCell,
     },
+    {
+      title: "",
+      dataIndex: "",
+      width: "5%",
+      align: "center",
+      render: (record) => (
+        <Popover
+          placement="bottom"
+          content={() => action(record)}
+          title=""
+          trigger="click"
+        >
+          <div className="moreIcon">
+            <IconMoreInfo />
+          </div>
+        </Popover>
+      ),
+    },
   ];
 
   useEffect(() => {
@@ -133,7 +174,7 @@ const MyCourseList = () => {
   };
 
   return (
-    <AdminLayout breadcrumbs={[t("Danh sách Khóa học của tôi")]}>
+    <AdminLayout breadcrumbs={[t("Danh sách Khóa học đã tạo")]}>
       {loading ? (
         <div
           style={{

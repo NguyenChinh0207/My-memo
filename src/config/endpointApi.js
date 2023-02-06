@@ -33,5 +33,9 @@ export const API_GET_EXAM_BY_COURSEID = `${API_EXAM_LIST}/course-id`;
 
 // admin
 const API_ADMIN = `${API_BASE}/admin`;
+const API_UNIT = `${API_BASE}/units`;
 export const API_USERS_LIST = `${API_ADMIN}/users`;
-
+export const API_UNIT_LIST_BY_COURSE = `${API_UNIT}/`;
+export const API_UNIT_CREATE = `${API_UNIT}/create`;
+export const API_UNIT_EDIT = `${API_UNIT}/edit`;
+export const API_UNIT_DELETE = `${API_UNIT}/delete`;

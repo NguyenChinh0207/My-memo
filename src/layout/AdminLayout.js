@@ -51,7 +51,7 @@ const AdminLayout = (props) => {
     },
     {
       key: ADMIN_MY_COURSE_LIST_PATH,
-      name: t("Khóa học của tôi"),
+      name: t("Khóa học đã tạo"),
       icon: <SolutionOutlined />,
     },
   ];

@@ -170,8 +170,8 @@ const UserDetail = () => {
       title: t("Số từ đã học"),
       dataIndex: "_id",
       width: "10%",
-      render: (id, record) => {
-        return progress[id].wordsLearned;
+      render: (id) => {
+        return progress[id]?.wordsLearned || 0;
       },
     },
     {
