@@ -12,6 +12,7 @@ $primaryTextColor: #7757a8;
     justify-content: space-between;
     align-items: center;
     width: 80%;
+    height: 100vh;
 }
 
 .banner {
@@ -43,7 +44,7 @@ li.active>a.u-button-style.u-text-palette-2-base,
 li.active>a.u-button-style.u-text-palette-2-base[class*="u-border-"],
 a.u-button-style.u-text-palette-2-base,
 a.u-button-style.u-text-palette-2-base[class*="u-border-"] {
-    color: $primaryTextColor  !important;
+    color: $primaryTextColor !important;
 }
 
 .u-text {
@@ -88,8 +89,8 @@ a.u-button-style.u-border-2 {
 }
 
 .u-button-style.u-border-palette-2-base {
-    border-color: $primaryTextColor  !important;
-    color: $primaryTextColor  !important;
+    border-color: $primaryTextColor !important;
+    color: $primaryTextColor !important;
     background-color: transparent !important;
 }
 

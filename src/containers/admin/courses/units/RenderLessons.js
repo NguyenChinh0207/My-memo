@@ -1,5 +1,5 @@
 import { Button, Col, Form, Input, Radio, Row } from "antd";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import "./Units.scss";
@@ -12,11 +12,18 @@ export const RenderLessons = (items) => {
   const history = useHistory();
   const [type, setType] = useState(1);
   const [form] = Form.useForm();
+  const [content, setContent] = useState("");
+  const editorRef = useRef(null);
 
   const handleChangeQuill = (_html, _a, _b, e) => {
+    if (editorRef.current) {
+      const content = editorRef.current.getContents().getText();
+      console.log("in content", content);
+      setContent(content);
+    }
     if (e.getText().trim().length === 0) {
       form.setFieldsValue({
-        content: null,
+        content: "",
       });
     }
   };
@@ -113,7 +120,7 @@ export const RenderLessons = (items) => {
                 modules={QUILL_CONFIG.modules}
                 formats={QUILL_CONFIG.formats}
                 onChange={handleChangeQuill}
-                value=""
+                value={content}
               />
             </Form.Item>
           </Col>

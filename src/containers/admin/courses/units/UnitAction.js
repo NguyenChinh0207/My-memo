@@ -6,37 +6,25 @@ import {
   Form,
   Input,
   Space,
-  Popconfirm,
-  Checkbox,
-  Select,
   Spin,
   notification,
   Table,
+  Image,
 } from "antd";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router-dom";
 import "./Units.scss";
 import AdminLayout from "../../../../layout/AdminLayout";
-import {
-  bindParams,
-  optionLanguages,
-  optionVoices,
-} from "../../../../config/function";
 import { postAxios } from "../../../../Http";
 import {
-  API_COURSE_CREATE,
-  API_COURSE_EDIT,
   API_UNIT_CREATE,
   API_UNIT_EDIT,
 } from "../../../../config/endpointApi";
-import {
-  ADMIN_COURSE_LIST_PATH,
-  ADMIN_MY_COURSE_LIST_PATH,
-} from "../../../../config/path";
 import { AppContext } from "../../../../context/AppContext";
 import TabsUnit from "../items/TabsUnit";
 import { RenderLessons } from "./RenderLessons";
 import { RenderSkills } from "./RenderSkills";
+import { UploadOutlined } from "@ant-design/icons";
 
 const UnitAction = () => {
   const [form] = Form.useForm();
@@ -49,36 +37,89 @@ const UnitAction = () => {
   const { TextArea } = Input;
   const { user_info } = useContext(AppContext);
   const [tab, setTab] = useState("0");
+  const [image, setImage] = useState();
+  const [preview, setPreview] = useState();
 
   useEffect(() => {
-    if (unitId && location.state.detail) {
+    if (unitId && location?.state?.detail) {
       const detail = location.state.detail;
       form.setFieldsValue(detail);
     }
   }, [location, form]);
 
-  const onFinish = (data) => {
-    data.id = unitId;
+  useEffect(() => {
+    if (!image && !image?.name) {
+      setPreview(undefined);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(image);
+    setPreview(objectUrl);
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [image]);
+
+  const onFinish = (body) => {
+    body.id = unitId;
     setLoading(true);
-    data.courseId = courseId;
-    postAxios(!unitId ? API_UNIT_CREATE : API_UNIT_EDIT, data)
-      .then((res) => {
-        notification.success({
-          message: !unitId
-            ? t("Tạo mới bài học thành công.")
-            : t("Chỉnh sửa bài học thành công."),
-        });
-        history.goBack();
-      })
-      .catch((error) => {
-        const { response } = error;
-        notification.error({
-          message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-        });
-      })
-      .then(() => setLoading(false));
+    body.courseId = courseId;
+    body.image = "https://memo-files.s3.us-west-2.amazonaws.com/unit.jfif";
+    if (image.name) {
+      const params = {
+        Bucket: "memo-files",
+        Key: `${unitId}-${image.name}`,
+        Body: image,
+      };
+      const s3 = location?.state?.instance;
+      s3.upload(params, async (err, data) => {
+        if (err) {
+          console.error("Error uploading file: ", err);
+          return;
+        }
+        await data;
+        if (data) {
+          if (unitId) {
+            body.image = data.Location;
+          }
+          postAxios(!unitId ? API_UNIT_CREATE : API_UNIT_EDIT, body)
+            .then((res) => {
+              notification.success({
+                message: !unitId
+                  ? t("Tạo mới bài học thành công.")
+                  : t("Chỉnh sửa bài học thành công."),
+              });
+              history.goBack();
+            })
+            .catch((error) => {
+              const { response } = error;
+              notification.error({
+                message: response?.data?.message
+                  ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+                  : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+              });
+            })
+            .then(() => setLoading(false));
+        }
+      });
+    } else {
+      postAxios(!unitId ? API_UNIT_CREATE : API_UNIT_EDIT, body)
+        .then((res) => {
+          notification.success({
+            message: !unitId
+              ? t("Tạo mới bài học thành công.")
+              : t("Chỉnh sửa bài học thành công."),
+          });
+          history.goBack();
+        })
+        .catch((error) => {
+          const { response } = error;
+          notification.error({
+            message: response?.data?.message
+              ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+              : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          });
+        })
+        .then(() => setLoading(false));
+    }
   };
 
   const renderForm = () => {
@@ -106,7 +147,7 @@ const UnitAction = () => {
           onFinish={onFinish}
         >
           <Row gutter={[20, 20]}>
-            <Col span={24}>
+            <Col span={unitId ? 16 : 24}>
               <Form.Item
                 label={t("Tên bài học")}
                 name="name"
@@ -134,6 +175,43 @@ const UnitAction = () => {
                 <TextArea rows={4} />
               </Form.Item>
             </Col>
+            {unitId && (
+              <Col
+                span={8}
+                style={{ display: "flex", justifyContent: "center" }}
+              >
+                <div className="imgWrapper">
+                  <Image
+                    className="imgCourseEdit"
+                    src={
+                      location?.state?.detail?.image
+                        ? location?.state?.detail?.image
+                        : preview
+                    }
+                  />
+                  <Button style={{ marginTop: "15px" }}>
+                    <label
+                      htmlFor="upload-photo-course"
+                      className="label-upload"
+                    >
+                      <UploadOutlined
+                        size={24}
+                        style={{ marginRight: "3px" }}
+                      />
+                      {t("Tải ảnh lên")}
+                    </label>
+                  </Button>
+                </div>
+                <input
+                  type="file"
+                  name="image"
+                  id="upload-photo-course"
+                  onChange={(e) => setImage(e.target.files[0])}
+                  style={{ display: "none" }}
+                  accept="image/*"
+                />
+              </Col>
+            )}
           </Row>
           <TabsUnit goBack={() => history.goBack()} setTab={setTab} />
           {tab === "0" && <RenderLessons />}

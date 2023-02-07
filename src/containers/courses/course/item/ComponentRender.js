@@ -44,7 +44,7 @@ export const ComponentRender = (items) => {
           )}
         </div>
       </div>
-      {items.added && items.course.owner._id !== ADMIN_ID && (
+      {items?.added && items?.course?.owner?._id !== ADMIN_ID && (
         <div className="ProgressDiv">
           <div className="WordsLearned">
             {items.wordsLearned} / {items.course.totalWords} {t("words_learn")}

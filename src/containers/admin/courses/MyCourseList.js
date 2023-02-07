@@ -6,6 +6,7 @@ import {
   Button,
   Col,
   Form,
+  Image,
   Input,
   Modal,
   notification,
@@ -80,6 +81,14 @@ const MyCourseList = () => {
       dataIndex: "key",
       render: (value, data, index) => {
         return index + 1;
+      },
+      onCell,
+    },
+    {
+      title: t("Ảnh"),
+      dataIndex: "image",
+      render: (image) => {
+        return <Image src={image} style={{width: '60px', height: '60px'}} />;
       },
       onCell,
     },

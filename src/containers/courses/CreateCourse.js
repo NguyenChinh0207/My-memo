@@ -53,6 +53,8 @@ const CreateCourse = () => {
   const onFinish = async (data) => {
     setLoading(true);
     data.owner = user_info?._id;
+    data.image =
+      "https://memo-files.s3.us-west-2.amazonaws.com/logoCourses.png";
     if (value) {
       data.active = 1;
     } else {

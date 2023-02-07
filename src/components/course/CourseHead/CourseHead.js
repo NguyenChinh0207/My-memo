@@ -113,7 +113,6 @@ const CourseHead = (props) => {
                 <div className="course-detail-wrapper-edit">
                   <img
                     className="imgCourseDetailEdit"
-                    alt="example"
                     src={logoCourses}
                   />
                   <div className="CourseDetails">
@@ -138,8 +137,7 @@ const CourseHead = (props) => {
                 <div className="course-detail-wrapper">
                   <Image
                     className="imgCourseDetail"
-                    alt="example"
-                    src={logoCourses}
+                    src={props?.image ? props.image : logoCourses}
                   />
                   <div className="CourseDetails">
                     <div className="breadcumb">

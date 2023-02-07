@@ -22,7 +22,6 @@ import {
 } from "antd";
 import { bindParams } from "../../config/function";
 import { SearchOutlined } from "@ant-design/icons";
-import FormItem from "antd/es/form/FormItem";
 import logoCourses from "../../assets/img/logoCourses.png";
 import { AppContext } from "../../context/AppContext";
 
@@ -168,8 +167,7 @@ const Courses = () => {
                             cover={
                               <img
                                 className="imgCourse"
-                                alt="example"
-                                src={logoCourses}
+                                src={item?.image ? item.image : logoCourses}
                               />
                             }
                           >

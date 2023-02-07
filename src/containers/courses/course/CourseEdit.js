@@ -34,7 +34,7 @@ const CourseEdit = () => {
   }, []);
 
   const checkIfOwner = (course) => {
-    if (user_info?._id && course.owner._id !== user_info?._id) {
+    if (user_info?._id && course?.owner?._id !== user_info?._id) {
       history.goBack();
     }
   };

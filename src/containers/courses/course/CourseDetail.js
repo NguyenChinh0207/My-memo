@@ -242,7 +242,7 @@ const CourseDetail = () => {
               <CourseHead {...course} added={added} setShowCard={setShowCard} />
               {!showCard ? (
                 <>
-                  {course.owner._id !== ADMIN_ID && (
+                  {course?.owner?._id !== ADMIN_ID && (
                     <>
                       <ComponentRender
                         course={course}

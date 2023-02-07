@@ -123,8 +123,7 @@ const CoursesOwner = () => {
               <div className="tilteCourseOwner">
                 <img
                   className="imgCourseOwner"
-                  alt="example"
-                  src={logoCourses}
+                  src={item?.image ? item.image : logoCourses}
                 />
                 <div className="titleItem">
                   <h3

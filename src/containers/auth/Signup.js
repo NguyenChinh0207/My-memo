@@ -20,7 +20,7 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
 
   const onFinish = async (data) => {
-    if (data.password !== data.password_again) {
+    if (data?.password !== data?.password_again) {
       form.setFields([
         {
           name: "password_again",

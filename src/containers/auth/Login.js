@@ -36,7 +36,7 @@ const Login = () => {
         saveUserInfo(res?.data);
         setUserInfo(res?.data);
         localStorage.setItem("roleId", res?.data.role);
-        if (res?.data.role === 1) {
+        if (res?.data?.role === 1) {
           history.push(USER_LIST_PATH);
         } else history.push(HOME_PATH);
       })

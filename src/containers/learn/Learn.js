@@ -49,10 +49,10 @@ const Learn = () => {
   }, []);
 
   useEffect(() => {
-    if (data) {
+    if (data.progress?.[courseId]) {
       loadProgress();
     }
-  }, [data.progress?.[courseId]]);
+  }, [data]);
 
   useEffect(() => {
     if (flag && sessionWords !== undefined) {
@@ -97,21 +97,17 @@ const Learn = () => {
   const loadProgress = () => {
     if (!isLoading) {
       let progressData = {};
-      console.log("in data", data.progress);
       if (data.progress?.[courseId]) {
         progressData = data.progress?.[courseId];
-        console.log("in progressData2", progressData);
       }
-      console.log("in progressData1", progressData);
       if (Object.keys(progressData).length === 0) {
         progressData = {
           wordsLearned: 0,
           wordsInProgress: {},
         };
       } else {
-        progressData = JSON.parse(JSON.stringify(progressData));
+        progressData = progressData;
       }
-      console.log("in progressData", progressData);
       setProgress(progressData);
     }
   };
@@ -176,9 +172,9 @@ const Learn = () => {
       description: currentWord.description,
       score: currentWord.score,
     };
-    if (currentWordObj.name === word.trim()) {
+    if (currentWordObj?.name === word.trim()) {
       currentWordObj.score++;
-      if (currentWordObj.score === GOAL_SCORE) {
+      if (currentWordObj?.score === GOAL_SCORE) {
         wordsLearnedArr.push(currentWordObj.name);
         sessionWordsArr.splice(index, 1);
       }

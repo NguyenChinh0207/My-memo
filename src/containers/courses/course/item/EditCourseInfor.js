@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import "../CourseDetail.scss";
 import { useTranslation } from "react-i18next";
+import AWS from "aws-sdk";
 import {
   Button,
   Checkbox,
@@ -18,7 +19,18 @@ import { UploadOutlined } from "@ant-design/icons";
 import { API_COURSE_EDIT } from "../../../../config/endpointApi";
 import { COURSE_DETAIL_PATH } from "../../../../config/path";
 import { postAxios } from "../../../../Http";
-import { bindParams, optionLanguages, optionVoices } from "../../../../config/function";
+import {
+  bindParams,
+  optionLanguages,
+  optionVoices,
+} from "../../../../config/function";
+
+AWS.config.update({
+  region: "us-west-2",
+  accessKeyId: "AKIAU6AM6N2AXNPXPPE2",
+  secretAccessKey: "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",
+});
+const s3 = new AWS.S3();
 
 const EditCourseInfor = (props) => {
   const { t } = useTranslation("common");
@@ -30,6 +42,7 @@ const EditCourseInfor = (props) => {
   const [image, setImage] = useState("");
   const course = props.course;
   const [form] = Form.useForm();
+  const [preview, setPreview] = useState();
 
   const formItemLayout = {
     labelCol: {
@@ -41,6 +54,18 @@ const EditCourseInfor = (props) => {
       sm: { span: 18 },
     },
   };
+  useEffect(() => {
+    if (!image && !image?.name) {
+      setPreview(undefined);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(image);
+    setPreview(objectUrl);
+
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [image]);
 
   useEffect(() => {
     if (course) {
@@ -57,35 +82,71 @@ const EditCourseInfor = (props) => {
   }, [form, course]);
 
   const uploadFile = (e) => {
-    console.log("in", e.target.files[0]);
-    setImage(e.target.files[0].name);
+    setImage(e.target.files[0]);
   };
 
-  const onFinish = async (data) => {
+  const onFinish = async (body) => {
     setLoading(true);
     if (value) {
-      data.active = 1;
+      body.active = 1;
     } else {
-      data.active = 0;
+      body.active = 0;
     }
-    data.id = course?._id;
-    data.image = image;
-    postAxios(API_COURSE_EDIT, data)
-      .then((res) => {
-        notification.success({
-          message: t("Chỉnh sửa khóa học thành công."),
-        });
-        history.push(bindParams(COURSE_DETAIL_PATH, { courseId: res?.id }));
-      })
-      .catch((error) => {
-        const { response } = error;
-        notification.error({
-          message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-        });
-      })
-      .then(() => setLoading(false));
+    body.id = course?._id;
+    if (image.name) {
+      const params = {
+        Bucket: "memo-files",
+        Key: `${user_info._id}-${image.name}`,
+        Body: image,
+      };
+
+      s3.upload(params, async (err, data) => {
+        if (err) {
+          console.error("Error uploading file: ", err);
+          return;
+        }
+        await data;
+        if (data) {
+          console.log("File uploaded successfully: ", data, data.Location);
+          body.image = data.Location;
+          postAxios(API_COURSE_EDIT, body)
+            .then((res) => {
+              notification.success({
+                message: t("Chỉnh sửa khóa học thành công."),
+              });
+              history.push(
+                bindParams(COURSE_DETAIL_PATH, { courseId: res?.id })
+              );
+            })
+            .catch((error) => {
+              const { response } = error;
+              notification.error({
+                message: response?.data?.message
+                  ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+                  : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+              });
+            })
+            .then(() => setLoading(false));
+        }
+      });
+    } else {
+      postAxios(API_COURSE_EDIT, body)
+        .then((res) => {
+          notification.success({
+            message: t("Chỉnh sửa khóa học thành công."),
+          });
+          history.push(bindParams(COURSE_DETAIL_PATH, { courseId: res?.id }));
+        })
+        .catch((error) => {
+          const { response } = error;
+          notification.error({
+            message: response?.data?.message
+              ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+              : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          });
+        })
+        .then(() => setLoading(false));
+    }
   };
 
   return (
@@ -208,7 +269,10 @@ const EditCourseInfor = (props) => {
         </Form.Item>
       </Form>
       <div className="imgWrapper">
-        <Image className="imgCourseEdit" alt="example" src={logoCourses} />
+        <Image
+          className="imgCourseEdit"
+          src={!course ? preview : !course?.image ? logoCourses : course?.image}
+        />
         <Button style={{ marginTop: "15px" }}>
           <label htmlFor="upload-photo-course" className="label-upload">
             <UploadOutlined size={24} style={{ marginRight: "3px" }} />

@@ -12,6 +12,7 @@ import {
   Divider,
   Table,
   notification,
+  Image,
 } from "antd";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router-dom";
@@ -77,7 +78,7 @@ const MyCourseDetail = () => {
       render: (createdAt) => {
         return createdAt ? moment(createdAt).format("YYYY-MM-DD") : "";
       },
-    }
+    },
   ];
 
   const Label = (props) => (
@@ -93,7 +94,7 @@ const MyCourseDetail = () => {
   };
 
   useEffect(() => {
-    if (courseId && location.state.detail) {
+    if (courseId && location?.state?.detail) {
       const detail = location.state.detail;
       setDetail(detail);
     }
@@ -142,7 +143,7 @@ const MyCourseDetail = () => {
         <Space size={"large"} direction={"vertical"}>
           <div className="site-layout-background site-detail-course-admin">
             <Row>
-              <Col span={24}>
+              <Col span={16}>
                 <div style={{ display: "flex" }}>
                   <Label>{t("Tên khóa học")}</Label>
                   <Text>{detail?.name}</Text>
@@ -159,8 +160,6 @@ const MyCourseDetail = () => {
                   <Text>{detail?.my_language}</Text>
                 </div>
                 <Divider className="divider-custom" />
-              </Col>
-              <Col span={24}>
                 <div style={{ display: "flex" }}>
                   <Label>{t("Thanh âm")}</Label>
                   <Text>{detail?.voice}</Text>
@@ -182,6 +181,18 @@ const MyCourseDetail = () => {
                   </Text>
                 </div>
                 <Divider className="divider-custom" />
+              </Col>
+              <Col
+                span={8}
+                style={{ display: "flex", justifyContent: "center" }}
+              >
+                <Label>{t("Ảnh")}</Label>
+                <div className="imgWrapper">
+                  <Image
+                    className="imgCourseEdit"
+                    src={detail?.image}
+                  />
+                </div>
               </Col>
             </Row>
             <Row>

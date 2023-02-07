@@ -13,6 +13,7 @@ import {
   notification,
   Table,
   Popover,
+  Image,
 } from "antd";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router-dom";
@@ -41,6 +42,15 @@ import IconMoreInfo from "../../../common/Icon/IconMoreInfo";
 import moment from "moment";
 import IconEdit from "../../../common/Icon/IconEdit";
 import { CODE_ALREADY_EXIST } from "../../../config/const";
+import { UploadOutlined } from "@ant-design/icons";
+import AWS from "aws-sdk";
+
+AWS.config.update({
+  region: "us-west-2",
+  accessKeyId: "AKIAU6AM6N2AXNPXPPE2",
+  secretAccessKey: "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",
+});
+const s3 = new AWS.S3();
 
 const MyCourseAction = () => {
   const [form] = Form.useForm();
@@ -53,7 +63,9 @@ const MyCourseAction = () => {
   const [value, setValue] = useState(false);
   const { TextArea } = Input;
   const { user_info } = useContext(AppContext);
-  const [units, setUnits] = useState([])
+  const [units, setUnits] = useState([]);
+  const [image, setImage] = useState("");
+  const [preview, setPreview] = useState();
 
   const action = (record) => {
     return (
@@ -66,16 +78,14 @@ const MyCourseAction = () => {
                 courseId: courseId,
                 unitId: record?._id,
               })}`,
-              state: { detail: record },
+              state: { detail: record, instance: s3 },
             })
           }
         >
           <IconEdit />
           <div className="pl-1">{t("Chỉnh sửa")}</div>
         </div>
-        <div
-          className="d-flex align-items-center pointer"
-        >
+        <div className="d-flex align-items-center pointer">
           <Popconfirm
             title={t("Bạn có chắc chắn muốn xóa bài học này?")}
             onConfirm={() => onClickDelete(record._id)}
@@ -87,67 +97,74 @@ const MyCourseAction = () => {
         </div>
       </div>
     );
-  }
+  };
 
-    const columns = [
-      {
-        title: "#",
-        dataIndex: "key",
-        render: (value, data, index) => {
-          return index + 1;
-        },
+  const columns = [
+    {
+      title: "#",
+      dataIndex: "key",
+      render: (value, data, index) => {
+        return index + 1;
       },
-      {
-        title: t("Tên bài học"),
-        dataIndex: "name",
-        render: (name) => {
-          return name;
-        },
+    },
+    {
+      title: t("Ảnh"),
+      dataIndex: "image",
+      render: (image) => {
+        return <Image src={image} style={{ width: "60px", height: "60px" }} />;
       },
-      {
-        title: t("Mô tả"),
-        dataIndex: "description",
-        ellipsis: true,
-        render: (description) => {
-          return description;
-        },
+    },
+    {
+      title: t("Tên bài học"),
+      dataIndex: "name",
+      render: (name) => {
+        return name;
       },
-      {
-        title: t("Số bài giảng"),
-        dataIndex: "",
-        render: (_, record) => {
-          return record?.lessons.length + record?.skills.length || 0;
-        },
+    },
+    {
+      title: t("Mô tả"),
+      dataIndex: "description",
+      ellipsis: true,
+      render: (description) => {
+        return description;
       },
-      {
-        title: t("Thời gian tạo"),
-        dataIndex: "createdAt",
-        render: (createdAt) => {
-          return createdAt ? moment(createdAt).format("YYYY-MM-DD") : "";
-        },
+    },
+    {
+      title: t("Số bài giảng"),
+      dataIndex: "",
+      render: (_, record) => {
+        return record?.lessons.length + record?.skills.length || 0;
       },
-      {
-        title: "",
-        dataIndex: "",
-        width: "5%",
-        align: "center",
-        render: (record) => (
-          <Popover
-            placement="bottom"
-            content={() => action(record)}
-            title=""
-            trigger="click"
-          >
-            <div className="moreIcon">
-              <IconMoreInfo />
-            </div>
-          </Popover>
-        ),
+    },
+    {
+      title: t("Thời gian tạo"),
+      dataIndex: "createdAt",
+      render: (createdAt) => {
+        return createdAt ? moment(createdAt).format("YYYY-MM-DD") : "";
       },
-    ];
+    },
+    {
+      title: "",
+      dataIndex: "",
+      width: "5%",
+      align: "center",
+      render: (record) => (
+        <Popover
+          placement="bottom"
+          content={() => action(record)}
+          title=""
+          trigger="click"
+        >
+          <div className="moreIcon">
+            <IconMoreInfo />
+          </div>
+        </Popover>
+      ),
+    },
+  ];
 
   useEffect(() => {
-    if (courseId && location.state.detail) {
+    if (courseId && location?.state?.detail) {
       const detail = location.state.detail;
       form.setFieldsValue(detail);
       detail.active === 1 ? setValue(true) : setValue(false);
@@ -157,6 +174,17 @@ const MyCourseAction = () => {
       setValue(false);
     };
   }, [location, form]);
+
+  useEffect(() => {
+    if (!image && !image?.name) {
+      setPreview(undefined);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(image);
+    setPreview(objectUrl);
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [image]);
 
   const loadUnits = () => {
     setLoading(true);
@@ -197,33 +225,72 @@ const MyCourseAction = () => {
       .then(() => setLoading(false));
   };
 
-  const onFinish = (data) => {
-    data.id = courseId;
+  const onFinish = (body) => {
+    body.id = courseId;
     setLoading(true);
-    data.owner = user_info?._id;
+    body.owner = user_info?._id;
     if (value) {
-      data.active = 1;
+      body.active = 1;
     } else {
-      data.active = 0;
+      body.active = 0;
     }
-    postAxios(!courseId ? API_COURSE_CREATE : API_COURSE_EDIT, data)
-      .then((res) => {
-        notification.success({
-          message: !courseId
-            ? t("Tạo mới khóa học thành công.")
-            : t("Chỉnh sửa khóa học thành công."),
-        });
-        history.push(ADMIN_MY_COURSE_LIST_PATH);
-      })
-      .catch((error) => {
-        const { response } = error;
-        notification.error({
-          message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-        });
-      })
-      .then(() => setLoading(false));
+    if (image.name) {
+      const params = {
+        Bucket: "memo-files",
+        Key: `${courseId}-${image.name}`,
+        Body: image,
+      };
+
+      s3.upload(params, async (err, data) => {
+        if (err) {
+          console.error("Error uploading file: ", err);
+          return;
+        }
+        await data;
+        if (data) {
+          if (courseId) {
+            body.image = data.Location;
+          }
+          postAxios(!courseId ? API_COURSE_CREATE : API_COURSE_EDIT, body)
+            .then((res) => {
+              notification.success({
+                message: !courseId
+                  ? t("Tạo mới khóa học thành công.")
+                  : t("Chỉnh sửa khóa học thành công."),
+              });
+              history.push(ADMIN_MY_COURSE_LIST_PATH);
+            })
+            .catch((error) => {
+              const { response } = error;
+              notification.error({
+                message: response?.data?.message
+                  ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+                  : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+              });
+            })
+            .then(() => setLoading(false));
+        }
+      });
+    } else {
+      postAxios(!courseId ? API_COURSE_CREATE : API_COURSE_EDIT, body)
+        .then((res) => {
+          notification.success({
+            message: !courseId
+              ? t("Tạo mới khóa học thành công.")
+              : t("Chỉnh sửa khóa học thành công."),
+          });
+          history.push(ADMIN_MY_COURSE_LIST_PATH);
+        })
+        .catch((error) => {
+          const { response } = error;
+          notification.error({
+            message: response?.data?.message
+              ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
+              : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          });
+        })
+        .then(() => setLoading(false));
+    }
   };
 
   const renderForm = () => {
@@ -251,7 +318,7 @@ const MyCourseAction = () => {
           onFinish={onFinish}
         >
           <Row gutter={[20, 20]}>
-            <Col span={24}>
+            <Col span={courseId ? 16 : 24}>
               <Form.Item
                 label={t("Tên khóa học")}
                 name="name"
@@ -322,6 +389,45 @@ const MyCourseAction = () => {
                   options={optionVoices}
                 />
               </Form.Item>
+            </Col>
+            {courseId && (
+              <Col
+                span={8}
+                style={{ display: "flex", justifyContent: "center" }}
+              >
+                <div className="imgWrapper">
+                  <Image
+                    className="imgCourseEdit"
+                    src={
+                      location?.state?.detail?.image
+                        ? location?.state?.detail?.image
+                        : preview
+                    }
+                  />
+                  <Button style={{ marginTop: "15px" }}>
+                    <label
+                      htmlFor="upload-photo-course"
+                      className="label-upload"
+                    >
+                      <UploadOutlined
+                        size={24}
+                        style={{ marginRight: "3px" }}
+                      />
+                      {t("Tải ảnh lên")}
+                    </label>
+                  </Button>
+                </div>
+                <input
+                  type="file"
+                  name="image"
+                  id="upload-photo-course"
+                  onChange={(e) => setImage(e.target.files[0])}
+                  style={{ display: "none" }}
+                  accept="image/*"
+                />
+              </Col>
+            )}
+            <Col span={24}>
               <Form.Item
                 label={t("Mô tả")}
                 name="description"

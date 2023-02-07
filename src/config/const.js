@@ -4,6 +4,8 @@ export const QUILL_CONFIG = {
       [{ header: "1" }, { header: "2" }, { font: [] }],
       [{ size: [] }],
       ["bold", "italic", "underline", "strike", "blockquote"],
+      [{ color: [] }, { background: [] }],
+      [{ align: [] }],
       [
         { list: "ordered" },
         { list: "bullet" },
@@ -25,6 +27,9 @@ export const QUILL_CONFIG = {
   formats: [
     "header",
     "font",
+    "color",
+    "background",
+    "align",
     "size",
     "bold",
     "italic",
