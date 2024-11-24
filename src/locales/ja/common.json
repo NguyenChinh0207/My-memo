@@ -35,6 +35,5 @@
   "validate_required": "このフィールドは必須です。",
   "msg_please_try_again": "エラーが発生しました。後で再試行してください。",
   "server_error": "エラーが発生しました",
-
   "author_created": "My memo ©2022 Created by Chinh Nguyen"
 }
