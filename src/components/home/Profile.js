@@ -21,12 +21,12 @@ const Profile = (props) => {
         <div className={"ProfileStats"}>
           <div className={"StatsWrapper"}>
             <div className={"StatsNumber"}>{props.wordsLearned}</div>
-            <div className={"StatsLabel"}>{t("words_learn")}</div>
+            <div className={"StatsLabel"}>{t("course:words_learned")}</div>
           </div>
           <div className={"StatsSeparator"} />
           <div className={"StatsWrapper"}>
             <div className={"StatsNumber"}>{props.points}</div>
-            <div className={"StatsLabel"}>{t("point")}</div>
+            <div className={"StatsLabel"}>{t("points")}</div>
           </div>
         </div>
       </div>

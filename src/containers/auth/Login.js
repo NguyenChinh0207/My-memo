@@ -68,7 +68,7 @@ const Login = () => {
       .catch((error) => {
         const { response } = error;
         notification.error({
-          message: response.data.message,
+          message: response?.data?.message,
         });
       });
   };
