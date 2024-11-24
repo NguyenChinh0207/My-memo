@@ -1,15 +1,16 @@
 import { notification } from "antd";
 import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { API_COURSE_DETAIL, API_GET_MY_COURSE, API_USER_EDIT } from "../config/endpointApi";
+import { API_GET_MY_COURSE, API_USER_EDIT } from "../config/endpointApi";
 import { getUserInfo } from "../config/function";
 import { AppContext } from "../context/AppContext";
 import { postAxios } from "../Http";
 
 const useGetMyCourse = (loadMyCourses = false) => {
+
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation("common");
-  const {user_info} = useContext(AppContext)
+  const { user_info } = useContext(AppContext);
   const userId = getUserInfo()?._id;
   const [myCourses, setMyCourses] = useState([]);
   const [progress, setProgress] = useState();
@@ -29,19 +30,42 @@ const useGetMyCourse = (loadMyCourses = false) => {
     }
   }, [loadMyCourses]);
 
+  const updateProgressOnLeave = (courseId) => {
+    
+    const updatedProgress = { ...progress };
+    if (updatedProgress[courseId]) {
+      updatedProgress[courseId].wordsLearned = 0;
+      updatedProgress[courseId].wordsInProgress = {};
+    }
+    setProgress(updatedProgress);
+
+    // Cập nhật lại trong cơ sở dữ liệu (API_USER_EDIT)
+    postAxios(API_USER_EDIT, {
+      _id: user_info?._id,
+      progress: JSON.stringify(updatedProgress),
+    })
+      .then(() => {
+        // Update success, maybe notify user or update UI
+      })
+      .catch((error) => {
+        notification.error({
+          message: t("common:msg_please_try_again"),
+        });
+      });
+  };
+
   const updateUser = (wordsLearned, points) => {
     postAxios(API_USER_EDIT, {
       _id: user_info?._id,
       wordsLearned: wordsLearned,
-      points: points,
-    })
+      points: points    })
       .then((res) => {})
       .catch((error) => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       });
   };
@@ -53,6 +77,7 @@ const useGetMyCourse = (loadMyCourses = false) => {
           const obj = res.data;
           const courses = obj.courses;
           let progress = {};
+          
           if (obj.progress !== "") {
             try {
               progress = JSON.parse(obj.progress);
@@ -77,13 +102,18 @@ const useGetMyCourse = (loadMyCourses = false) => {
               name: c.name,
               wordsLearned: wordsLearned,
               totalWords: totalWords,
+              image: c.image,
+              owner: c.owner,
+              units: c.units,
             };
             coursesF.push(course);
             totalWordsLearned += wordsLearned;
           }
           const level = 1;
           const points = totalWordsLearned * 100;
-          updateUser(totalWordsLearned, points);
+          if (loadMyCourses) {
+             updateUser(totalWordsLearned, points);
+          }
           setMyCourses(coursesF);
           setLevel(level);
           setPoints(points);
@@ -95,14 +125,14 @@ const useGetMyCourse = (loadMyCourses = false) => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setIsLoading(false));
   };
 
   const data = { myCourses, progress, wordsLearned, level, points };
-  return [isLoading, data];
+  return [isLoading, data, updateProgressOnLeave];
 };
 export default useGetMyCourse;

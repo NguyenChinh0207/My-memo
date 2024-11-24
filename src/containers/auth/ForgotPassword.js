@@ -3,7 +3,7 @@ import "./Login.scss";
 import { useTranslation } from "react-i18next";
 
 const ForgotPassword = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("auth");
 
   const [loading, setLoading] = useState(false);
 
@@ -12,17 +12,17 @@ const ForgotPassword = () => {
   return (
     <div className="main">
       <p className="sign" align="center">
-        FORGOT PASSWORD
+        {t("forgot_password_title")}
       </p>
       <form className="form1" />
       <input
         className="un "
         type="text"
         align="center"
-        placeholder="Email"
+        placeholder={t("email_placeholder")}
       />
       <a className="submit-login btn-send" align="center">
-        Send email
+        {t("send_mail")}
       </a>
     </div>
   );

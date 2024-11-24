@@ -4,43 +4,58 @@ import { NavLink, useHistory } from "react-router-dom";
 import Layout from "antd/lib/layout/layout";
 import {
   Button,
-  Col,
   Form,
   Image,
   Input,
-  Modal,
+  Popconfirm,
   notification,
   Popover,
-  Row,
   Space,
   Spin,
   Table,
+  Checkbox,
 } from "antd";
 import AdminLayout from "../../../layout/AdminLayout";
 import "./CourseList.scss";
 import { SearchOutlined } from "@ant-design/icons";
 import { postAxios } from "../../../Http";
 import {
-  API_COURSES_LIST_ALL,
-  API_COURSE_LIST,
+  API_COURSE_DELETE,
   API_COURSE_OWNER_LIST,
-  API_USERS_LIST,
 } from "../../../config/endpointApi";
 import { bindParams } from "../../../config/function";
-import { ADMIN_MY_COURSE_CREATE_PATH, ADMIN_MY_COURSE_DETAIL_PATH, ADMIN_MY_COURSE_EDIT_PATH, COURSE_DETAIL_PATH, USER_DETAIL_PATH } from "../../../config/path";
-import { ADMIN_ID } from "../../../config/const";
+import {
+  ADMIN_MY_COURSE_DETAIL_PATH,
+  ADMIN_MY_COURSE_CREATE_PATH,
+  ADMIN_MY_COURSE_EDIT_PATH,
+} from "../../../config/path";
 import IconMoreInfo from "../../../common/Icon/IconMoreInfo";
 import IconEdit from "../../../common/Icon/IconEdit";
+import IconDelete from "../../../common/Icon/IconDelete";
+import { CODE_NOT_FOUND, LIMIT } from "../../../config/const";
+import { AppContext } from "../../../context/AppContext";
 
-const MyCourseList = () => {
-  const { t } = useTranslation("common");
+const CourseList = () => {
+  const { t } = useTranslation("course");
   const history = useHistory();
+  const { user_info } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
   const [keyword, setKeyword] = useState("");
+  const [status, setStatus] = useState();
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const LIMIT = 15;
+  const ACTIVE_COURSE_OPTIONS = [
+    {
+      label: t("active"), 
+      value: 1,
+    },
+    {
+      label: t("deactive"),
+      value: 0,
+    },
+  ];
 
   const onCell = (record) => {
     return {
@@ -69,8 +84,18 @@ const MyCourseList = () => {
           }
         >
           <IconEdit />
-          <div className="pl-1">{t("Chỉnh sửa")}</div>
+          <div className="pl-1">{t("common:edit")}</div>
         </div>
+        <Popconfirm
+          className="d-flex align-items-center pointer"
+          title={t("confirm_delete_course")}
+          onConfirm={() => handleDelete(record._id, record.owner._id)}
+          okText={t("common:yes")}
+          cancelText={t("common:no")}
+        >
+          <IconDelete />
+          <div className="pl-1">{t("common:delete")}</div>
+        </Popconfirm>
       </div>
     );
   };
@@ -80,20 +105,20 @@ const MyCourseList = () => {
       title: "#",
       dataIndex: "key",
       render: (value, data, index) => {
-        return index + 1;
+        return (currentPage - 1) * LIMIT + index + 1;
       },
       onCell,
     },
     {
-      title: t("Ảnh"),
+      title: t("image"),
       dataIndex: "image",
       render: (image) => {
-        return <Image src={image} style={{width: '60px', height: '60px'}} />;
+        return <Image src={image} style={{ width: "60px", height: "60px" }} />;
       },
       onCell,
     },
     {
-      title: t("Tên khóa học"),
+      title: t("course_name"),
       dataIndex: "name",
       render: (name) => {
         return name;
@@ -101,7 +126,7 @@ const MyCourseList = () => {
       onCell,
     },
     {
-      title: t("Ngôn ngữ dạy"),
+      title: t("teacher_lang"),
       dataIndex: "language",
       render: (language) => {
         return language;
@@ -109,7 +134,7 @@ const MyCourseList = () => {
       onCell,
     },
     {
-      title: t("Ngôn ngữ của người học"),
+      title: t("learner_lang"),
       dataIndex: "my_language",
       render: (my_language) => {
         return my_language;
@@ -117,15 +142,15 @@ const MyCourseList = () => {
       onCell,
     },
     {
-      title: t("Trạng thái"),
+      title: t("status"),
       dataIndex: "active",
       render: (active) => {
-        return active === 1 ? t("Công khai") : t("Không công khai");
+        return active === 1 ? t("active") : t("deactive");
       },
       onCell,
     },
     {
-      title: t("Người tạo"),
+      title: t("creator"),
       dataIndex: "owner",
       render: (owner) => {
         return owner.username;
@@ -153,28 +178,32 @@ const MyCourseList = () => {
   ];
 
   useEffect(() => {
-    loadMyCourseAdmin();
-  }, [keyword]);
+    loadAllCourses();
+  }, [keyword, status]);
 
-  const loadMyCourseAdmin = () => {
+  const loadAllCourses = () => {
     setLoading(true);
-    postAxios(API_COURSE_OWNER_LIST, {
-      userId: ADMIN_ID,
-    })
+
+    const params = {
+      userId: user_info._id,
+      keyword,
+      status: status !== null ? status : undefined,
+    };
+
+    postAxios(API_COURSE_OWNER_LIST, params)
       .then((res) => {
         setTotal(res?.total);
-        const arr = res?.data;
-        setData(arr);
+        setData(res?.data);
       })
       .catch((error) => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false)); // Sử dụng `finally` để đảm bảo setLoading(false) luôn được gọi
   };
 
   const onSearch = (data) => {
@@ -182,8 +211,36 @@ const MyCourseList = () => {
     setKeyword(data.keyword);
   };
 
+  const onChangeCheckbox = (checkedValues) => {
+    setStatus(checkedValues);
+  };
+
+  const handleDelete = (course_id, user_id) => {
+    setLoading(true);
+    postAxios(API_COURSE_DELETE, { courseId: course_id, userId: user_id })
+      .then((res) => {
+        notification.success({
+          message: t("delete_course_success"),
+        });
+        loadAllCourses();
+      })
+      .catch((error) => {
+        const { response } = error;
+        if (response?.data?.code === CODE_NOT_FOUND) {
+          notification.error({
+            message: `${t("course_not_found")}`,
+          });
+          return;
+        }
+        notification.error({
+          message: t("common:msg_please_try_again"),
+        });
+      })
+      .then(() => setLoading(false));
+  };
+
   return (
-    <AdminLayout breadcrumbs={[t("Danh sách Khóa học đã tạo")]}>
+    <AdminLayout breadcrumbs={[t("created_courses")]}>
       {loading ? (
         <div
           style={{
@@ -200,7 +257,7 @@ const MyCourseList = () => {
           <div className="create-center">
             <NavLink to={ADMIN_MY_COURSE_CREATE_PATH}>
               <Button className="btn btn-common" size="large">
-                {t("Tạo khóa học")}
+                {t("create_course")}
               </Button>
             </NavLink>
           </div>
@@ -208,22 +265,29 @@ const MyCourseList = () => {
             <div className="site-layout-background">
               <div className="banner--title">
                 <div className="banner-header">
-                  <div style={{ fontWeight: "bold" }}>
-                    {[t("Danh sách các khóa học")]}
-                  </div>
+                  <div style={{ fontWeight: "bold" }}>{[t("created_courses")]}</div>
                   <div className="search-wrap">
                     <Form
                       className="tabbar-form"
                       onFinish={onSearch}
-                      initialValues={{ keyword: keyword }}
+                      initialValues={{ keyword: keyword, status: status }}
                     >
+                      <Form.Item
+                        name={"status"}
+                        className="d-flex align-items-center"
+                      >
+                        <Checkbox.Group
+                          options={ACTIVE_COURSE_OPTIONS}
+                          onChange={onChangeCheckbox}
+                        />
+                      </Form.Item>
                       <Form.Item
                         name={"keyword"}
                         className="input-search-discount"
                       >
                         <Input
                           allowClear
-                          placeholder={t("Nhập từ khoá...")}
+                          placeholder={t("keyword_placeholder")}
                           size={"large"}
                           style={{
                             borderTopLeftRadius: "8px",
@@ -252,11 +316,15 @@ const MyCourseList = () => {
                 className="custom-table"
                 columns={columns}
                 dataSource={data}
-                rowKey="id"
+                rowKey={(record) => record._id}
                 loading={loading}
                 pagination={{
                   total: total,
                   pageSize: LIMIT,
+                  current: currentPage, // Trang hiện tại
+                  onChange: (page) => {
+                    setCurrentPage(page); // Cập nhật trang khi người dùng thay đổi trang
+                  },
                 }}
               />
             </div>
@@ -267,4 +335,4 @@ const MyCourseList = () => {
   );
 };
 
-export default React.memo(MyCourseList);
+export default React.memo(CourseList);

@@ -1,31 +1,28 @@
-import { SoundOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
 import { Button, Spin } from "antd";
-import React, { useState } from "react";
+import { SoundOutlined } from "@ant-design/icons";
 import "../CourseDetail.scss";
 
 export const FlashCard = (props) => {
   const [flip, setFlip] = useState(false);
-  let msg = new SpeechSynthesisUtterance();
-  let synth = speechSynthesis;
+  const synth = speechSynthesis;
 
-  const speechHandler = (msg) => {
-    msg.text = props.name;
-    msg.voice = synth.getVoices()[props.voiceId || 13];
-    window.speechSynthesis.speak(msg);
-    console.log(synth.getVoices());
+  useEffect(() => {
+    setFlip(false); // Reset trạng thái flip khi dữ liệu thẻ thay đổi
+  }, [props.curCardId, props.name]);
+
+  const speechHandler = () => {
+    const msg = new SpeechSynthesisUtterance(props.name);
+    const voices = synth.getVoices();
+    msg.voice = voices[props.voiceId || 13];
+    synth.speak(msg);
   };
+
   return (
     <div className="FlashCard">
       {props.loadingCard ? (
-        <div
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          <Spin size={"large"} />
+        <div className="loading-spinner">
+          <Spin size="large" />
         </div>
       ) : (
         <div className="card-holder">
@@ -33,9 +30,6 @@ export const FlashCard = (props) => {
             className={`card ${flip ? "flip" : ""}`}
             onClick={() => setFlip(!flip)}
           >
-            {/* <div className="soundBtn" onClick={() => speechHandler(msg)}>
-              <SoundOutlined />
-            </div> */}
             <div className="front">
               <p className="p-front">{props.curCardId}</p>
               <p>{props.name}</p>
@@ -44,14 +38,11 @@ export const FlashCard = (props) => {
               <p>{props.description}</p>
             </div>
           </div>
-          <div
-            className={`soundBtn ${
-              !flip ? "blockSound" : "hiddenSound"
-            }`}
-            onClick={() => speechHandler(msg)}
-          >
-            <SoundOutlined />
-          </div>
+          {!flip && (
+            <div className="soundBtn" onClick={speechHandler}>
+              <SoundOutlined />
+            </div>
+          )}
         </div>
       )}
     </div>

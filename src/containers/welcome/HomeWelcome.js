@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink, Redirect, useHistory } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import './HomeWelcome.scss'
 import PrivateLayout from '../../layout/PrivateLayout'
-import { HOME_PATH, USER_LOGIN } from '../../config/path'
+import { USER_LOGIN } from '../../config/path'
 
 const HomeWelcome = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("homeLayout");
   return (
     <PrivateLayout>
       <div className="wrapper">
@@ -17,9 +17,7 @@ const HomeWelcome = () => {
               <h1 className="u-text u-text-palette-2-base u-text-1">
                 {t("learn_title")}
               </h1>
-              <p className="u-text u-text-2">
-                Sample text. Click to select the text box.
-              </p>
+              <p className="u-text u-text-2">{t("welcome_to_dashboard")}</p>
               <NavLink
                 to={USER_LOGIN}
                 className="u-active-palette-2-base u-border-2 u-border-active-palette-2-base u-border-hover-palette-2-base u-border-palette-2-base u-btn u-btn-round u-button-style u-hover-palette-2-base u-none u-radius-50 u-text-active-white u-text-black u-text-hover-white u-btn-2"

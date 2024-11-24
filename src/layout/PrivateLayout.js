@@ -3,7 +3,7 @@ import { Layout, Menu, Avatar, Space, Dropdown, Tooltip } from "antd";
 import { IconEng, IconVi } from "../common/Icon/Icon";
 import { NavLink, useHistory, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AUTH_TOKEN, EN, KEY_LANGUAGE, USER_INFO, VI } from "../config/const";
+import { AUTH_TOKEN, EN, JA, KEY_LANGUAGE, USER_INFO, VI } from "../config/const";
 import { getCurrentLanguage } from "../config/function";
 import i18n from "i18next";
 import avatar from "../assets/img/avatar.png";
@@ -17,25 +17,23 @@ import { AppContext } from "../context/AppContext";
 import "./PrivateLayout.scss";
 import {
   COURSES_PATH,
-  COURSE_DETAIL_PATH,
   COURSE_LIST_OWNER_PATH,
   DASHBOARD_PATH,
-  GROUPS_PATH,
   HOME_PATH,
   USER_LOGIN,
   USER_REGISTER,
 } from "../config/path";
+import IconJapan from "../common/Icon/IconJapan";
 
 const PrivateLayout = (props) => {
   const { children } = props;
   const { handleSelectLanguage, user_info } = useContext(AppContext);
   const history = useHistory();
   const location = useLocation();
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("homeLayout");
   const [visible, setVisible] = useState(false);
   const [visibleLogout, setVisibleLogout] = useState(false);
   const [visibleNotify, setVisibleNotify] = useState(false);
-  console.log("user info----------------", user_info?._id);
   const locale = getCurrentLanguage();
 
   const handleChangeLanguage = (e) => {
@@ -59,11 +57,14 @@ const PrivateLayout = (props) => {
 
   const menu = (
     <Menu onClick={handleChangeLanguage} selectedKeys={locale}>
+      <Menu.Item key={EN}>
+        <Avatar src={<IconEng />} />
+      </Menu.Item>
       <Menu.Item key={VI}>
         <Avatar src={<IconVi />} />
       </Menu.Item>
-      <Menu.Item key={EN}>
-        <Avatar src={<IconEng />} />
+      <Menu.Item key={JA}>
+        <Avatar src={<IconJapan />} />
       </Menu.Item>
     </Menu>
   );
@@ -75,14 +76,14 @@ const PrivateLayout = (props) => {
         icon={<FolderOpenOutlined />}
         onClick={handleCourses}
       >
-        {t("Khóa học đã tạo")}
+        {t("courses_created")}
       </Menu.Item>
       <Menu.Item
         key={"logout"}
         icon={<LogoutOutlined />}
         onClick={handleLogout}
       >
-        {t("logout")}
+        {t("btn_logout")}
       </Menu.Item>
     </Menu>
   );
@@ -124,7 +125,17 @@ const PrivateLayout = (props) => {
             onOpenChange={(flag) => setVisible(flag)}
             open={visible}
           >
-            <Avatar src={locale === VI ? <IconVi /> : <IconEng />} />
+            <Avatar
+              src={
+                locale === VI ? (
+                  <IconVi />
+                ) : locale === EN ? (
+                  <IconEng />
+                ) : (
+                  <IconJapan />
+                )
+              }
+            />
           </Dropdown>
           <Dropdown
             overlay={notifyList}
@@ -194,7 +205,15 @@ const PrivateLayout = (props) => {
             >
               <Avatar
                 style={{ marginRight: "15px" }}
-                src={locale === VI ? <IconVi /> : <IconEng />}
+                src={
+                  locale === VI ? (
+                    <IconVi />
+                  ) : locale === EN ? (
+                    <IconEng />
+                  ) : (
+                    <IconJapan />
+                  )
+                }
               />
             </Dropdown>
           </Space>
@@ -202,14 +221,14 @@ const PrivateLayout = (props) => {
             to={USER_LOGIN}
             className={"NavLoginSignup AuthNavButtonsDiv " + loginBtnActive}
           >
-            {t("login:btn_login")}
+            {t("btn_login")}
           </NavLink>
           <NavLink
             to={USER_REGISTER}
             className={`NavLoginSignup LRMargin ${signUpBtnActive}`}
             style={{ color: "#2b3648" }}
           >
-            {t("login:btn_signup")}
+            {t("btn_signup")}
           </NavLink>
         </div>
       </div>
@@ -234,7 +253,7 @@ const PrivateLayout = (props) => {
           textAlign: "center",
         }}
       >
-        My memo ©2022 Created by Chinh Nguyen
+        {t("common:author_created")}
       </Layout.Footer>
     </Layout>
   );

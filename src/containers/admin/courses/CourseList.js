@@ -1,18 +1,17 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import Layout from "antd/lib/layout/layout";
 import {
   Button,
-  Col,
   Form,
+  Image,
   Input,
-  Modal,
   notification,
-  Row,
   Space,
   Spin,
   Table,
+  Checkbox,
 } from "antd";
 import AdminLayout from "../../../layout/AdminLayout";
 import "./CourseList.scss";
@@ -20,28 +19,39 @@ import { SearchOutlined } from "@ant-design/icons";
 import { postAxios } from "../../../Http";
 import {
   API_COURSES_LIST_ALL,
-  API_COURSE_LIST,
-  API_USERS_LIST,
 } from "../../../config/endpointApi";
 import { bindParams } from "../../../config/function";
-import { COURSE_DETAIL_PATH, USER_DETAIL_PATH } from "../../../config/path";
+import {
+  ADMIN_COURSE_DETAIL_PATH,
+} from "../../../config/path";
+import { LIMIT } from "../../../config/const";
 
 const CourseList = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
   const [keyword, setKeyword] = useState("");
-  const [active, setActive] = useState();
+  const [status, setStatus] = useState();
+  const [currentPage, setCurrentPage] = useState(1); 
 
-  const LIMIT = 15;
+  const ACTIVE_COURSE_OPTIONS = [
+    {
+      label: t("active"), 
+      value: 1,
+    },
+    {
+      label: t("deactive"),
+      value: 0,
+    },
+  ];
 
   const onCell = (record) => {
     return {
       onClick: () =>
         history.push({
-          pathname: `${bindParams(COURSE_DETAIL_PATH, {
+          pathname: `${bindParams(ADMIN_COURSE_DETAIL_PATH, {
             courseId: record._id,
           })}`,
           state: { detail: record },
@@ -54,12 +64,20 @@ const CourseList = () => {
       title: "#",
       dataIndex: "key",
       render: (value, data, index) => {
-        return index + 1;
+        return (currentPage - 1) * LIMIT + index + 1;
       },
       onCell,
     },
     {
-      title: t("Tên khóa học"),
+      title: t("image"),
+      dataIndex: "image",
+      render: (image) => {
+        return <Image src={image} style={{ width: "60px", height: "60px" }} />;
+      },
+      onCell,
+    },
+    {
+      title: t("course_list"),
       dataIndex: "name",
       render: (name) => {
         return name;
@@ -67,7 +85,7 @@ const CourseList = () => {
       onCell,
     },
     {
-      title: t("Ngôn ngữ dạy"),
+      title: t("teacher_lang"),
       dataIndex: "language",
       render: (language) => {
         return language;
@@ -75,7 +93,7 @@ const CourseList = () => {
       onCell,
     },
     {
-      title: t("Ngôn ngữ của người học"),
+      title: t("learner_lang"),
       dataIndex: "my_language",
       render: (my_language) => {
         return my_language;
@@ -83,15 +101,15 @@ const CourseList = () => {
       onCell,
     },
     {
-      title: t("Trạng thái"),
+      title: t("status"),
       dataIndex: "active",
       render: (active) => {
-        return active === 1 ? t("Công khai") : t("Không công khai");
+        return active === 1 ? t("active") : t("deactive");
       },
       onCell,
     },
     {
-      title: t("Người tạo"),
+      title: t("creator"),
       dataIndex: "owner",
       render: (owner) => {
         return owner.username;
@@ -101,12 +119,15 @@ const CourseList = () => {
   ];
 
   useEffect(() => {
-    loadCoursesAll();
-  }, [keyword]);
+    loadAllCourses();
+  }, [keyword, status]);
 
-  const loadCoursesAll = () => {
+  const loadAllCourses = () => {
     setLoading(true);
-    postAxios(API_COURSES_LIST_ALL, { keyword: keyword })
+
+    const params = { keyword, status: status !== null ? status : undefined };
+
+    postAxios(API_COURSES_LIST_ALL, params)
       .then((res) => {
         setTotal(res?.total);
         setData(res?.data);
@@ -115,11 +136,11 @@ const CourseList = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false)); // Sử dụng `finally` để đảm bảo setLoading(false) luôn được gọi
   };
 
   const onSearch = (data) => {
@@ -127,8 +148,12 @@ const CourseList = () => {
     setKeyword(data.keyword);
   };
 
+  const onChangeCheckbox = (checkedValues) => {
+    setStatus(checkedValues);
+  };
+
   return (
-    <AdminLayout breadcrumbs={[t("Danh sách Khóa học")]}>
+    <AdminLayout breadcrumbs={[t("course_list")]}>
       {loading ? (
         <div
           style={{
@@ -146,22 +171,29 @@ const CourseList = () => {
             <div className="site-layout-background">
               <div className="banner--title">
                 <div className="banner-header">
-                  <div style={{ fontWeight: "bold" }}>
-                    {[t("Danh sách các khóa học")]}
-                  </div>
+                  <div style={{ fontWeight: "bold" }}>{[t("course_list")]}</div>
                   <div className="search-wrap">
                     <Form
                       className="tabbar-form"
                       onFinish={onSearch}
-                      initialValues={{ keyword: keyword }}
+                      initialValues={{ keyword: keyword, status: status }}
                     >
+                      <Form.Item
+                        name={"status"}
+                        className="d-flex align-items-center"
+                      >
+                        <Checkbox.Group
+                          options={ACTIVE_COURSE_OPTIONS}
+                          onChange={onChangeCheckbox}
+                        />
+                      </Form.Item>
                       <Form.Item
                         name={"keyword"}
                         className="input-search-discount"
                       >
                         <Input
                           allowClear
-                          placeholder={t("Nhập từ khoá...")}
+                          placeholder={t("keyword_placeholder")}
                           size={"large"}
                           style={{
                             borderTopLeftRadius: "8px",
@@ -190,11 +222,15 @@ const CourseList = () => {
                 className="custom-table"
                 columns={columns}
                 dataSource={data}
-                rowKey="id"
+                rowKey={(record) => record._id}
                 loading={loading}
                 pagination={{
                   total: total,
                   pageSize: LIMIT,
+                  current: currentPage, // Trang hiện tại
+                  onChange: (page) => {
+                    setCurrentPage(page); // Cập nhật trang khi người dùng thay đổi trang
+                  },
                 }}
               />
             </div>
@@ -205,4 +241,4 @@ const CourseList = () => {
   );
 };
 
-export default CourseList;
+export default React.memo(CourseList);

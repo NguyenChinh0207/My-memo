@@ -1,29 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, NavLink, useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import "./Courses.scss";
 import PrivateLayout from "../../layout/PrivateLayout";
 import {
-  COURSE_CREATE_PATH,
   COURSE_DETAIL_PATH,
   COURSE_EDIT_PATH,
-  COURSE_LIST_OWNER_PATH,
 } from "../../config/path";
 import Layout from "antd/lib/layout/layout";
 import { postAxios } from "../../Http";
 import {
   API_COURSE_EDIT,
-  API_COURSE_LIST,
   API_COURSE_OWNER_LIST,
 } from "../../config/endpointApi";
 import {
-  Avatar,
-  Button,
-  Card,
   Col,
-  Form,
-  Image,
-  Input,
   List,
   Modal,
   notification,
@@ -33,15 +24,12 @@ import {
 import { bindParams } from "../../config/function";
 import {
   ExclamationCircleFilled,
-  MoreOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
-import FormItem from "antd/es/form/FormItem";
 import logoCourses from "../../assets/img/logoCourses.png";
 import { AppContext } from "../../context/AppContext";
 
 const CoursesOwner = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const history = useHistory();
   const { user_info } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
@@ -68,8 +56,8 @@ const CoursesOwner = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -87,8 +75,8 @@ const CoursesOwner = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -96,7 +84,7 @@ const CoursesOwner = () => {
 
   const onStatus = (id, active) => {
     confirm({
-      title: t("Bạn có chắc chắn muốn thay đổi trạng thái khóa học?"),
+      title: t("confim_change_status"),
       icon: <ExclamationCircleFilled />,
       onOk: () => changeStatusActive(id, active),
       onCancel() {},
@@ -143,8 +131,8 @@ const CoursesOwner = () => {
                   )}`}</p>
                   <p>
                     {item.active
-                      ? `(${t("Công khai")})`
-                      : `(${t("Không công khai")})`}
+                      ? `(${t("active")})`
+                      : `(${t("deactive")})`}
                   </p>
                 </div>
               </div>
@@ -159,7 +147,7 @@ const CoursesOwner = () => {
                           courseId: item._id,
                         })}
                       >
-                        {t("Chỉnh sửa khóa học")}
+                        {t("edit_course")}
                       </Link>
                     </li>
                     <li>
@@ -167,7 +155,7 @@ const CoursesOwner = () => {
                         className={"TooltipLink"}
                         onClick={() => onStatus(item._id, item.active)}
                       >
-                        {t("Thay đổi trạng thái")}
+                        {t("change_status")}
                       </div>
                     </li>
                   </ul>
@@ -198,7 +186,7 @@ const CoursesOwner = () => {
         <Layout style={{ minWidth: "100vh" }} className="Course">
           <div className="PageHead">
             <div className="PageHeadRow">
-              <div className="Title">{t("Các khóa học đã tạo")}</div>
+              <div className="Title">{t("created_courses")}</div>
             </div>
           </div>
           <div className="Content-courses Content-courses-owner">

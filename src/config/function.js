@@ -33,6 +33,8 @@ export const getTranslationFiles = (languages, translationFiles) => {
       } catch (error) {}
     }
   }
+  console.log("in ", resources);
+  
   return resources;
 };
 

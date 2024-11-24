@@ -57,8 +57,8 @@ const CourseEdit = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -94,8 +94,8 @@ const CourseEdit = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       });
   };

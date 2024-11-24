@@ -1,12 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import Row from "antd/es/grid/row";
 import {
-  Button,
   Col,
-  Form,
-  Input,
   Space,
-  Checkbox,
   Spin,
   Layout,
   Divider,
@@ -15,23 +11,22 @@ import {
   Image,
 } from "antd";
 import { useTranslation } from "react-i18next";
-import { useHistory, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import "./CourseList";
 import AdminLayout from "../../../layout/AdminLayout";
-import { AppContext } from "../../../context/AppContext";
 import { API_UNIT_LIST_BY_COURSE } from "../../../config/endpointApi";
-import IconMoreInfo from "../../../common/Icon/IconMoreInfo";
 import moment from "moment";
 import { postAxios } from "../../../Http";
+import useCourseDetail from "../../../hook/useCourseDetail";
 
 const MyCourseDetail = () => {
   const params = useParams();
-  const history = useHistory();
   const location = useLocation();
   const { courseId } = params;
-  const { t } = useTranslation("cmmon");
+  const { t } = useTranslation("course");
   const [loading, setLoading] = useState(false);
-  const { user_info } = useContext(AppContext);
+  const { course } = useCourseDetail(courseId, t, setLoading);
+
   const [detail, setDetail] = useState({});
   const [units, setUnits] = useState([]);
 
@@ -44,21 +39,21 @@ const MyCourseDetail = () => {
       },
     },
     {
-      title: t("Tên bài học"),
+      title: t("lecture_name"),
       dataIndex: "name",
       render: (name) => {
         return name;
       },
     },
     {
-      title: t("Ảnh"),
+      title: t("image"),
       dataIndex: "image",
       render: (image) => {
-        return <img src={image} />;
+        return <img src={image} style={{ width: "60px", height: "60px" }} />;
       },
     },
     {
-      title: t("Mô tả"),
+      title: t("description"),
       dataIndex: "description",
       ellipsis: true,
       render: (description) => {
@@ -66,14 +61,7 @@ const MyCourseDetail = () => {
       },
     },
     {
-      title: t("Số bài giảng"),
-      dataIndex: "",
-      render: (_, record) => {
-        return record?.lessons.length + record?.skills.length || 0;
-      },
-    },
-    {
-      title: t("Thời gian tạo"),
+      title: t("created_time"),
       dataIndex: "createdAt",
       render: (createdAt) => {
         return createdAt ? moment(createdAt).format("YYYY-MM-DD") : "";
@@ -94,9 +82,13 @@ const MyCourseDetail = () => {
   };
 
   useEffect(() => {
-    if (courseId && location?.state?.detail) {
-      const detail = location.state.detail;
-      setDetail(detail);
+    if (courseId) {
+      if (location?.state?.detail) {
+        const detail = location.state.detail;
+        setDetail(detail);
+      } else {
+        setDetail(course)
+      }
     }
   }, [location]);
 
@@ -115,8 +107,8 @@ const MyCourseDetail = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -145,39 +137,39 @@ const MyCourseDetail = () => {
             <Row>
               <Col span={16}>
                 <div style={{ display: "flex" }}>
-                  <Label>{t("Tên khóa học")}</Label>
+                  <Label>{t("course_name")}</Label>
                   <Text>{detail?.name}</Text>
                 </div>
                 <Divider className="divider-custom" />
                 <div style={{ display: "flex" }}>
                   {" "}
-                  <Label>{t("Dạy")}</Label>
+                  <Label>{t("teacher_lang")}</Label>
                   <Text>{detail?.language}</Text>
                 </div>
                 <Divider className="divider-custom" />
                 <div style={{ display: "flex" }}>
-                  <Label>{t("Cho người nói")}</Label>
+                  <Label>{t("learner_lang")}</Label>
                   <Text>{detail?.my_language}</Text>
                 </div>
                 <Divider className="divider-custom" />
                 <div style={{ display: "flex" }}>
-                  <Label>{t("Thanh âm")}</Label>
+                  <Label>{t("voice_lang")}</Label>
                   <Text>{detail?.voice}</Text>
                 </div>
                 <Divider className="divider-custom" />
                 <div style={{ display: "flex" }}>
                   {" "}
-                  <Label>{t("Mô tả")}</Label>
+                  <Label>{t("description")}</Label>
                   <Text>{detail?.description}</Text>
                 </div>
                 <Divider className="divider-custom" />
                 <div style={{ display: "flex" }}>
                   {" "}
-                  <Label>{t("Công khai")}</Label>
+                  <Label>{t("active")}</Label>
                   <Text>
                     {detail?.active === 1
-                      ? t("Công khai")
-                      : t("Không công khai")}
+                      ? t("active")
+                      : t("deactive")}
                   </Text>
                 </div>
                 <Divider className="divider-custom" />
@@ -186,25 +178,22 @@ const MyCourseDetail = () => {
                 span={8}
                 style={{ display: "flex", justifyContent: "center" }}
               >
-                <Label>{t("Ảnh")}</Label>
+                <Label>{t("image")}</Label>
                 <div className="imgWrapper">
-                  <Image
-                    className="imgCourseEdit"
-                    src={detail?.image}
-                  />
+                  <Image className="imgCourseEdit" src={detail?.image} />
                 </div>
               </Col>
             </Row>
             <Row>
               <Col span={24}>
                 <Label style={{ marginTop: "10px" }}>{`${t(
-                  t("Danh sách các bài học")
+                  t("lecture_list")
                 )}:`}</Label>
                 <Table
                   className="custom-table"
                   columns={columns}
                   dataSource={units}
-                  rowKey="id"
+                  rowKey={(record) => record._id}
                   loading={loading}
                 />
               </Col>
@@ -218,8 +207,8 @@ const MyCourseDetail = () => {
   return (
     <AdminLayout
       breadcrumbs={[
-        t("Danh sách khóa học đã tạo"),
-        !courseId ? t("Tạo mới") : t("Chi tiết"),
+        t("created_courses"),
+        !courseId ? t("common:create") : `${courseId}`,
       ]}
     >
       {renderForm()}

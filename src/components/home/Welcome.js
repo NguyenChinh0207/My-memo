@@ -18,14 +18,12 @@ const Welcome = () => {
           </div>
         </div>
         <p className={"Description"}>
-          Có vẻ như bạn chưa chọn khóa học nào! Một thế giới vô vàn thứ để học
-          đang chờ bạn khám phá đấy! Hãy nhấn vào nút bên cạnh và chọn hành
-          trình học tiếp theo của bạn nào.
+          {t("begin_text")}
         </p>
       </div>
       <div className={"BtnWrapper"}>
         <NavLink to={COURSES_PATH} className={"CoursesBtn"}>
-          Tìm khóa học
+          {t("search_course")}
         </NavLink>
       </div>
     </div>

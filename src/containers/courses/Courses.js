@@ -26,7 +26,7 @@ import logoCourses from "../../assets/img/logoCourses.png";
 import { AppContext } from "../../context/AppContext";
 
 const Courses = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const history = useHistory();
   const { user_info } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
@@ -56,8 +56,8 @@ const Courses = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -91,7 +91,7 @@ const Courses = () => {
         <Layout style={{ minWidth: "100vh" }} className="Course">
           <div className="PageHead">
             <div className="PageHeadRow">
-              <div className="Title">{t("Các khóa học")}</div>
+              <div className="Title">{t("course_list")}</div>
               <div className="create-search">
                 <div className="search-wrap" style={{ marginRight: "10px" }}>
                   <Form
@@ -106,7 +106,7 @@ const Courses = () => {
                     >
                       <Input
                         allowClear
-                        placeholder={t("Nhập từ khoá...")}
+                        placeholder={t("keyword_placeholder")}
                         size={"large"}
                         style={{
                           borderTopLeftRadius: "6px",
@@ -129,7 +129,7 @@ const Courses = () => {
                   </Form>
                 </div>
                 <NavLink className="CreateButton" to={COURSE_CREATE_PATH}>
-                  {t("Tạo khóa học")}
+                  {t("create_course")}
                 </NavLink>
               </div>
             </div>
@@ -177,7 +177,7 @@ const Courses = () => {
                                   {item?.language}
                                 </a>
                                 <span className="author">
-                                  {t("bởi")}{" "}
+                                  {t("by")}{" "}
                                   <a
                                     href="#"
                                     data-role="hovercard"
@@ -206,7 +206,7 @@ const Courses = () => {
                   loading={loading}
                   className="btn-load"
                 >
-                  {t("Hiển thị thêm")}
+                  {t("show_more")}
                 </Button>
               )}
             </div>

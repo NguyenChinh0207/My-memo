@@ -2,18 +2,14 @@ import React, { useContext, useEffect, useState } from "react";
 import "./Exam.scss";
 import { useHistory, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Layout, notification, Radio, Spin } from "antd";
+import { Layout, Radio } from "antd";
 import { AppContext } from "../../context/AppContext";
 import ExamHeader from "../../components/exam/ExamHeader";
-import { API_EXAM_DETAIL, API_EXAM_LIST } from "../../config/endpointApi";
-import { postAxios } from "../../Http";
-import { bindParams, shuffleArray } from "../../config/function";
+import { shuffleArray } from "../../config/function";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 
 const ExamOnline = () => {
-  const { t } = useTranslation("common");
-  const history = useHistory();
-  const { courseId, examId } = useParams();
+  const { t } = useTranslation("course");
   const location = useLocation();
   const { user_info } = useContext(AppContext);
   const [exam, setExam] = useState({});
@@ -45,7 +41,7 @@ const ExamOnline = () => {
       [e.target.name]: e.target.value,
     });
   };
-  console.log("answer", answer, answer[`answer5`]);
+
   return (
     <Layout style={{ minWidth: "100vh" }} className="examOnline">
       <ExamHeader
@@ -63,7 +59,7 @@ const ExamOnline = () => {
               <div key={index}>
                 <div className="question">
                   <p>
-                    {`${t("Câu hỏi số")} ${index + 1}:`}{" "}
+                    {`${t("question_number")} ${index + 1}:`}{" "}
                     <span>
                       {!String(answer[`answer${index + 1}`]) ||
                       answer[`answer${index + 1}`] === undefined ? (
@@ -117,7 +113,7 @@ const ExamOnline = () => {
             {questions.map((item, index) => (
               <div key={index}>
                 <div className="question">
-                  <p>{`${t("Câu hỏi số")} ${index + 1}:`} </p>
+                  <p>{`${t("question_number")} ${index + 1}:`} </p>
                   <p>{item.content}</p>
                 </div>
                 <div className="answer">

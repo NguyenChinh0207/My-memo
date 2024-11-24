@@ -1,36 +1,27 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NavLink, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import "./Courses.scss";
 import PrivateLayout from "../../layout/PrivateLayout";
-import {
-  COURSES_PATH,
-  COURSE_CREATE,
-  COURSE_CREATE_PATH,
-  COURSE_EDIT_PATH,
-} from "../../config/path";
 import Layout from "antd/lib/layout/layout";
-import { postAxios } from "../../Http";
-import { API_COURSE_CREATE, API_COURSE_LIST } from "../../config/endpointApi";
 import {
   Button,
   Checkbox,
   Form,
   Input,
-  notification,
   Select,
-  Spin,
 } from "antd";
 import { AppContext } from "../../context/AppContext";
-import { bindParams, optionLanguages, optionVoices } from "../../config/function";
+import { optionLanguages, optionVoices } from "../../config/function";
+import { useCourseAction } from "../../hook/useCourseAction";
 
 const CreateCourse = () => {
-  const { t } = useTranslation("common");
-  const history = useHistory();
+  const { t } = useTranslation("course");
   const [loading, setLoading] = useState(false);
   const { user_info } = useContext(AppContext);
   const { TextArea } = Input;
   const [value, setValue] = useState(false);
+  const { handleCourseAction} = useCourseAction();
 
   useEffect(() => {
     return () => {
@@ -51,33 +42,15 @@ const CreateCourse = () => {
   };
 
   const onFinish = async (data) => {
-    setLoading(true);
     data.owner = user_info?._id;
-    data.image =
-      "https://memo-files.s3.us-west-2.amazonaws.com/logoCourses.png";
+    // data.image =
+    //   "https://memo-files.s3.us-west-2.amazonaws.com/logoCourses.png";
     if (value) {
       data.active = 1;
     } else {
       data.active = 0;
     }
-    postAxios(API_COURSE_CREATE, data)
-      .then((res) => {
-        notification.success({
-          message: t("Tạo mới khóa học thành công."),
-        });
-        history.push(
-          bindParams(COURSE_EDIT_PATH, { courseId: res?.data?._id })
-        );
-      })
-      .catch((error) => {
-        const { response } = error;
-        notification.error({
-          message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-        });
-      })
-      .then(() => setLoading(false));
+    await handleCourseAction("", data, t, setLoading);
   };
 
   return (
@@ -85,7 +58,7 @@ const CreateCourse = () => {
       <Layout style={{ minWidth: "100vh" }} className="Course">
         <div className="PageHead">
           <div className="PageHeadRow">
-            <div className="Title">{t("Tạo khóa học")}</div>
+            <div className="Title">{t("create_course")}</div>
           </div>
         </div>
         <Form
@@ -95,34 +68,32 @@ const CreateCourse = () => {
           {...formItemLayout}
         >
           <Form.Item
-            label={t("Tên khóa học")}
+            label={t("course_name")}
             name="name"
             rules={[
               {
                 required: true,
                 whitespace: true,
-                message: t("Đây là thông tin bắt buộc."),
+                message: t("validate_required"),
               },
             ]}
-            extra={t(
-              "Đặt tên phù hợp cho khóa học sẽ giúp các học viên khác tìm kiếm dễ dàng hơn."
-            )}
+            extra={t("give_course_name")}
           >
-            <Input placeholder={t("Nhập tên khóa học...")} />
+            <Input placeholder={t("course_name_placeholder")} />
           </Form.Item>
           <Form.Item
-            label={t("Dạy")}
+            label={t("teacher_lang")}
             name="language"
             rules={[
               {
                 required: true,
-                message: t("Đây là thông tin bắt buộc."),
+                message: t("validate_required"),
               },
             ]}
           >
             <Select
               showSearch
-              placeholder={t("Chọn ngôn ngữ")}
+              placeholder={t("select_lang")}
               filterOption={(input, option) =>
                 (option?.label ?? "")
                   .toLowerCase()
@@ -132,18 +103,18 @@ const CreateCourse = () => {
             />
           </Form.Item>
           <Form.Item
-            label={t("Cho người nói")}
+            label={t("learner_lang")}
             name="my_language"
             rules={[
               {
                 required: true,
-                message: t("Đây là thông tin bắt buộc."),
+                message: t("validate_required"),
               },
             ]}
           >
             <Select
               showSearch
-              placeholder={t("Chọn ngôn ngữ")}
+              placeholder={t("select_lang")}
               filterOption={(input, option) =>
                 (option?.label ?? "")
                   .toLowerCase()
@@ -152,10 +123,10 @@ const CreateCourse = () => {
               options={optionLanguages}
             />
           </Form.Item>
-          <Form.Item label={t("Thanh âm")} name="voice">
+          <Form.Item label={t("voice_lang")} name="voice">
             <Select
               showSearch
-              placeholder={t("Chọn thanh âm")}
+              placeholder={t("select_voice")}
               filterOption={(input, option) =>
                 (option?.label ?? "")
                   .toLowerCase()
@@ -165,16 +136,16 @@ const CreateCourse = () => {
             />
           </Form.Item>
           <Form.Item
-            label={t("Mô tả")}
+            label={t("description")}
             name="description"
             rules={[
               {
                 required: true,
                 whitespace: true,
-                message: t("Đây là thông tin bắt buộc."),
+                message: t("validate_required"),
               },
             ]}
-            extra={t("Mô tả khóa học bằng ngôn ngữ của người học.")}
+            extra={t("description_course")}
           >
             <TextArea rows={4} />
           </Form.Item>
@@ -190,7 +161,7 @@ const CreateCourse = () => {
               checked={value}
               onChange={() => setValue(!value)}
             >
-              {t("Công khai")}
+              {t("active")}
             </Checkbox>
           </Form.Item>
 
@@ -206,7 +177,7 @@ const CreateCourse = () => {
               className="createCourse"
               loading={loading}
             >
-              {t("Tạo khóa học")}
+              {t("create_course")}
             </Button>
           </Form.Item>
         </Form>

@@ -10,6 +10,8 @@ import {
   notification,
   Table,
   Image,
+  Popover,
+  Popconfirm,
 } from "antd";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router-dom";
@@ -17,109 +19,204 @@ import "./Units.scss";
 import AdminLayout from "../../../../layout/AdminLayout";
 import { postAxios } from "../../../../Http";
 import {
-  API_UNIT_CREATE,
-  API_UNIT_EDIT,
+  API_LESSONS_LIST_BY_UNIT_ID,
+  API_LESSON_DELETE,
 } from "../../../../config/endpointApi";
-import { AppContext } from "../../../../context/AppContext";
-import TabsUnit from "../items/TabsUnit";
-import { RenderLessons } from "./RenderLessons";
-import { RenderSkills } from "./RenderSkills";
 import { UploadOutlined } from "@ant-design/icons";
+import { bindParams } from "../../../../config/function";
+import IconMoreInfo from "../../../../common/Icon/IconMoreInfo";
+import moment from "moment";
+import IconEdit from "../../../../common/Icon/IconEdit";
+import { DeleteOutlined } from "@ant-design/icons";
+import logoCourses from "../../../../assets/img/logoCourses.png";
+import {
+  ADMIN_CREATE_LESSON_PATH,
+  ADMIN_EDIT_LESSON_PATH,
+} from "../../../../config/path";
+import { CODE_ALREADY_EXIST, CODE_NOT_FOUND } from "../../../../config/const";
+import { useFileUpload } from "../../../../hook/useFileUpload";
+import { useUnitAction } from "../../../../hook/useUnitAction";
 
 const UnitAction = () => {
   const [form] = Form.useForm();
   const params = useParams();
   const history = useHistory();
   const location = useLocation();
+  const { handleFileUpload } = useFileUpload();
+  const { handleUnitAction } = useUnitAction();
   const { courseId, unitId } = params;
-  const { t } = useTranslation("cmmon");
+  const { t } = useTranslation("course");
   const [loading, setLoading] = useState(false);
   const { TextArea } = Input;
-  const { user_info } = useContext(AppContext);
-  const [tab, setTab] = useState("0");
   const [image, setImage] = useState();
   const [preview, setPreview] = useState();
+  const [lessons, setLessons] = useState([]);
 
   useEffect(() => {
     if (unitId && location?.state?.detail) {
       const detail = location.state.detail;
       form.setFieldsValue(detail);
+      loadLessons();
     }
   }, [location, form]);
 
   useEffect(() => {
-    if (!image && !image?.name) {
-      setPreview(undefined);
-      return;
+    if (image && typeof image === "string") {
+      setPreview(image);
     }
-    const objectUrl = URL.createObjectURL(image);
-    setPreview(objectUrl);
-    // free memory when ever this component is unmounted
-    return () => URL.revokeObjectURL(objectUrl);
   }, [image]);
 
-  const onFinish = (body) => {
-    body.id = unitId;
+  const action = (record) => {
+    return (
+      <div>
+        <div
+          className="d-flex align-items-center pointer"
+          onClick={() =>
+            history.push({
+              pathname: `${bindParams(ADMIN_EDIT_LESSON_PATH, {
+                courseId,
+                unitId,
+                lessonId: record?._id,
+              })}`,
+              state: { detail: record },
+            })
+          }
+        >
+          <IconEdit />
+          <div className="pl-1">{t("common:edit")}</div>
+        </div>
+        <div className="d-flex align-items-center pointer">
+          <Popconfirm
+            title={t("confirm_delete_lecture")}
+            onConfirm={() => onClickDelete(record._id)}
+            okText={t("common:yes")}
+            cancelText={t("common:no")}
+            className="d-flex align-items-center pointer"
+          >
+            <DeleteOutlined style={{ fontSize: "22px" }} />
+            <div className="pl-1">{t("delete_course")}</div>
+          </Popconfirm>
+        </div>
+      </div>
+    );
+  };
+
+  const columns = [
+    {
+      title: "#",
+      dataIndex: "key",
+      with: "5%",
+      render: (value, data, index) => {
+        return index + 1;
+      },
+    },
+    {
+      title: t("lesson_name"),
+      dataIndex: "title",
+      render: (title) => {
+        return title;
+      },
+    },
+    {
+      title: `${t("lecture_name_teaching")}`,
+      dataIndex: "titleTargetLanguage",
+      render: (titleTargetLanguage) => {
+        return titleTargetLanguage;
+      },
+    },
+    {
+      title: t("lesson_type"),
+      dataIndex: "tagType",
+      ellipsis: true,
+      render: (tagType) => {
+        return Number(tagType) === 1
+          ? "vocabulary"
+          : Number(tagType) === 2
+          ? "grammar"
+          : Number(tagType) === 3
+          ? "Listen"
+          : "read";
+      },
+    },
+    {
+      title: t("created_time"),
+      dataIndex: "createdAt",
+      render: (createdAt) => {
+        return createdAt ? moment(createdAt).format("YYYY-MM-DD HH:mm:ss") : "";
+      },
+    },
+    {
+      title: "",
+      dataIndex: "",
+      width: "5%",
+      align: "center",
+      render: (record) => (
+        <Popover
+          placement="bottom"
+          content={() => action(record)}
+          title=""
+          trigger="click"
+        >
+          <div className="moreIcon">
+            <IconMoreInfo />
+          </div>
+        </Popover>
+      ),
+    },
+  ];
+
+  const loadLessons = () => {
     setLoading(true);
-    body.courseId = courseId;
-    body.image = "https://memo-files.s3.us-west-2.amazonaws.com/unit.jfif";
-    if (image.name) {
-      const params = {
-        Bucket: "memo-files",
-        Key: `${unitId}-${image.name}`,
-        Body: image,
-      };
-      const s3 = location?.state?.instance;
-      s3.upload(params, async (err, data) => {
-        if (err) {
-          console.error("Error uploading file: ", err);
+    postAxios(API_LESSONS_LIST_BY_UNIT_ID, { unitId })
+      .then((res) => {
+        const list = res?.data;
+        setLessons(list);
+      })
+      .catch((error) => {
+        const { response } = error;
+        notification.error({
+          message: response?.data?.message
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
+        });
+      })
+      .then(() => setLoading(false));
+  };
+
+  const onClickDelete = (id) => {
+    setLoading(true);
+    postAxios(API_LESSON_DELETE, { id })
+      .then((res) => {
+        loadLessons();
+      })
+      .catch((error) => {
+        const { response } = error;
+        if (response?.data?.code === CODE_NOT_FOUND) {
+          notification.error({
+            message: `${t("lesson_not_found")}`,
+          });
           return;
         }
-        await data;
-        if (data) {
-          if (unitId) {
-            body.image = data.Location;
-          }
-          postAxios(!unitId ? API_UNIT_CREATE : API_UNIT_EDIT, body)
-            .then((res) => {
-              notification.success({
-                message: !unitId
-                  ? t("Tạo mới bài học thành công.")
-                  : t("Chỉnh sửa bài học thành công."),
-              });
-              history.goBack();
-            })
-            .catch((error) => {
-              const { response } = error;
-              notification.error({
-                message: response?.data?.message
-                  ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-                  : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-              });
-            })
-            .then(() => setLoading(false));
-        }
-      });
-    } else {
-      postAxios(!unitId ? API_UNIT_CREATE : API_UNIT_EDIT, body)
-        .then((res) => {
-          notification.success({
-            message: !unitId
-              ? t("Tạo mới bài học thành công.")
-              : t("Chỉnh sửa bài học thành công."),
-          });
-          history.goBack();
-        })
-        .catch((error) => {
-          const { response } = error;
-          notification.error({
-            message: response?.data?.message
-              ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-              : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-          });
-        })
-        .then(() => setLoading(false));
+        notification.error({
+          message: t("common:msg_please_try_again"),
+        });
+      })
+      .then(() => setLoading(false));
+  };
+
+  const uploadFile = async (e) => {
+    const image_path = await handleFileUpload(e);
+    setImage(image_path);
+  };
+
+  const onFinish = async (body) => {
+    body.id = unitId;
+    body.courseId = courseId;
+
+    if (image && image.name) {
+      body.image = image;
     }
+    await handleUnitAction(unitId, body, t, setLoading);
   };
 
   const renderForm = () => {
@@ -147,75 +244,93 @@ const UnitAction = () => {
           onFinish={onFinish}
         >
           <Row gutter={[20, 20]}>
-            <Col span={unitId ? 16 : 24}>
+            <Col span={24}>
               <Form.Item
-                label={t("Tên bài học")}
+                label={t("lecture_name")}
                 name="name"
                 rules={[
                   {
                     required: true,
                     whitespace: true,
-                    message: t("Đây là thông tin bắt buộc."),
+                    message: t("validate_required"),
                   },
                 ]}
               >
-                <Input placeholder={t("Nhập tên bài học...")} />
+                <Input placeholder={t("lecture_name_placeholder")} />
               </Form.Item>
-              <Form.Item
-                label={t("Mô tả")}
-                name="description"
-                rules={[
-                  {
-                    required: true,
-                    whitespace: true,
-                    message: t("Đây là thông tin bắt buộc."),
-                  },
-                ]}
-              >
+              <Form.Item label={t("description")} name="description">
                 <TextArea rows={4} />
               </Form.Item>
             </Col>
-            {unitId && (
-              <Col
-                span={8}
-                style={{ display: "flex", justifyContent: "center" }}
-              >
-                <div className="imgWrapper">
-                  <Image
-                    className="imgCourseEdit"
-                    src={
-                      location?.state?.detail?.image
-                        ? location?.state?.detail?.image
-                        : preview
+            <Col span={24} style={{ display: "flex", justifyContent: "start" }}>
+              <div className="imgWrapper" style={{ alignItems: "center" }}>
+                <Image
+                  className="imgCourseEdit"
+                  style={{
+                    padding: 0,
+                  }}
+                  src={
+                    location?.state?.detail?.image
+                      ? location?.state?.detail?.image
+                      : preview
+                  }
+                />
+                <Button style={{ marginTop: "15px" }}>
+                  <label htmlFor="upload-photo-course" className="label-upload">
+                    <UploadOutlined size={24} style={{ marginRight: "3px" }} />
+                    {t("upload_image")}
+                  </label>
+                </Button>
+              </div>
+              <input
+                type="file"
+                name="image"
+                id="upload-photo-course"
+                onChange={uploadFile}
+                style={{ display: "none" }}
+                accept="image/*"
+              />
+            </Col>
+          </Row>
+          {unitId && (
+            <Row>
+              <Col span={24}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <h4 style={{ marginTop: "20px" }}>{`${t(
+                    t("lesson_list")
+                  )}:`}</h4>
+                  <Button
+                    size={"large"}
+                    className={"btn btn-common"}
+                    onClick={() =>
+                      history.push(
+                        bindParams(ADMIN_CREATE_LESSON_PATH, {
+                          courseId,
+                          unitId,
+                        })
+                      )
                     }
-                  />
-                  <Button style={{ marginTop: "15px" }}>
-                    <label
-                      htmlFor="upload-photo-course"
-                      className="label-upload"
-                    >
-                      <UploadOutlined
-                        size={24}
-                        style={{ marginRight: "3px" }}
-                      />
-                      {t("Tải ảnh lên")}
-                    </label>
+                  >
+                    {t("create_lesson")}
                   </Button>
                 </div>
-                <input
-                  type="file"
-                  name="image"
-                  id="upload-photo-course"
-                  onChange={(e) => setImage(e.target.files[0])}
-                  style={{ display: "none" }}
-                  accept="image/*"
+                <Table
+                  className="custom-table"
+                  columns={columns}
+                  dataSource={lessons}
+                  rowKey="id"
+                  loading={loading}
                 />
               </Col>
-            )}
-          </Row>
-          <TabsUnit goBack={() => history.goBack()} setTab={setTab} />
-          {tab === "0" && <RenderLessons />}
-          {tab === "1" && <RenderSkills />}
+            </Row>
+          )}
           <Row>
             <Col span={24} className={"area-button"}>
               <Space>
@@ -225,7 +340,7 @@ const UnitAction = () => {
                   id="btn-solid"
                   onClick={() => history.goBack()}
                 >
-                  {t("Quay lại")}
+                  {t("back")}
                 </Button>
                 <Button
                   loading={loading}
@@ -234,7 +349,7 @@ const UnitAction = () => {
                   size={"large"}
                   block
                 >
-                  {!unitId ? t("Tạo mới") : t("Chỉnh sửa")}
+                  {!unitId ? t("common:create") : t("common:edit")}
                 </Button>
               </Space>
             </Col>
@@ -247,9 +362,11 @@ const UnitAction = () => {
   return (
     <AdminLayout
       breadcrumbs={[
-        t("Danh sách khóa học đã tạo"),
-        t("Chỉnh sửa khóa học"),
-        !unitId ? t("Tạo mới bài học") : t("Chỉnh sửa bài học"),
+        t("created_courses"),
+        `${courseId}`,
+        t("lecture"),
+        !unitId ? t("common:create") : `${unitId}`,
+        unitId && t("common:edit"),
       ]}
     >
       {renderForm()}

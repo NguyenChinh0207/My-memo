@@ -6,14 +6,14 @@ import { Button, Tabs } from "antd";
 const { TabPane } = Tabs;
 
 const EditingNavBar = (props) => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const [loading, setLoading] = useState(false);
   const { setTab } = props;
 
   const data = [
-    { title: t("Từ") },
-    { title: t("Chi tiết") },
-    { title: t("Bộ câu hỏi trắc nghiệm") },
+    { title: t("vocabulary") },
+    { title: t("common:detail") },
+    { title: t("exam_list") },
   ];
 
   const handleTabChange = (tab) => {
@@ -31,7 +31,7 @@ const EditingNavBar = (props) => {
     <div className="EditingNavBar">
       <div className="Row">
         <div style={{ width: "100%" }}>
-          <div className="Title">{t("editing")}</div>
+          <div className="Title">{t("common:editing")}</div>
           <Tabs
             defaultActiveKey="0"
             tabBarExtraContent={extraContent}

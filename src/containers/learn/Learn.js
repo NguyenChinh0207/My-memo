@@ -36,10 +36,10 @@ const Learn = () => {
   const [wordsLearned, setWordsLearned] = useState([]);
   const [currentWord, setCurrentWord] = useState();
   const [courseFinished, setCourseFinished] = useState(false);
-  const [sessionCreated, setSessionCreated] = useState();
   const [loadMyCourses, setLoadMyCourses] = useState(false);
   const [isLoading, data] = useGetMyCourse(loadMyCourses);
   const [flag, setFlag] = useState(false);
+  const [inputReset, setInputReset] = useState(false);
 
   useEffect(() => {
     loadCourse();
@@ -56,44 +56,65 @@ const Learn = () => {
 
   useEffect(() => {
     if (flag && sessionWords !== undefined) {
-      console.log("in vào useEfffect");
       setTimeout(setResultToLearning, 1000);
     }
   }, [flag]);
 
   useEffect(() => {
     if (progress && course) {
-      console.log("in progress", progress);
       // setSessionCreated(true);
       createLearningSession();
     }
   }, [progress, course]);
 
+  useEffect(() => {
+    if (inputReset && resultStr === "learning") {
+      const turnsNumber = turns - 1;
+      if (turnsNumber > 0 && sessionWords.length > 0) {
+        let idx = Math.floor(Math.random() * sessionWords.length);
+        if (sessionWords.length > 1) {
+          while (idx === index) {
+            idx = Math.floor(Math.random() * sessionWords.length);
+          }
+        }
+        setIndex(idx);
+        setCurrentWord(sessionWords[idx]); // Đảm bảo từ mới được cập nhật sau khi reset
+        setTurns(turnsNumber);
+      } else {
+        setCourseFinished(true);
+      }
+    }
+  }, [inputReset, resultStr]);
+
   const createLearningSession = () => {
     const sessionWordsArr = [];
     const wordsLearnedArr = [];
+
+    // Duyệt qua tất cả các từ của khóa học để phân loại
     for (let pair of course.words) {
       let score = progress.wordsInProgress[pair.name] || 0;
       if (score !== GOAL_SCORE) {
         pair.score = score;
-        sessionWordsArr.push(pair);
+        sessionWordsArr.push(pair); // Thêm vào sessionWords nếu chưa đạt mục tiêu
       } else {
-        wordsLearnedArr.push(pair.name);
+        wordsLearnedArr.push(pair.name); // Nếu đã đạt mục tiêu, đưa vào wordsLearned
       }
     }
-    console.log("in create learnig1", wordsLearnedArr);
-    if (sessionWordsArr.length === 0) {
-      history.goBack();
-    } else {
-      const currentWordData = sessionWordsArr[0];
-      setLoading(false);
-      console.log("in create learnig2", wordsLearnedArr);
-      setWordsLearned(wordsLearnedArr);
-      setCurrentWord(currentWordData);
-      setSessionWords(sessionWordsArr);
-    }
-  };
 
+    // Kiểm tra nếu không có từ nào chưa học
+    if (sessionWordsArr.length === 0) {
+      // Nếu tất cả từ đã học xong, chuyển về màn hình hoàn thành khóa học
+      setCourseFinished(true);
+      return;
+    }
+
+    // Đảm bảo không có lỗi về sessionWords và cập nhật dữ liệu mới
+    const currentWordData = sessionWordsArr[0];
+    setLoading(false);
+    setWordsLearned(wordsLearnedArr);
+    setCurrentWord(currentWordData);
+    setSessionWords(sessionWordsArr);
+  };
   const loadProgress = () => {
     if (!isLoading) {
       let progressData = {};
@@ -130,27 +151,29 @@ const Learn = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
   };
 
   const nextClick = () => {
-    console.log("in index nextClick", index, sessionWords[index]);
     const turnsNumber = turns - 1;
     if (turnsNumber === 0) {
-      setTurns(0);
+      setTurns(0); // Khi không còn lượt nào, dừng lại
     } else {
-      const sessionWordsArr = JSON.parse(JSON.stringify(sessionWords));
-      sessionWordsArr[index].score++;
+      const sessionWordsArr = [...sessionWords]; // Tạo bản sao của mảng sessionWords
+      sessionWordsArr[index].score++; // Tăng điểm của từ hiện tại
+
+      // Chọn một từ ngẫu nhiên mới để học
       let idx = 0;
       if (sessionWordsArr.length > 1) {
         do {
           idx = Math.floor(Math.random() * sessionWordsArr.length);
-        } while (idx === index);
+        } while (idx === index); // Đảm bảo không chọn lại từ hiện tại
       }
+
       setTurns(turnsNumber);
       setIndex(idx);
       setSessionWords(sessionWordsArr);
@@ -163,38 +186,40 @@ const Learn = () => {
   };
 
   const userWrote = (word) => {
-    setFlag(false);
-    console.log("in index userWrote", index, sessionWords[index]);
-    let sessionWordsArr = JSON.parse(JSON.stringify(sessionWords));
+    const sessionWordsArr = [...sessionWords];
     const wordsLearnedArr = [...wordsLearned];
-    const currentWordObj = {
-      name: currentWord.name,
-      description: currentWord.description,
-      score: currentWord.score,
-    };
-    if (currentWordObj?.name === word.trim()) {
+    const currentWordObj = { ...currentWord };
+
+    if (currentWordObj.name === word.trim()) {
       currentWordObj.score++;
-      if (currentWordObj?.score === GOAL_SCORE) {
+      if (currentWordObj.score === GOAL_SCORE) {
         wordsLearnedArr.push(currentWordObj.name);
-        sessionWordsArr.splice(index, 1);
+        sessionWordsArr.splice(index, 1); // Loại bỏ từ đã học
       }
-      postProgress(sessionWordsArr, wordsLearnedArr);
       setResultStr("correct");
-      setSessionWords(sessionWordsArr);
-      console.log("in wordlerans", sessionWordsArr, wordsLearnedArr);
-      setWordsLearned(wordsLearnedArr);
-      setCurrentWord(currentWordObj);
-      setFlag(true);
     } else {
-      console.log("in vào set wrong", sessionWordsArr[index], index);
-      if (sessionWordsArr[index]) sessionWordsArr[index].score = 0;
+      sessionWordsArr.push(currentWordObj);
       currentWordObj.score = 0;
       setResultStr("wrong");
-      setSessionWords(sessionWordsArr);
-      setCurrentWord(currentWordObj);
-      setFlag(true);
     }
-    // setTimeout(setResultToLearning, 1000);
+
+    // Cập nhật trạng thái học
+    postProgress(sessionWordsArr, wordsLearnedArr);
+    setInputReset(false);
+
+    setTimeout(() => {
+      setWordsLearned(wordsLearnedArr);
+      setSessionWords(sessionWordsArr);
+
+      if (resultStr === "correct") {
+        setInputReset(true); // Đổi từ mới khi đúng
+      } else {
+        const randomIdx = Math.floor(Math.random() * sessionWordsArr.length);
+        setIndex(randomIdx);
+        setCurrentWord(sessionWordsArr[randomIdx]);
+        setResultStr("learning");
+      }
+    }, 1000); // Thời gian delay
   };
 
   const postProgress = (words, wordsLearnedList) => {
@@ -219,44 +244,31 @@ const Learn = () => {
   };
 
   const setResultToLearning = () => {
-    console.log("in set result learning", index, resultStr);
     if (resultStr === "wrong") {
-      console.log("vào wrong", index);
       setResultStr("learning");
-    } else {
-      const turnsNumber = turns - 1;
-      const sessionWordsArr = sessionWords;
-      console.log("in sessionWords", sessionWords);
-      if (turnsNumber === 0) {
-        setTurns(0);
-      } else if (sessionWordsArr.length === 0) {
-        setCourseFinished(true);
-      } else {
-        let idx = 0;
-        if (sessionWordsArr.length > 1) {
-          do {
-            idx = Math.floor(Math.random() * sessionWordsArr.length);
-            console.log("in index setResultToLearning1", idx, index);
-          } while (idx === index);
+    } else if (resultStr === "correct") {
+      setTimeout(() => {
+        const turnsNumber = turns - 1;
+        if (turnsNumber > 0 && sessionWords.length > 0) {
+          let idx = Math.floor(Math.random() * sessionWords.length);
+          if (sessionWords.length > 1) {
+            while (idx === index) {
+              idx = Math.floor(Math.random() * sessionWords.length);
+            }
+          }
+          setIndex(idx);
+          setCurrentWord(sessionWords[idx]); // Cập nhật từ mới
+          setTurns(turnsNumber);
+          setResultStr("learning");
+        } else {
+          setCourseFinished(true); // Kết thúc khóa học
         }
-        const currentWordObj = sessionWordsArr[idx];
-        console.log(
-          "in index setResultToLearning",
-          idx,
-          index,
-          sessionWordsArr[idx]
-        );
-        setResultStr("learning");
-        setIndex(idx);
-        setTurns(turnsNumber);
-        setCurrentWord(currentWordObj);
-      }
+      }, 1000);
     }
     setFlag(false);
   };
 
   if (course && !loading) {
-    console.log("In vào content1", resultStr);
     const pair = currentWord;
     let content = <NewWordFragment next={nextClick} {...pair} />;
     if (turns === 0 || courseFinished) {
@@ -264,12 +276,12 @@ const Learn = () => {
         <SessionComplete courseFinished={courseFinished} home={goToCourse} />
       );
     } else if (pair?.score > 0 || resultStr === "wrong") {
-      console.log("In vào content", resultStr);
       content = (
         <WriteWordFragment
           result={resultStr}
           userWrote={userWrote}
-          pair={pair}
+          pair={currentWord}
+          setInputReset={setInputReset}
         />
       );
     }

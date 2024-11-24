@@ -1,29 +1,25 @@
 import React, { useContext, useState } from "react";
 import "./Login.scss";
 import { useTranslation } from "react-i18next";
-import { NavLink, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import PrivateLayout from "../../layout/PrivateLayout";
 import img from "../../assets/img/space.png";
-import { Button, Checkbox, Col, Form, Input, notification } from "antd";
-import validator from "validator";
+import { Button, Checkbox, Form, Input, notification } from "antd";
+
 import {
   API_LOGIN,
   API_POST_PROGRESS,
   API_SAVE_USER,
 } from "../../config/endpointApi";
-import {
-  HOME_PATH,
-  USER_FORGOT_PASSWORD,
-  USER_LIST_PATH,
-} from "../../config/path";
+import { HOME_PATH, USER_LIST_PATH } from "../../config/path";
 import { postAxios } from "../../Http";
-import { AUTH_TOKEN, E001, E002 } from "../../config/const";
+import { E001, E002 } from "../../config/const";
 import { saveAccessToken, saveUserInfo } from "../../config/function";
 import ReactFacebookLogin from "react-facebook-login";
 import { AppContext } from "../../context/AppContext";
 
 const Login = () => {
-  const { t } = useTranslation("login");
+  const { t } = useTranslation("auth");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
   const { setUserInfo } = useContext(AppContext);
@@ -44,11 +40,11 @@ const Login = () => {
         const { response } = error;
         if (response?.data?.code === E001)
           notification.error({
-            message: t("Tên đăng nhập hoặc mật khẩu không đúng."),
+            message: t("input_user_password_incorrect"),
           });
         if (response?.data?.code === E002)
           notification.error({
-            message: t("Mật khẩu không đúng."),
+            message: t("password_invalid"),
           });
       })
       .then(() => setLoading(false));
@@ -88,33 +84,33 @@ const Login = () => {
             onFinish={onFinish}
             layout={"vertical"}
           >
-            <div className="LoginTitle">{t("btn_login")}</div>
+            <div className="LoginTitle">{t("login_title")}</div>
             <Form.Item
-              label={t("Tên đăng nhập")}
+              label={t("user_name")}
               name="username"
               rules={[
                 {
                   required: true,
                   whitespace: true,
-                  message: t("Đây là thông tin bắt buộc."),
+                  message: t("field_require"),
                 },
               ]}
             >
-              <Input placeholder={t("Nhập tên đăng nhập...")} />
+              <Input placeholder={t("username_placeholder")} />
             </Form.Item>
 
             <Form.Item
-              label={t("Mật khẩu")}
+              label={t("password")}
               name="password"
               rules={[
                 {
                   required: true,
                   whitespace: true,
-                  message: t("Đây là thông tin bắt buộc."),
+                  message: t("field_require"),
                 },
               ]}
             >
-              <Input.Password placeholder={t("Nhập mật khẩu...")} />
+              <Input.Password placeholder={t("password_placeholder")} />
             </Form.Item>
             <Form.Item className="rememberPassword-wrap">
               <Form.Item
@@ -122,10 +118,10 @@ const Login = () => {
                 valuePropName="checked"
                 className="checkbox-rememberme"
               >
-                <Checkbox>{t("Ghi nhớ mật khẩu")}</Checkbox>
+                <Checkbox>{t("remember_me")}</Checkbox>
               </Form.Item>
               {/* <NavLink className="login-form-forgot" to={USER_FORGOT_PASSWORD}>
-                {t("Quên mật khẩu?")}
+                {t("forgot_password")}
               </NavLink> */}
             </Form.Item>
             <Form.Item>
@@ -135,7 +131,7 @@ const Login = () => {
                 className="LoginButton"
                 loading={loading}
               >
-                {t("btn_login")}
+                {t("login_btn")}
               </Button>
             </Form.Item>
             <Form.Item>
@@ -146,10 +142,10 @@ const Login = () => {
                 callback={responseFacebook}
                 cssClass="my-facebook-button-class"
                 icon="fa-facebook"
-                textButton={t("login_title")}
+                textButton={t("login_with_fb_btn")}
                 render={(renderProps) => (
                   <Button onClick={renderProps.onClick}>
-                    {t("login_title")}
+                    {t("login_with_fb_btn")}
                   </Button>
                 )}
               />

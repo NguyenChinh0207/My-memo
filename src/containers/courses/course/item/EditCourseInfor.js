@@ -1,42 +1,26 @@
 import React, { useContext, useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import "../CourseDetail.scss";
 import { useTranslation } from "react-i18next";
-import AWS from "aws-sdk";
+// import AWS from "aws-sdk";
 import {
   Button,
   Checkbox,
   Form,
   Image,
   Input,
-  notification,
   Select,
 } from "antd";
-import { AppContext } from "../../../../context/AppContext";
-import { useHistory } from "react-router-dom";
 import logoCourses from "../../../../assets/img/logoCourses.png";
 import { UploadOutlined } from "@ant-design/icons";
-import { API_COURSE_EDIT } from "../../../../config/endpointApi";
-import { COURSE_DETAIL_PATH } from "../../../../config/path";
-import { postAxios } from "../../../../Http";
-import {
-  bindParams,
-  optionLanguages,
-  optionVoices,
-} from "../../../../config/function";
-
-AWS.config.update({
-  region: "us-west-2",
-  accessKeyId: "AKIAU6AM6N2AXNPXPPE2",
-  secretAccessKey: "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",
-});
-const s3 = new AWS.S3();
+import { optionLanguages, optionVoices } from "../../../../config/function";
+import { useFileUpload } from "../../../../hook/useFileUpload";
+import { useCourseAction } from "../../../../hook/useCourseAction";
 
 const EditCourseInfor = (props) => {
-  const { t } = useTranslation("common");
-  const history = useHistory();
+  const { t } = useTranslation("course");
   const [loading, setLoading] = useState(false);
-  const { user_info } = useContext(AppContext);
+  const { handleFileUpload } = useFileUpload();
+  const { handleCourseAction } = useCourseAction();
   const { TextArea } = Input;
   const [value, setValue] = useState(false);
   const [image, setImage] = useState("");
@@ -55,16 +39,9 @@ const EditCourseInfor = (props) => {
     },
   };
   useEffect(() => {
-    if (!image && !image?.name) {
-      setPreview(undefined);
-      return;
+    if (image && typeof image === "string") {
+      setPreview(image);
     }
-
-    const objectUrl = URL.createObjectURL(image);
-    setPreview(objectUrl);
-
-    // free memory when ever this component is unmounted
-    return () => URL.revokeObjectURL(objectUrl);
   }, [image]);
 
   useEffect(() => {
@@ -81,72 +58,22 @@ const EditCourseInfor = (props) => {
     };
   }, [form, course]);
 
-  const uploadFile = (e) => {
-    setImage(e.target.files[0]);
+  const uploadFile = async (e) => {
+    const image_path = await handleFileUpload(e);
+    setImage(image_path);
   };
 
   const onFinish = async (body) => {
-    setLoading(true);
     if (value) {
       body.active = 1;
     } else {
       body.active = 0;
     }
     body.id = course?._id;
-    if (image.name) {
-      const params = {
-        Bucket: "memo-files",
-        Key: `${user_info._id}-${image.name}`,
-        Body: image,
-      };
-
-      s3.upload(params, async (err, data) => {
-        if (err) {
-          console.error("Error uploading file: ", err);
-          return;
-        }
-        await data;
-        if (data) {
-          console.log("File uploaded successfully: ", data, data.Location);
-          body.image = data.Location;
-          postAxios(API_COURSE_EDIT, body)
-            .then((res) => {
-              notification.success({
-                message: t("Chỉnh sửa khóa học thành công."),
-              });
-              history.push(
-                bindParams(COURSE_DETAIL_PATH, { courseId: res?.id })
-              );
-            })
-            .catch((error) => {
-              const { response } = error;
-              notification.error({
-                message: response?.data?.message
-                  ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-                  : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-              });
-            })
-            .then(() => setLoading(false));
-        }
-      });
-    } else {
-      postAxios(API_COURSE_EDIT, body)
-        .then((res) => {
-          notification.success({
-            message: t("Chỉnh sửa khóa học thành công."),
-          });
-          history.push(bindParams(COURSE_DETAIL_PATH, { courseId: res?.id }));
-        })
-        .catch((error) => {
-          const { response } = error;
-          notification.error({
-            message: response?.data?.message
-              ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-              : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-          });
-        })
-        .then(() => setLoading(false));
+    if (image && image.name) {
+      body.image = image;
     }
+    await handleCourseAction(body.id, body, t, setLoading);
   };
 
   return (
@@ -159,34 +86,32 @@ const EditCourseInfor = (props) => {
         form={form}
       >
         <Form.Item
-          label={t("Tên khóa học")}
+          label={t("course_name")}
           name="name"
           rules={[
             {
               required: true,
               whitespace: true,
-              message: t("Đây là thông tin bắt buộc."),
+              message: t("common:validate_required"),
             },
           ]}
-          extra={t(
-            "Đặt tên phù hợp cho khóa học sẽ giúp các học viên khác tìm kiếm dễ dàng hơn."
-          )}
+          extra={t("give_course_name")}
         >
-          <Input placeholder={t("Nhập tên khóa học...")} />
+          <Input placeholder={t("course_name_placeholder")} />
         </Form.Item>
         <Form.Item
-          label={t("Dạy")}
+          label={t("teacher_lang")}
           name="language"
           rules={[
             {
               required: true,
-              message: t("Đây là thông tin bắt buộc."),
+              message: t("common:validate_required"),
             },
           ]}
         >
           <Select
             showSearch
-            placeholder={t("Chọn ngôn ngữ")}
+            placeholder={t("select_lang")}
             filterOption={(input, option) =>
               (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
             }
@@ -194,28 +119,28 @@ const EditCourseInfor = (props) => {
           />
         </Form.Item>
         <Form.Item
-          label={t("Cho người nói")}
+          label={t("learner_lang")}
           name="my_language"
           rules={[
             {
               required: true,
-              message: t("Đây là thông tin bắt buộc."),
+              message: t("validate_required"),
             },
           ]}
         >
           <Select
             showSearch
-            placeholder={t("Chọn ngôn ngữ")}
+            placeholder={t("select_lang")}
             filterOption={(input, option) =>
               (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
             }
             options={optionLanguages}
           />
         </Form.Item>
-        <Form.Item label={t("Thanh âm")} name="voice">
+        <Form.Item label={t("voice_lang")} name="voice">
           <Select
             showSearch
-            placeholder={t("Chọn thanh âm")}
+            placeholder={t("select_voice")}
             filterOption={(input, option) =>
               (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
             }
@@ -223,16 +148,16 @@ const EditCourseInfor = (props) => {
           />
         </Form.Item>
         <Form.Item
-          label={t("Mô tả")}
+          label={t("description")}
           name="description"
           rules={[
             {
               required: true,
               whitespace: true,
-              message: t("Đây là thông tin bắt buộc."),
+              message: t("validate_required"),
             },
           ]}
-          extra={t("Mô tả khóa học bằng ngôn ngữ của người học.")}
+          extra={t("description_course")}
         >
           <TextArea rows={4} />
         </Form.Item>
@@ -248,7 +173,7 @@ const EditCourseInfor = (props) => {
             checked={value}
             onChange={() => setValue(!value)}
           >
-            {t("Công khai")}
+            {t("active")}
           </Checkbox>
         </Form.Item>
 
@@ -264,19 +189,19 @@ const EditCourseInfor = (props) => {
             className="createCourse"
             loading={loading}
           >
-            {t("Chỉnh sửa khóa học")}
+            {t("edit_course")}
           </Button>
         </Form.Item>
       </Form>
       <div className="imgWrapper">
         <Image
           className="imgCourseEdit"
-          src={!course ? preview : !course?.image ? logoCourses : course?.image}
+          src={preview || course?.image || logoCourses}
         />
         <Button style={{ marginTop: "15px" }}>
           <label htmlFor="upload-photo-course" className="label-upload">
             <UploadOutlined size={24} style={{ marginRight: "3px" }} />
-            {t("Tải ảnh lên")}
+            {t("upload_image")}
           </label>
         </Button>
       </div>

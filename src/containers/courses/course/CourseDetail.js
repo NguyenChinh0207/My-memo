@@ -9,7 +9,6 @@ import { Button, Modal, notification, Spin } from "antd";
 import {
   API_ACTION_MY_COURSE,
   API_COURSE_DETAIL,
-  API_GET_MY_COURSE,
 } from "../../../config/endpointApi";
 import { postAxios } from "../../../Http";
 import CourseHead from "../../../components/course/CourseHead/CourseHead";
@@ -24,10 +23,10 @@ import {
 } from "@ant-design/icons";
 import useGetMyCourse from "../../../hook/useGetMyCourse";
 import { FlashCard } from "./item/FlashCard";
-import { ADMIN_ID } from "../../../config/const";
+import { UnitsList } from "./item/UnitsList";
 
 const CourseDetail = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const history = useHistory();
   const params = useParams();
   const { courseId } = params;
@@ -43,7 +42,8 @@ const CourseDetail = () => {
   const [progressWidth, setProgressWidth] = useState();
   const [progress, setProgress] = useState(0);
   const { confirm } = Modal;
-  const [isLoading, data] = useGetMyCourse(loadMyCourses);
+  const [isLoading, data, updateProgressOnLeave] =
+    useGetMyCourse(loadMyCourses);
   const [showCard, setShowCard] = useState(false);
   const [curCardId, setCurCardId] = useState(1);
   const [wordsData, setWordsData] = useState();
@@ -95,7 +95,7 @@ const CourseDetail = () => {
         const words = course?.words ? JSON.parse(course.words) : [];
         if (course) {
           if (words.length === 0) {
-            course.words = [{ word: t("Khóa học trống"), description: "" }];
+            course.words = [{ word: t("course_empty"), description: "" }];
           } else {
             course.words = words;
           }
@@ -109,8 +109,8 @@ const CourseDetail = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -131,7 +131,6 @@ const CourseDetail = () => {
       if (courses && courses.length > 0) {
         for (let c of courses) {
           if (String(c._id) === courseId) {
-            console.log("in c", c);
             addedWord = true;
             words = c.wordsLearned;
           }
@@ -144,9 +143,13 @@ const CourseDetail = () => {
 
   const openModal = () => {
     confirm({
-      title: `${t("Bạn có chắc chắn muốn rời khỏi khóa học?")}`,
+      title: `${t("confirm_leave_course")}`,
       icon: <ExclamationCircleFilled />,
-      onOk: () => updateCourse("remove"),
+      onOk: () => {
+        // Cập nhật progress khi rời khỏi khóa học
+        updateProgressOnLeave(courseId);
+        updateCourse("remove"); // Tiến hành rời khóa học
+      },
       onCancel: () => {},
     });
   };
@@ -165,8 +168,8 @@ const CourseDetail = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -187,7 +190,7 @@ const CourseDetail = () => {
       <div className="SecondHeader">
         <div className="Row" style={{ display: "flex", justifyContent: "end" }}>
           <div onClick={() => setShowCard(false)} className="EditBtn">
-            {t("Quay lại")}
+            {t("back")}
             <DoubleRightOutlined />
           </div>
         </div>
@@ -217,8 +220,9 @@ const CourseDetail = () => {
 
   const shuffleFunc = () => {
     setLoadingCard(true);
-    const arr = shuffleArray(course.words, course.words.length);
-    setWordsData(arr);
+    const shuffledWords = shuffleArray(course.words, course.words.length);
+    setWordsData([...shuffledWords]);
+    setCurCardId(1);
     setLoadingCard(false);
   };
 
@@ -242,23 +246,26 @@ const CourseDetail = () => {
               <CourseHead {...course} added={added} setShowCard={setShowCard} />
               {!showCard ? (
                 <>
-                  {course?.owner?._id !== ADMIN_ID && (
-                    <>
-                      <ComponentRender
-                        course={course}
-                        progress={progress}
-                        progressWidth={progressWidth}
-                        learnBtnClasses={learnBtnClasses}
-                        added={added}
-                        owner={owner}
-                        courseId={courseId}
-                        wordsLearned={wordsLearned}
-                        openModal={openModal}
-                        learn={learn}
-                        updateCourse={updateCourse}
-                      />
-                      <WordsTable {...course} />
-                    </>
+                  <ComponentRender
+                    course={course}
+                    progress={progress}
+                    progressWidth={progressWidth}
+                    learnBtnClasses={learnBtnClasses}
+                    added={added}
+                    owner={owner}
+                    courseId={courseId}
+                    wordsLearned={wordsLearned}
+                    openModal={openModal}
+                    learn={learn}
+                    updateCourse={updateCourse}
+                  />
+                  {course?.words && <WordsTable {...course} />}
+                  {course?.units && course?.units.length > 0 && (
+                    <UnitsList
+                      course={course}
+                      added={added}
+                      openModal={openModal}
+                    />
                   )}
                 </>
               ) : (
@@ -271,7 +278,7 @@ const CourseDetail = () => {
                       onClick={goToPrev}
                     >
                       <DoubleLeftOutlined />
-                      {t("Trước")}
+                      {t("common:before")}
                     </Button>
                     <FlashCard
                       {...wordsData.find(
@@ -286,7 +293,7 @@ const CourseDetail = () => {
                       className="ms-4 prev-next-btns"
                       onClick={goToNext}
                     >
-                      {t("Tiếp")}
+                      {t("common:next")}
                       <DoubleRightOutlined />
                     </Button>
                   </div>
@@ -296,7 +303,7 @@ const CourseDetail = () => {
                       className="ms-4 prev-next-btns"
                       onClick={shuffleFunc}
                     >
-                      {t("Trộn thẻ")}
+                      {t("common:shuffle")}
                     </Button>
                   </div>
                 </>

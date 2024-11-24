@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import PropTypes from "prop-types";
 
 import "./CourseHead.scss";
@@ -22,12 +22,12 @@ import { EXAM_ONLINE_PATH } from "../../../config/path";
 import { RightOutlined } from "@ant-design/icons";
 import { API_EXAM_DETAIL, API_EXAM_LIST } from "../../../config/endpointApi";
 import { postAxios } from "../../../Http";
-import { ADMIN_ID } from "../../../config/const";
+import { AppContext } from "../../../context/AppContext";
 
 const { Option } = Select;
 
 const CourseHead = (props) => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const { name, description, owner, edit, added, setShowCard } = props;
   const history = useHistory();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,6 +36,7 @@ const CourseHead = (props) => {
   const [examId, setExamId] = useState();
   const [loading, setLoading] = useState(false);
   const [exam, setExam] = useState({});
+  const { user_info } = useContext(AppContext);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -59,8 +60,8 @@ const CourseHead = (props) => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       });
   };
@@ -75,8 +76,8 @@ const CourseHead = (props) => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -111,10 +112,7 @@ const CourseHead = (props) => {
             {props.name ? (
               <React.Fragment>
                 <div className="course-detail-wrapper-edit">
-                  <img
-                    className="imgCourseDetailEdit"
-                    src={logoCourses}
-                  />
+                  <img className="imgCourseDetailEdit" src={logoCourses} />
                   <div className="CourseDetails">
                     <div className="TitleCourseEdit">{name}</div>
                   </div>
@@ -164,10 +162,10 @@ const CourseHead = (props) => {
                             className="examBtn"
                             onClick={() => setIsModalOpen(true)}
                           >
-                            {t("Kiểm tra trắc nghiệm")}
+                            {t("test_exam")}
                           </Button>
                         </div>
-                        {owner._id !== ADMIN_ID && (
+                        {owner._id !== user_info._id && (
                           <div style={{ marginTop: "10px" }}>
                             <Button
                               type="default"
@@ -194,21 +192,21 @@ const CourseHead = (props) => {
         </div>
       )}
       <Modal
-        title={t("Chọn chủ đề kiểm tra")}
+        title={t("select_topic")}
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         footer={[
           <Button key="back" onClick={() => setIsModalOpen(false)}>
-            {t("Quay lại")}
+            {t("common:back")}
           </Button>,
           <Button key="submit" type="primary" onClick={handleSubmit}>
-            {t("Bắt đầu")}
+            {t("common:start")}
           </Button>,
         ]}
       >
         <Select
           size="large"
-          placeholder={t("Chọn chủ đề kiểm tra")}
+          placeholder={t("select_topic")}
           style={{ width: "100%" }}
           onChange={handleSelect}
         >
@@ -218,27 +216,22 @@ const CourseHead = (props) => {
             </Option>
           ))}
         </Select>
-        {validate && (
-          <p style={{ color: "red" }}>{t("Đây là thông tin bắt buộc.")}</p>
-        )}
+        {validate && <p style={{ color: "red" }}>{t("validate_required")}</p>}
         {examId && exam && (
           <Form className="formExamDetailSelect">
             <Row>
               <Col span={24}>
-                <Form.Item label={t("Tên chủ đề")} className="itemFormExam">
+                <Form.Item label={t("topic_name")} className="itemFormExam">
                   <div className="">{exam?.name}</div>
                 </Form.Item>
                 <Divider className="divider-custom-form" />
-                <Form.Item label={t("Số câu hỏi")} className="itemFormExam">
+                <Form.Item label={t("questions")} className="itemFormExam">
                   <div className="">{exam?.questions_appear}</div>
                 </Form.Item>
                 <Divider className="divider-custom-form" />
-                <Form.Item
-                  label={t("Thời gian làm bài")}
-                  className="itemFormExam"
-                >
+                <Form.Item label={t("anwser_time")} className="itemFormExam">
                   <div className="">
-                    {exam?.time_answer} {t("phút")}
+                    {exam?.time_answer} {t("minutes")}
                   </div>
                 </Form.Item>
               </Col>

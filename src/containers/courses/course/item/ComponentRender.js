@@ -1,34 +1,38 @@
+import React, { useContext } from "react";
 import { Button } from "antd";
-import React from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
-import { ADMIN_ID } from "../../../../config/const";
 import { bindParams } from "../../../../config/function";
 import { COURSE_EDIT_PATH } from "../../../../config/path";
+import { AppContext } from "../../../../context/AppContext";
 import "../CourseDetail.scss";
 
 export const ComponentRender = (items) => {
-  console.log("in item", items);
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const history = useHistory();
+  const { user_info } = useContext(AppContext);
 
   return (
     <>
       <div className="SecondHeader">
         <div className="Row">
-          {items.added ? (
-            <div className="RemoveButton" onClick={items.openModal}>
-              {t("quit_course")}
-            </div>
-          ) : (
-            <Button
-              className="StartButton"
-              onClick={() => items.updateCourse("add")}
-            >
-              {t("add_to_my_courses")}
-            </Button>
+          {items?.course?.owner?._id !== user_info._id && (
+            <>
+              {items.added ? (
+                <div className="RemoveButton" onClick={items.openModal}>
+                  {t("leave_course")}
+                </div>
+              ) : (
+                <Button
+                  className="StartButton"
+                  onClick={() => items.updateCourse("add")}
+                >
+                  {t("add_to_my_courses")}
+                </Button>
+              )}
+            </>
           )}
-          {items.owner && (
+          {items.owner && items?.course?.owner?._id == user_info._id && (
             <div
               onClick={() =>
                 history.push(
@@ -39,15 +43,16 @@ export const ComponentRender = (items) => {
               }
               className="EditBtn"
             >
-              {t("Chỉnh sửa khóa học")}
+              {t("edit_course")}
             </div>
           )}
         </div>
       </div>
-      {items?.added && items?.course?.owner?._id !== ADMIN_ID && (
+      {items?.added && items?.course?.owner?._id !== user_info._id && (
         <div className="ProgressDiv">
           <div className="WordsLearned">
-            {items.wordsLearned} / {items.course.totalWords} {t("words_learn")}
+            {items.wordsLearned} / {items.course.totalWords}{" "}
+            {t("words_learned")}
           </div>
           <div className="ProgressBar">
             <div style={items.progressWidth} className="Progress" />
@@ -56,7 +61,7 @@ export const ComponentRender = (items) => {
             <div className="CourseCompleted">{t("course_complete")}</div>
           )}
           <Button onClick={items.learn} className={items.learnBtnClasses}>
-            {t("learn")}
+            {t("start_pratice")}
           </Button>
         </div>
       )}

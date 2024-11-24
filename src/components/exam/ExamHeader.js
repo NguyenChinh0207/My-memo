@@ -11,7 +11,7 @@ import { API_EXAM_EDIT } from "../../config/endpointApi";
 import { postAxios } from "../../Http";
 
 const ExamHeader = (props) => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const { exam, answer, corrects, user, status, setStatus } = props;
   const history = useHistory();
   const [countdown, setCountdown] = useState();
@@ -62,8 +62,8 @@ const ExamHeader = (props) => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
   };
@@ -90,22 +90,20 @@ const ExamHeader = (props) => {
               <div className="course-detail-wrapper1">
                 <Form style={{ width: "100%" }}>
                   <div>
-                    <div className="titleExamOnline">
-                      {t("Kiểm tra trắc nghiệm")}
-                    </div>
+                    <div className="titleExamOnline">{t("test_exam")}</div>
                     <Divider className="divider-custom" />
                   </div>
                   <Row>
                     <Col span={15}>
                       <Form.Item
-                        label={t("Tên chủ đề")}
+                        label={t("topic_name")}
                         className="itemFormExam"
                       >
                         <div>{exam?.name}</div>
                       </Form.Item>
                       <Divider className="divider-custom" />
                       <Form.Item
-                        label={t("Trả lời đúng")}
+                        label={t("correct_answer")}
                         className="itemFormExam"
                       >
                         <div style={{ fontSize: "18px", fontWeight: "bold" }}>
@@ -113,29 +111,26 @@ const ExamHeader = (props) => {
                         </div>
                       </Form.Item>
                       <Divider className="divider-custom" />
-                      <Form.Item
-                        label={t("Thời gian")}
-                        className="itemFormExam"
-                      >
+                      <Form.Item label={t("time")} className="itemFormExam">
                         <div>{time}</div>
                       </Form.Item>
                     </Col>
                     <Col span={9}>
                       <Form.Item
-                        label={t("Họ và tên")}
+                        label={t("common:fullname")}
                         className="itemFormExam"
                       >
                         <div>{user?.fullname || user?.username}</div>
                       </Form.Item>
                       <Divider className="divider-custom" />
-                      <Form.Item label={t("Email")} className="itemFormExam">
+                      <Form.Item
+                        label={t("common:email")}
+                        className="itemFormExam"
+                      >
                         <div>{user?.email}</div>
                       </Form.Item>
                       <Divider className="divider-custom" />
-                      <Form.Item
-                        label={t("Trạng thái")}
-                        className="itemFormExam"
-                      >
+                      <Form.Item label={t("status")} className="itemFormExam">
                         <div
                           style={
                             status === "Fail"
@@ -166,9 +161,7 @@ const ExamHeader = (props) => {
                         alignItems: "center",
                       }}
                     >
-                      <div className="titleExamOnline">
-                        {t("Kiểm tra trắc nghiệm")}
-                      </div>
+                      <div className="titleExamOnline">{t("test_exam")}</div>
                       <div
                         className="itemFormExam"
                         style={{ display: "flex", alignItems: "center" }}
@@ -184,10 +177,7 @@ const ExamHeader = (props) => {
                   </div>
                   <Row>
                     <Col span={15}>
-                      <Form.Item
-                        label={t("Số câu trả lời")}
-                        className="itemFormExam"
-                      >
+                      <Form.Item label={t("answers")} className="itemFormExam">
                         <div style={{ fontSize: "18px", fontWeight: "bold" }}>
                           {Object.keys(answer).length > 0
                             ? `${Object.keys(answer).length}/${
@@ -201,13 +191,13 @@ const ExamHeader = (props) => {
                       <Form.Item className="itemFormExam">
                         <Popconfirm
                           placement="bottom"
-                          title={t("Bạn có chắc chắn muốn nộp bài?")}
+                          title={t("confirm_submit_test_exam")}
                           onConfirm={() => handleSubmit()}
-                          okText={t("Có")}
-                          cancelText={t("Không")}
+                          okText={t("common:yes")}
+                          cancelText={t("common:no")}
                         >
                           <Button className="btnStartExam">
-                            {t("Nộp bài")}
+                            {t("submit")}
                           </Button>
                         </Popconfirm>
                       </Form.Item>

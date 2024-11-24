@@ -12,7 +12,7 @@ import { USER_LOGIN } from "../../config/path";
 import { CODE_EMAIL_ALREADY, CODE_USERNAME_ALREADY } from "../../config/const";
 
 const Signup = () => {
-  const { t } = useTranslation("login");
+  const { t } = useTranslation("auth");
 
   const history = useHistory();
   const [form] = Form.useForm();
@@ -24,7 +24,7 @@ const Signup = () => {
       form.setFields([
         {
           name: "password_again",
-          errors: [t("Mật khẩu không khớp!")],
+          errors: [t("password_not_matched")],
         },
       ]);
       return;
@@ -46,7 +46,7 @@ const Signup = () => {
           });
         }
         notification.success({
-          message: t("Bạn đã đăng kí thành công!"),
+          message: t("register_success"),
         });
         history.push(USER_LOGIN);
       })
@@ -54,11 +54,11 @@ const Signup = () => {
         const { response } = error;
         if (response?.data?.code === CODE_USERNAME_ALREADY)
           notification.error({
-            message: t("Tên đăng nhập đã được sử dụng."),
+            message: t("username_taken"),
           });
         if (response?.data?.code === CODE_EMAIL_ALREADY)
           notification.error({
-            message: t("Email đã được sử dụng."),
+            message: t("email_taken"),
           });
       })
       .then(() => setLoading(false));
@@ -76,34 +76,34 @@ const Signup = () => {
             onFinish={onFinish}
             layout={"vertical"}
           >
-            <div className="LoginTitle">{t("btn_signup")}</div>
+            <div className="LoginTitle">{t("register_title")}</div>
             <Form.Item
-              label={t("Họ và tên")}
+              label={t("fullname")}
               name="fullname"
               rules={[
                 {
                   required: true,
                   whitespace: true,
-                  message: t("Đây là thông tin bắt buộc."),
+                  message: t("field_require"),
                 },
               ]}
             >
-              <Input placeholder={t("Nhập họ và tên...")} />
+              <Input placeholder={t("fullname_placeholder")} />
             </Form.Item>
 
             <Form.Item
-              label={t("Tên đăng nhập")}
+              label={t("user_name")}
               name="username"
               // extra={t("Tên đăng nhập tối đa 12 kí tự")}
               rules={[
                 {
                   required: true,
                   whitespace: true,
-                  message: t("Đây là thông tin bắt buộc."),
+                  message: t("field_require"),
                 },
               ]}
             >
-              <Input placeholder={t("Nhập tên đăng nhập...")} />
+              <Input placeholder={t("username_placeholder")} />
             </Form.Item>
 
             <Form.Item
@@ -112,26 +112,26 @@ const Signup = () => {
               rules={[
                 {
                   type: "email",
-                  message: t("Email không đúng định dạng!"),
+                  message: t("email_invalid"),
                 },
                 {
                   required: true,
                   whitespace: true,
-                  message: t("Đây là thông tin bắt buộc."),
+                  message: t("field_require"),
                 },
               ]}
             >
-              <Input placeholder={t("Nhập email...")} />
+              <Input placeholder={t("email_placeholder")} />
             </Form.Item>
 
             <Form.Item
-              label={t("Mật khẩu")}
+              label={t("password")}
               name="password"
               rules={[
                 {
                   required: true,
                   whitespace: true,
-                  message: t("Đây là thông tin bắt buộc."),
+                  message: t("field_require"),
                 },
                 {
                   validator(_, value) {
@@ -147,7 +147,7 @@ const Signup = () => {
                       ) {
                         return Promise.resolve();
                       } else {
-                        return Promise.reject("Mật khẩu chưa đủ mạnh.");
+                        return Promise.reject("password_not_strong");
                       }
                     }
                     return Promise.resolve();
@@ -155,21 +155,21 @@ const Signup = () => {
                 },
               ]}
             >
-              <Input.Password placeholder={t("Nhập mật khẩu...")} />
+              <Input.Password placeholder={t("password_placeholder")} />
             </Form.Item>
 
             <Form.Item
-              label={t("Nhập lại mật khẩu")}
+              label={t("password_again")}
               name="password_again"
               rules={[
                 {
                   required: true,
                   whitespace: true,
-                  message: t("Đây là thông tin bắt buộc."),
+                  message: t("field_require"),
                 },
               ]}
             >
-              <Input.Password placeholder={t("Nhập lại mật khẩu...")} />
+              <Input.Password placeholder={t("password_again_placeholder")} />
             </Form.Item>
 
             <Form.Item>
@@ -179,7 +179,7 @@ const Signup = () => {
                 className="LoginButton"
                 loading={loading}
               >
-                {t("btn_signup")}
+                {t("register_btn")}
               </Button>
             </Form.Item>
           </Form>

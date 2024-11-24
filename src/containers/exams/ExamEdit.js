@@ -13,7 +13,6 @@ import {
   Table,
   Tooltip,
 } from "antd";
-import { LANGUAGES } from "../../config/const";
 import { bindParams, handleDownload } from "../../config/function";
 import * as xlsx from "xlsx";
 import { UploadOutlined } from "@ant-design/icons";
@@ -22,7 +21,7 @@ import { API_EXAM_DETAIL, API_EXAM_EDIT } from "../../config/endpointApi";
 import { EXAM_DETAIL_PATH } from "../../config/path";
 
 const ExamEdit = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
   const { courseId, examId } = useParams();
@@ -53,7 +52,7 @@ const ExamEdit = () => {
       },
     },
     {
-      title: t("Câu hỏi"),
+      title: t("question"),
       width: "20%",
       align: "left",
       ellipsis: "true",
@@ -68,7 +67,7 @@ const ExamEdit = () => {
       },
     },
     {
-      title: t("Câu trả lời 1"),
+      title: t("answer1"),
       dataIndex: "answer",
       width: "13%",
       ellipsis: true,
@@ -82,7 +81,7 @@ const ExamEdit = () => {
       },
     },
     {
-      title: t("Câu trả lời 2"),
+      title: t("answer2"),
       dataIndex: "answer",
       width: "13%",
       ellipsis: true,
@@ -96,7 +95,7 @@ const ExamEdit = () => {
       },
     },
     {
-      title: t("Câu trả lời 3"),
+      title: t("answer3"),
       dataIndex: "answer",
       width: "13%",
       ellipsis: true,
@@ -110,7 +109,7 @@ const ExamEdit = () => {
       },
     },
     {
-      title: t("Câu trả lời 4"),
+      title: t("answer4"),
       dataIndex: "answer",
       width: "13%",
       ellipsis: true,
@@ -124,7 +123,7 @@ const ExamEdit = () => {
       },
     },
     {
-      title: t("Đáp án"),
+      title: t("correct_answer"),
       dataIndex: "correct",
       width: "10%",
       ellipsis: true,
@@ -164,8 +163,8 @@ const ExamEdit = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -221,7 +220,7 @@ const ExamEdit = () => {
       postAxios(API_EXAM_EDIT, data)
         .then((res) => {
           notification.success({
-            message: t("Chỉnh sửa chủ đề thành công."),
+            message: t("edit_topic_success"),
           });
           history.push(
             bindParams(EXAM_DETAIL_PATH, {
@@ -234,8 +233,8 @@ const ExamEdit = () => {
           const { response } = error;
           notification.error({
             message: response?.data?.message
-              ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-              : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+              ? `${t("common:server_error")}: ${response?.data?.message}`
+              : t("common:msg_please_try_again"),
           });
         })
         .then(() => setLoading(false));
@@ -247,7 +246,7 @@ const ExamEdit = () => {
       <Layout style={{ minWidth: "100vh" }} className="Exam">
         <div className="PageHead">
           <div className="PageHeadRow">
-            <div className="Title">{t("Chỉnh sửa chủ đề")}</div>
+            <div className="Title">{t("edit_topic")}</div>
           </div>
         </div>
         <Form
@@ -258,20 +257,20 @@ const ExamEdit = () => {
           {...formItemLayout}
         >
           <Form.Item
-            label={t("Tên chủ đề")}
+            label={t("topic_name")}
             name="name"
             rules={[
               {
                 required: true,
                 whitespace: true,
-                message: t("Đây là thông tin bắt buộc."),
+                message: t("common:validate_required"),
               },
             ]}
           >
-            <Input placeholder={t("Nhập tên chủ đề...")} />
+            <Input placeholder={t("topic_name_placeholder")} />
           </Form.Item>
           <Form.Item
-            label={t("Số lượng câu hỏi xuất hiện")}
+            label={t("questions_appear")}
             name="questions_appear"
             rules={[
               {
@@ -279,12 +278,12 @@ const ExamEdit = () => {
                 validator: (_, value) => {
                   if (!value) {
                     return Promise.reject(
-                      new Error(t("Đây là thông tin bắt buộc."))
+                      new Error(t("common:validate_required"))
                     );
                   }
                   if (Number(value) <= 0) {
                     return Promise.reject(
-                      new Error(t("Số lượng phải lớn hơn 0"))
+                      new Error(t("quantity_greater_validate"))
                     );
                   }
                   form.setFieldsValue({ questions_appear: Number(value) });
@@ -299,18 +298,18 @@ const ExamEdit = () => {
                   event.preventDefault();
                 }
               }}
-              placeholder={t("Nhập số lượng")}
+              placeholder={t("quantity_placeholder")}
             />
           </Form.Item>
           <Form.Item
-            label={t("Thời gian trả lời(phút)")}
+            label={t("response_time")}
             name="time_answer"
             rules={[
               {
                 validator(_, value) {
                   if (Number(value) <= 0) {
                     return Promise.reject(
-                      new Error(t("Số lượng phải lớn hơn 0"))
+                      new Error(t("quantity_greater_validate"))
                     );
                   }
                   form.setFieldsValue({ time_answer: Number(value) });
@@ -325,7 +324,7 @@ const ExamEdit = () => {
                   event.preventDefault();
                 }
               }}
-              placeholder={t("Nhập thời gian trả lời")}
+              placeholder={t("response_time_placeholder")}
             />
           </Form.Item>
           <Form.Item
@@ -339,7 +338,7 @@ const ExamEdit = () => {
                 <Button type="default" className="ImportBtn">
                   <label htmlFor="upload-photo" className="label-upload">
                     <UploadOutlined size={24} style={{ marginRight: "3px" }} />
-                    {t("Tải lên danh sách câu hỏi")}
+                    {t("upload_question_list")}
                   </label>
                 </Button>
                 <span style={{ marginLeft: "5px" }}>{fileName}</span>
@@ -353,10 +352,10 @@ const ExamEdit = () => {
                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
               />
               {validate && (
-                <p style={{ color: "red" }}>{t("Đây là thông tin bắt buộc.")}</p>
+                <p style={{ color: "red" }}>{t("common:validate_required")}</p>
               )}
               <a href={"#"} onClick={handleDownload}>
-                {t("Tải template câu hỏi tại đây")}
+                {t("download_template")}
               </a>
             </div>
           </Form.Item>
@@ -372,7 +371,7 @@ const ExamEdit = () => {
               style={{ marginRight: "10px" }}
               onClick={() => history.goBack()}
             >
-              {t("Quay lại")}
+              {t("back")}
             </Button>
             <Button
               type="primary"
@@ -380,11 +379,11 @@ const ExamEdit = () => {
               className="CreateExam"
               loading={loading}
             >
-              {t("Chỉnh sửa")}
+              {t("edit")}
             </Button>
           </Form.Item>
           <Divider />
-          <p>{t("Danh sách câu hỏi")}</p>
+          <p>{t("question_list")}</p>
           <Table columns={columns} dataSource={questions} />
         </Form>
       </Layout>

@@ -4,12 +4,12 @@ import "./SessionComplete.scss";
 import { useTranslation } from "react-i18next";
 
 const SessionComplete = (props) => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   return (
     <React.Fragment>
       <div className="SessionComplete">
         {props.courseFinished ? (
-          <div className="Content">{t("course_finish")}</div>
+          <div className="Content">{t("course_complete")}</div>
         ) : (
           <div className="Content">{t("goal_complete")}</div>
         )}

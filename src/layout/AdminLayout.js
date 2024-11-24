@@ -1,19 +1,27 @@
 import React, { useState, useContext } from "react";
 import PropTypes from "prop-types";
-import { Layout, Menu, Breadcrumb, Avatar, Space, Dropdown, Image } from "antd";
+import {
+  Layout,
+  Menu,
+  Breadcrumb,
+  Avatar,
+  Space,
+  Dropdown,
+  Image,
+  Tooltip,
+} from "antd";
 import { SolutionOutlined, UserOutlined } from "@ant-design/icons";
 import Sider from "antd/es/layout/Sider";
 import { IconEng, IconVi } from "../common/Icon/Icon";
 import { NavLink, useHistory, useLocation } from "react-router-dom";
 import {
-  COURSES_PATH,
   USER_LOGIN,
   USER_LIST_PATH,
   ADMIN_COURSE_LIST_PATH,
   ADMIN_MY_COURSE_LIST_PATH,
 } from "../config/path";
 import { useTranslation } from "react-i18next";
-import { AUTH_TOKEN, EN, KEY_LANGUAGE, USER_INFO, VI } from "../config/const";
+import { AUTH_TOKEN, EN, JA, KEY_LANGUAGE, USER_INFO, VI } from "../config/const";
 import { getCurrentLanguage, getRole } from "../config/function";
 import i18n from "i18next";
 import avatar from "../assets/img/avatar.png";
@@ -21,37 +29,37 @@ import { LogoutOutlined } from "@ant-design/icons";
 import { AppContext } from "../context/AppContext";
 import "./AdminLayout.scss";
 import img from "../assets/img/logoIcon.PNG";
+import IconJapan from "../common/Icon/IconJapan";
 
 const { SubMenu } = Menu;
 
 const AdminLayout = (props) => {
   const { breadcrumbs, children } = props;
-  const { handleSelectLanguage, openedMenus, setOpenMenus } =
+  const { handleSelectLanguage, openedMenus, user_info } =
     useContext(AppContext);
   const history = useHistory();
   const location = useLocation();
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("adminLayout");
   const role = getRole();
   const [visible, setVisible] = useState(false);
   const [visibleLogout, setVisibleLogout] = useState(false);
-  console.log("in location", location.pathname);
 
   const locale = getCurrentLanguage();
 
   let menus = [
     {
       key: USER_LIST_PATH,
-      name: t("Danh sách người dùng"),
+      name: t("user_list"),
       icon: <UserOutlined />,
     },
     {
       key: ADMIN_COURSE_LIST_PATH,
-      name: t("Danh sách khóa học"),
+      name: t("course_list"),
       icon: <SolutionOutlined />,
     },
     {
       key: ADMIN_MY_COURSE_LIST_PATH,
-      name: t("Khóa học đã tạo"),
+      name: t("created_course_list"),
       icon: <SolutionOutlined />,
     },
   ];
@@ -73,11 +81,14 @@ const AdminLayout = (props) => {
 
   const menu = (
     <Menu onClick={handleChangeLanguage} selectedKeys={locale}>
+      <Menu.Item key={EN}>
+        <Avatar src={<IconEng />} />
+      </Menu.Item>
       <Menu.Item key={VI}>
         <Avatar src={<IconVi />} />
       </Menu.Item>
-      <Menu.Item key={EN}>
-        <Avatar src={<IconEng />} />
+      <Menu.Item key={JA}>
+        <Avatar src={<IconJapan />} />
       </Menu.Item>
     </Menu>
   );
@@ -170,7 +181,17 @@ const AdminLayout = (props) => {
                     onOpenChange={(flag) => setVisible(flag)}
                     open={visible}
                   >
-                    <Avatar src={locale === VI ? <IconVi /> : <IconEng />} />
+                    <Avatar
+                      src={
+                        locale === VI ? (
+                          <IconVi />
+                        ) : locale === EN ? (
+                          <IconEng />
+                        ) : (
+                          <IconJapan />
+                        )
+                      }
+                    />
                   </Dropdown>
                   <Dropdown
                     overlay={menuUser}
@@ -178,7 +199,14 @@ const AdminLayout = (props) => {
                     onOpenChange={(flag) => setVisibleLogout(flag)}
                     open={visibleLogout}
                   >
-                    <Avatar width={30} height={30} src={avatar} />
+                    <Space size={"small"}>
+                      <Avatar width={30} height={30} src={avatar} />
+                      <Tooltip color={"#c5c4c4"} placement="right">
+                        <span className="textColor username pointer">
+                          {user_info?.username}
+                        </span>
+                      </Tooltip>
+                    </Space>
                   </Dropdown>
                 </Space>
               </div>

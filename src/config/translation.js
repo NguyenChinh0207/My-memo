@@ -1,12 +1,15 @@
-import { EN, VI } from './const'
+import { EN, VI, JA } from "./const";
 
-export const languages = [VI, EN]
+export const languages = [EN, VI, JA];
 
 export const translationFiles = [
-    'common',
-    'login'
-]
+  "common",
+  "auth",
+  "homeLayout",
+  "adminLayout",
+  "course",
+];
 
-const translation = { languages, translationFiles }
+const translation = { languages, translationFiles };
 
-export default translation
+export default translation;

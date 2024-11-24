@@ -6,14 +6,10 @@ import { Button, Tabs } from "antd";
 const { TabPane } = Tabs;
 
 const TabsUnit = (props) => {
-  const { t } = useTranslation("common");
-  const [loading, setLoading] = useState(false);
+  const { t } = useTranslation("course");
   const { setTab } = props;
 
-  const data = [
-    { title: t("Bài giảng") },
-    { title: t("Kỹ năng") },
-  ];
+  const data = [{ title: t("lecture") }];
 
   const handleTabChange = (tab) => {
     setTab(tab);
@@ -23,10 +19,7 @@ const TabsUnit = (props) => {
     <div className="">
       <div className="">
         <div style={{ width: "100%" }}>
-          <Tabs
-            defaultActiveKey="0"
-            onChange={handleTabChange}
-          >
+          <Tabs defaultActiveKey="0" onChange={handleTabChange}>
             {data.map((item, index) => (
               <TabPane tab={item.title} key={index}></TabPane>
             ))}

@@ -1,34 +1,25 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import Layout from "antd/lib/layout/layout";
 import {
-  Button,
   Col,
   Divider,
-  Form,
-  Input,
   Modal,
   notification,
-  Popover,
   Row,
   Space,
   Spin,
   Table,
 } from "antd";
-import { AppContext } from "../../../context/AppContext";
 import AdminLayout from "../../../layout/AdminLayout";
 import "./UserList.scss";
-import { SearchOutlined } from "@ant-design/icons";
 import { postAxios } from "../../../Http";
 import {
   API_COURSE_OWNER_LIST,
   API_GET_EXAM_BY_COURSEID,
   API_GET_MY_COURSE,
-  API_USERS_LIST,
 } from "../../../config/endpointApi";
-import { bindParams } from "../../../config/function";
-import { USER_DETAIL_PATH } from "../../../config/path";
 import IconMoreInfo from "../../../common/Icon/IconMoreInfo";
 
 const Label = (props) => (
@@ -44,9 +35,9 @@ const Text = ({ pink, children, lightGray, ...restProps }) => {
 };
 
 const UserDetail = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const location = useLocation();
-  const {userId} = useParams()
+  const { userId } = useParams();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [coursesOwner, setCoursesOwner] = useState([]);
@@ -65,7 +56,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Tên khóa học"),
+      title: t("course_name"),
       dataIndex: "name",
       ellipsis: true,
       width: "15%",
@@ -74,7 +65,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Mô tả"),
+      title: t("description"),
       dataIndex: "description",
       width: "30%",
       ellipsis: true,
@@ -83,7 +74,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Ngôn ngữ dạy"),
+      title: t("teacher_lang"),
       dataIndex: "language",
       width: "15%",
       render: (language) => {
@@ -91,7 +82,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Ngôn ngữ của người học"),
+      title: t("learner_lang"),
       dataIndex: "my_language",
       width: "15%",
       render: (my_language) => {
@@ -99,7 +90,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Số từ vựng"),
+      title: t("words"),
       dataIndex: "words",
       width: "10%",
       render: (words) => {
@@ -107,11 +98,11 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Trạng thái"),
+      title: t("status"),
       dataIndex: "active",
       width: "10%",
       render: (active) => {
-        return active === 1 ? t("Công khai") : t("Không công khai");
+        return active === 1 ? t("active") : t("deactive");
       },
     },
   ];
@@ -125,7 +116,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Tên khóa học"),
+      title: t("course_name"),
       dataIndex: "name",
       ellipsis: true,
       width: "15%",
@@ -134,16 +125,16 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Mô tả"),
+      title: t("description"),
       dataIndex: "description",
-      width: "35%",
+      width: "20%",
       ellipsis: true,
       render: (description) => {
         return description;
       },
     },
     {
-      title: t("Ngôn ngữ dạy"),
+      title: t("teacher_lang"),
       dataIndex: "language",
       width: "15%",
       render: (language) => {
@@ -151,7 +142,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Ngôn ngữ của người học"),
+      title: t("learner_lang"),
       dataIndex: "my_language",
       width: "15%",
       render: (my_language) => {
@@ -159,7 +150,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Số từ vựng"),
+      title: t("words"),
       dataIndex: "words",
       width: "10%",
       render: (words) => {
@@ -167,17 +158,17 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Số từ đã học"),
+      title: t("words_learned"),
       dataIndex: "_id",
-      width: "10%",
+      width: "15%",
       render: (id) => {
-        return progress[id]?.wordsLearned || 0;
+        return (progress && progress[id]?.wordsLearned) || 0;
       },
     },
     {
-      title: "",
+      title: t("history"),
       dataIndex: "_id",
-      width: "5%",
+      width: "15%",
       render: (id) => (
         <div className="moreIcon" onClick={() => action(id)}>
           <IconMoreInfo />
@@ -195,7 +186,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Tên chủ đề"),
+      title: t("topic_name"),
       dataIndex: "name",
       ellipsis: true,
       width: "15%",
@@ -204,7 +195,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Thời gian trả lời"),
+      title: t("anwser_time"),
       dataIndex: "time_answer",
       width: "15%",
       ellipsis: true,
@@ -213,7 +204,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Số lượng câu hỏi xuất hiện"),
+      title: t("questions_appear"),
       dataIndex: "questions_appear",
       width: "20%",
       render: (questions_appear) => {
@@ -221,7 +212,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Số câu hỏi"),
+      title: t("questions"),
       dataIndex: "questions",
       width: "10%",
       render: (questions) => {
@@ -229,7 +220,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Số câu đúng"),
+      title: t("correct_answers"),
       dataIndex: "result",
       width: "10%",
       render: (result, record) => {
@@ -239,7 +230,7 @@ const UserDetail = () => {
       },
     },
     {
-      title: t("Kết quả"),
+      title: t("result"),
       dataIndex: "result",
       width: "10%",
       render: (result, record) => {
@@ -254,9 +245,11 @@ const UserDetail = () => {
           status = 1;
         else status = 2;
         return status === 1 ? (
-          <span style={{ color: "green", fontWeight: "bold" }}>Pass</span>
+          <span style={{ color: "green", fontWeight: "bold" }}>
+            {t("pass")}
+          </span>
         ) : status === 2 ? (
-          <span style={{ color: "red", fontWeight: "bold" }}>Fail</span>
+          <span style={{ color: "red", fontWeight: "bold" }}>{t("fail")}</span>
         ) : (
           ""
         );
@@ -288,8 +281,8 @@ const UserDetail = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -305,8 +298,8 @@ const UserDetail = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -325,8 +318,8 @@ const UserDetail = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -338,7 +331,7 @@ const UserDetail = () => {
   };
 
   return (
-    <AdminLayout breadcrumbs={[t("Danh sách người dùng"), data?.username]}>
+    <AdminLayout breadcrumbs={[t("common:user_list"), data?.username]}>
       {loading ? (
         <div
           style={{
@@ -357,31 +350,31 @@ const UserDetail = () => {
               <Row>
                 <Col span={12}>
                   <div style={{ display: "flex" }}>
-                    <Label>{t("Họ và tên")}</Label>
+                    <Label>{t("common:fullname")}</Label>
                     <Text>{data?.fullname}</Text>
                   </div>
                   <Divider className="divider-custom" />
                   <div style={{ display: "flex" }}>
                     {" "}
-                    <Label>{t("Tên đăng nhập")}</Label>
+                    <Label>{t("common:username")}</Label>
                     <Text>{data?.username}</Text>
                   </div>
                   <Divider className="divider-custom" />
                   <div style={{ display: "flex" }}>
-                    <Label>{t("Email")}</Label>
+                    <Label>{t("common:email")}</Label>
                     <Text>{data?.email}</Text>
                   </div>
                   <Divider className="divider-custom" />
                 </Col>
                 <Col span={12}>
                   <div style={{ display: "flex" }}>
-                    <Label>{t("Điểm")}</Label>
+                    <Label>{t("common:points")}</Label>
                     <Text>{data?.points}</Text>
                   </div>
                   <Divider className="divider-custom" />
                   <div style={{ display: "flex" }}>
                     {" "}
-                    <Label>{t("Số từ đã học")}</Label>
+                    <Label>{t("words_learned")}</Label>
                     <Text>{data?.wordsLearned}</Text>
                   </div>
                   <Divider className="divider-custom" />
@@ -390,13 +383,13 @@ const UserDetail = () => {
               <Row>
                 <Col span={24}>
                   <div style={{ marginTop: "10px" }}>{`${t(
-                    t("Danh sách khóa học đã tạo")
+                    t("created_courses")
                   )}:`}</div>
                   <Table
                     className="custom-table"
                     columns={columnsOwner}
                     dataSource={coursesOwner}
-                    rowKey="id"
+                    rowKey={(record) => record._id}
                     loading={loading}
                   />
                 </Col>
@@ -404,19 +397,19 @@ const UserDetail = () => {
               <Row>
                 <Col span={24}>
                   <div style={{ marginTop: "10px" }}>{`${t(
-                    t("Danh sách khóa học của tôi")
+                    t("my_course_list")
                   )}:`}</div>
                 </Col>
                 <Table
                   className="custom-table"
                   columns={columnsMyCourses}
                   dataSource={myCourses}
-                  rowKey="id"
+                  rowKey={(record) => record._id}
                   loading={loading}
                 />
               </Row>
               <Modal
-                title={t("Lịch sử kiểm tra")}
+                title={t("test_history")}
                 open={openModal}
                 onCancel={() => setOpenModal(false)}
                 footer={false}
@@ -427,7 +420,7 @@ const UserDetail = () => {
                     className="custom-table"
                     columns={columnsExam}
                     dataSource={exams}
-                    rowKey="id"
+                    rowKey={(record) => record._id}
                     loading={loading}
                   />
                 </Row>

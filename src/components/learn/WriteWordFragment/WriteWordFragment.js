@@ -3,47 +3,49 @@ import PropTypes from "prop-types";
 import "./WriteWordFragment.scss";
 import { useTranslation } from "react-i18next";
 
-const WriteWordFragment = (props) => {
-  const {t} = useTranslation("common")
+const WriteWordFragment = ({ result, userWrote, pair, setInputReset }) => {
+  const { t } = useTranslation("common");
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef(null);
 
   useEffect(() => {
     inputRef.current.focus();
-  }, [])
-  
-  useEffect(() => {
-    	if (props.result === 'learning') {
-    		clearInput();
-    	}
-  },[props.result])
+  }, []);
 
-  const inputChange = event => {
-  	setInputValue(event.target.value);
+  useEffect(() => {
+    if (result === "learning") {
+      clearInput();
+      setInputReset(true);
+    }
+  }, [result]);
+
+  const inputChange = (event) => {
+    setInputValue(event.target.value);
   };
 
-  const onKeyDown = e => {
-  	if (e.key === 'Enter' && props.result === 'learning') {
-  		onNext();
-  	}
+  const onKeyDown = (e) => {
+    if (e.key === "Enter" && result === "learning") {
+      onNext();
+    }
   };
 
   const onNext = () => {
-  	if (props.result === 'learning') {
-  		props.userWrote(inputValue);
-  	}
+    if (result === "learning") {
+      userWrote(inputValue);
+      setInputReset(true); // Set inputReset chỉ khi bạn đã hoàn tất việc xử lý kết quả
+    }
   };
 
   const clearInput = () => {
-  	inputRef.current.focus();
-  	setInputValue('')
+    inputRef.current.focus();
+    setInputValue("");
   };
 
   let inputClasses = "Input";
 
-  if (props.result === "correct") {
+  if (result === "correct") {
     inputClasses += " " + "InputCorrect";
-  } else if (props.result === "wrong") {
+  } else if (result === "wrong") {
     inputClasses += " " + "InputWrong";
   }
 
@@ -51,11 +53,10 @@ const WriteWordFragment = (props) => {
     <div className="WriteWord">
       <div className="ContentWriteWord">
         <div className="Main">
-          <div className="Word">{props.pair.description}</div>
-          {/* {input} */}
+          <div className="Word">{pair.description}</div>
           <input
             ref={inputRef}
-            readOnly={props.result !== "learning"}
+            readOnly={result !== "learning"}
             value={inputValue}
             onChange={inputChange}
             onKeyDown={onKeyDown}
@@ -65,7 +66,7 @@ const WriteWordFragment = (props) => {
         <div className="RightColumnWriteWord">
           <div onClick={onNext} className="NextButton">
             <div className="RightArrow" />
-            <div>{t("Tiếp tục")}</div>
+            <div>{t("continue")}</div>
           </div>
         </div>
       </div>

@@ -14,7 +14,7 @@ const NewWordFragment = props => {
         <div className="RightColumnNewWord">
           <div onClick={props.next} className="NextButton">
             <div className="RightArrow" />
-            <div>{t("Tiếp tục")}</div>
+            <div>{t("continue")}</div>
           </div>
         </div>
       </div>

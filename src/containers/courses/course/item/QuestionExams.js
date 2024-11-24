@@ -26,10 +26,10 @@ import {
   API_EXAM_DELETE,
   API_EXAM_LIST,
 } from "../../../../config/endpointApi";
-import { CODE_ALREADY_EXIST } from "../../../../config/const";
+import { CODE_ALREADY_EXIST, CODE_NOT_FOUND } from "../../../../config/const";
 
 const QuestionExams = (props) => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
   const { courseId } = useParams();
@@ -76,7 +76,7 @@ const QuestionExams = (props) => {
       onCell,
     },
     {
-      title: t("Tên chủ đề"),
+      title: t("topic_name"),
       width: "25%",
       align: "left",
       ellipsis: "true",
@@ -84,17 +84,17 @@ const QuestionExams = (props) => {
       onCell,
     },
     {
-      title: t("Thời gian trả lời"),
+      title: t("anwser_time"),
       dataIndex: "time_answer",
       width: "20%",
       align: "left",
       render: (time_answer) => {
-        return `${time_answer} ${t("giây")}`;
+        return `${time_answer} ${t("seconds")}`;
       },
       onCell,
     },
     {
-      title: t("Số câu hỏi xuất hiện"),
+      title: t("questions_appear"),
       dataIndex: "questions_appear",
       width: "20%",
       align: "left",
@@ -104,7 +104,7 @@ const QuestionExams = (props) => {
       onCell,
     },
     {
-      title: t("Hành động"),
+      title: t("actions"),
       dataIndex: "_id",
       width: "15%",
       align: "left",
@@ -131,10 +131,10 @@ const QuestionExams = (props) => {
               <IconEdit style={{ color: "grey", width: "40px" }} />
             </div>
             <Popconfirm
-              title={t("Bạn có chắc chắn muốn xóa chủ đề này?")}
+              title={t("confirm_delete_topic")}
               onConfirm={() => onClickDelete(_id)}
-              okText={t("Có")}
-              cancelText={t("Không")}
+              okText={t("common:yes")}
+              cancelText={t("common:no")}
             >
               <div className="RemoveBtn" />
             </Popconfirm>
@@ -157,15 +157,14 @@ const QuestionExams = (props) => {
     setLoading(true);
     postAxios(API_EXAM_LIST, { courseId: course._id })
       .then((res) => {
-        console.log("in data", res?.data);
         setExams(res?.data);
       })
       .catch((error) => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -212,18 +211,21 @@ const QuestionExams = (props) => {
     setLoading(true);
     postAxios(API_EXAM_DELETE, { id })
       .then((res) => {
+        notification.success({
+          message: t("delete_exam_success"),
+        });
         loadExams();
       })
       .catch((error) => {
         const { response } = error;
-        if (response?.data?.code === CODE_ALREADY_EXIST) {
+        if (response?.data?.code === CODE_NOT_FOUND) {
           notification.error({
-            message: `${t("Chủ đề")} ${t("không tồn tại")}`,
+            message: `${t("topic_not_found")}`,
           });
           return;
         }
         notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          message: t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -242,7 +244,7 @@ const QuestionExams = (props) => {
       postAxios(API_EXAM_CREATE, data)
         .then((res) => {
           notification.success({
-            message: t("Tạo mới chủ đề thành công"),
+            message: t("create_topic_success"),
           });
           setShowForm(false);
           setFileName("");
@@ -254,12 +256,12 @@ const QuestionExams = (props) => {
           const { response } = error;
           if (response?.data?.code === CODE_ALREADY_EXIST) {
             notification.error({
-              message: `${t("Tên chủ đề")} ${t("đã tồn tại")}`,
+              message: `${t("msg_topic_exist")}`,
             });
             return;
           }
           notification.error({
-            message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            message: t("common:msg_please_try_again"),
           });
         })
         .then(() => setLoading(false));
@@ -269,9 +271,9 @@ const QuestionExams = (props) => {
   return (
     <div className="formQuestions">
       <div className="HeaderFormQuestion">
-        <h3>{t("Danh sách các chủ đề")}</h3>
+        <h3>{t("topic_list")}</h3>
         <div className="showCreate" onClick={() => setShowForm(!showForm)}>
-          {t("Tạo mới")}
+          {t("common:create")}
           <CaretDownOutlined className="showCreateIcon" />
         </div>
       </div>
@@ -285,33 +287,31 @@ const QuestionExams = (props) => {
           {...formItemLayout}
         >
           <Form.Item
-            label={t("Tên chủ đề")}
+            label={t("topic_name")}
             name="name"
             rules={[
               {
                 required: true,
                 whitespace: true,
-                message: t("Đây là thông tin bắt buộc."),
+                message: t("common:validate_required"),
               },
             ]}
           >
-            <Input placeholder={t("Nhập tên chủ đề...")} />
+            <Input placeholder={t("topic_name_placeholder")} />
           </Form.Item>
           <Form.Item
-            label={t("Số lượng câu hỏi xuất hiện")}
+            label={t("questions_appear")}
             name="questions_appear"
             rules={[
               {
                 required: true,
                 validator: (_, value) => {
                   if (!value) {
-                    return Promise.reject(
-                      new Error(t("Đây là thông tin bắt buộc."))
-                    );
+                    return Promise.reject(new Error(t("validate_required")));
                   }
                   if (Number(value) <= 0) {
                     return Promise.reject(
-                      new Error(t("Số lượng phải lớn hơn 0"))
+                      new Error(t("quantity_greater_validate"))
                     );
                   }
                   form.setFieldsValue({ questions_appear: Number(value) });
@@ -326,18 +326,18 @@ const QuestionExams = (props) => {
                   event.preventDefault();
                 }
               }}
-              placeholder={t("Nhập số lượng...")}
+              placeholder={t("quantity_placeholder")}
             />
           </Form.Item>
           <Form.Item
-            label={t("Thời gian trả lời(phút)")}
+            label={t("response_time")}
             name="time_answer"
             rules={[
               {
                 validator(_, value) {
                   if (Number(value) <= 0) {
                     return Promise.reject(
-                      new Error(t("Số lượng phải lớn hơn 0"))
+                      new Error(t("quantity_greater_validate"))
                     );
                   }
                   form.setFieldsValue({ time_answer: Number(value) });
@@ -352,7 +352,7 @@ const QuestionExams = (props) => {
                   event.preventDefault();
                 }
               }}
-              placeholder={t("Nhập thời gian trả lời...")}
+              placeholder={t("response_time_placeholder")}
             />
           </Form.Item>
           <Form.Item
@@ -366,7 +366,7 @@ const QuestionExams = (props) => {
                 <Button type="default" className="ImportBtn">
                   <label htmlFor="upload-photo" className="label-upload">
                     <UploadOutlined size={24} style={{ marginRight: "3px" }} />
-                    {t("Tải lên danh sách câu hỏi")}
+                    {t("upload_question_list")}
                   </label>
                 </Button>
                 <span style={{ marginLeft: "5px" }}>{fileName}</span>
@@ -380,10 +380,10 @@ const QuestionExams = (props) => {
                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
               />
               {validate && (
-                <p style={{ color: "red" }}>{t("Đây là thông tin bắt buộc.")}</p>
+                <p style={{ color: "red" }}>{t("validate_required")}</p>
               )}
               <a href={"#"} onClick={handleDownload}>
-                {t("Tải template câu hỏi tại đây")}
+                {t("download_template")}
               </a>
             </div>
           </Form.Item>
@@ -399,7 +399,7 @@ const QuestionExams = (props) => {
               className="CreateExam"
               loading={loading}
             >
-              {t("Tạo mới")}
+              {t("common:create")}
             </Button>
           </Form.Item>
           <Divider />
@@ -409,7 +409,7 @@ const QuestionExams = (props) => {
       )}
       {!showForm && exams.length === 0 && (
         <div style={{ textAlign: "center", marginBottom: "10px" }}>
-          {t("Khóa học này chưa có chủ đề trắc nghiệm nào")}
+          {t("course:course_no_exam")}
         </div>
       )}
       <Table

@@ -26,39 +26,32 @@ import {
 } from "../../../config/function";
 import { postAxios } from "../../../Http";
 import {
-  API_COURSE_CREATE,
-  API_COURSE_EDIT,
   API_UNIT_DELETE,
   API_UNIT_LIST_BY_COURSE,
 } from "../../../config/endpointApi";
 import {
-  ADMIN_COURSE_LIST_PATH,
   ADMIN_CREATE_UNIT_PATH,
-  ADMIN_EDIT_UNIT_PATH,
-  ADMIN_MY_COURSE_LIST_PATH,
+  ADMIN_EDIT_UNIT_PATH
 } from "../../../config/path";
 import { AppContext } from "../../../context/AppContext";
 import IconMoreInfo from "../../../common/Icon/IconMoreInfo";
 import moment from "moment";
 import IconEdit from "../../../common/Icon/IconEdit";
-import { CODE_ALREADY_EXIST } from "../../../config/const";
-import { UploadOutlined } from "@ant-design/icons";
-import AWS from "aws-sdk";
+import logoCourses from "../../../assets/img/logoCourses.png";
+import { CODE_NOT_FOUND } from "../../../config/const";
+import { UploadOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useFileUpload } from "../../../hook/useFileUpload";
+import { useCourseAction } from "../../../hook/useCourseAction";
 
-AWS.config.update({
-  region: "us-west-2",
-  accessKeyId: "AKIAU6AM6N2AXNPXPPE2",
-  secretAccessKey: "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",
-});
-const s3 = new AWS.S3();
-
-const MyCourseAction = () => {
+const CourseAction = () => {
   const [form] = Form.useForm();
   const params = useParams();
   const history = useHistory();
   const location = useLocation();
   const { courseId } = params;
-  const { t } = useTranslation("cmmon");
+  const { t } = useTranslation("course");
+  const { handleFileUpload } = useFileUpload();
+  const { handleAdminCourseAction } = useCourseAction();
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState(false);
   const { TextArea } = Input;
@@ -78,21 +71,23 @@ const MyCourseAction = () => {
                 courseId: courseId,
                 unitId: record?._id,
               })}`,
-              state: { detail: record, instance: s3 },
+              state: { detail: record },
             })
           }
         >
           <IconEdit />
-          <div className="pl-1">{t("Chỉnh sửa")}</div>
+          <div className="pl-1">{t("common:edit")}</div>
         </div>
         <div className="d-flex align-items-center pointer">
           <Popconfirm
-            title={t("Bạn có chắc chắn muốn xóa bài học này?")}
+            title={t("confirm_delete_lecture")}
             onConfirm={() => onClickDelete(record._id)}
-            okText={t("Có")}
-            cancelText={t("Không")}
+            okText={t("common:yes")}
+            cancelText={t("common:no")}
+            className="d-flex align-items-center pointer"
           >
-            <div className="RemoveBtn" />
+            <DeleteOutlined style={{ fontSize: "22px" }} />
+            <div className="pl-1">{t("delete_lecture")}</div>
           </Popconfirm>
         </div>
       </div>
@@ -103,26 +98,27 @@ const MyCourseAction = () => {
     {
       title: "#",
       dataIndex: "key",
+      with: "10%",
       render: (value, data, index) => {
         return index + 1;
       },
     },
     {
-      title: t("Ảnh"),
-      dataIndex: "image",
-      render: (image) => {
-        return <Image src={image} style={{ width: "60px", height: "60px" }} />;
-      },
-    },
-    {
-      title: t("Tên bài học"),
+      title: t("lecture_name"),
       dataIndex: "name",
       render: (name) => {
         return name;
       },
     },
     {
-      title: t("Mô tả"),
+      title: t("image"),
+      dataIndex: "image",
+      render: (image) => {
+        return <Image src={image} style={{ width: "60px", height: "60px" }} />;
+      },
+    },
+    {
+      title: t("description"),
       dataIndex: "description",
       ellipsis: true,
       render: (description) => {
@@ -130,14 +126,7 @@ const MyCourseAction = () => {
       },
     },
     {
-      title: t("Số bài giảng"),
-      dataIndex: "",
-      render: (_, record) => {
-        return record?.lessons.length + record?.skills.length || 0;
-      },
-    },
-    {
-      title: t("Thời gian tạo"),
+      title: t("created_time"),
       dataIndex: "createdAt",
       render: (createdAt) => {
         return createdAt ? moment(createdAt).format("YYYY-MM-DD") : "";
@@ -176,14 +165,9 @@ const MyCourseAction = () => {
   }, [location, form]);
 
   useEffect(() => {
-    if (!image && !image?.name) {
-      setPreview(undefined);
-      return;
+    if (image && typeof image === "string") {
+      setPreview(image);
     }
-    const objectUrl = URL.createObjectURL(image);
-    setPreview(objectUrl);
-    // free memory when ever this component is unmounted
-    return () => URL.revokeObjectURL(objectUrl);
   }, [image]);
 
   const loadUnits = () => {
@@ -197,8 +181,8 @@ const MyCourseAction = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -212,85 +196,38 @@ const MyCourseAction = () => {
       })
       .catch((error) => {
         const { response } = error;
-        if (response?.data?.code === CODE_ALREADY_EXIST) {
+        if (response?.data?.code === CODE_NOT_FOUND) {
           notification.error({
-            message: `${t("Bài học")} ${t("không tồn tại")}`,
+            message: `${t("lecture_not_found")}`,
           });
           return;
         }
         notification.error({
-          message: t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+          message: t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
   };
 
-  const onFinish = (body) => {
+  const uploadFile = async (e) => {
+    const image_path = await handleFileUpload(e);
+    setImage(image_path);
+  };
+
+  const onFinish = async (body) => {
     body.id = courseId;
-    setLoading(true);
     body.owner = user_info?._id;
     if (value) {
       body.active = 1;
     } else {
       body.active = 0;
     }
-    if (image.name) {
-      const params = {
-        Bucket: "memo-files",
-        Key: `${courseId}-${image.name}`,
-        Body: image,
-      };
 
-      s3.upload(params, async (err, data) => {
-        if (err) {
-          console.error("Error uploading file: ", err);
-          return;
-        }
-        await data;
-        if (data) {
-          if (courseId) {
-            body.image = data.Location;
-          }
-          postAxios(!courseId ? API_COURSE_CREATE : API_COURSE_EDIT, body)
-            .then((res) => {
-              notification.success({
-                message: !courseId
-                  ? t("Tạo mới khóa học thành công.")
-                  : t("Chỉnh sửa khóa học thành công."),
-              });
-              history.push(ADMIN_MY_COURSE_LIST_PATH);
-            })
-            .catch((error) => {
-              const { response } = error;
-              notification.error({
-                message: response?.data?.message
-                  ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-                  : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-              });
-            })
-            .then(() => setLoading(false));
-        }
-      });
-    } else {
-      postAxios(!courseId ? API_COURSE_CREATE : API_COURSE_EDIT, body)
-        .then((res) => {
-          notification.success({
-            message: !courseId
-              ? t("Tạo mới khóa học thành công.")
-              : t("Chỉnh sửa khóa học thành công."),
-          });
-          history.push(ADMIN_MY_COURSE_LIST_PATH);
-        })
-        .catch((error) => {
-          const { response } = error;
-          notification.error({
-            message: response?.data?.message
-              ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-              : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
-          });
-        })
-        .then(() => setLoading(false));
+    if (image && image.name) {
+      body.image = image;
     }
+
+    await handleAdminCourseAction(courseId, body, t, setLoading);
   };
 
   const renderForm = () => {
@@ -320,34 +257,32 @@ const MyCourseAction = () => {
           <Row gutter={[20, 20]}>
             <Col span={courseId ? 16 : 24}>
               <Form.Item
-                label={t("Tên khóa học")}
+                label={t("course_name")}
                 name="name"
                 rules={[
                   {
                     required: true,
                     whitespace: true,
-                    message: t("Đây là thông tin bắt buộc."),
+                    message: t("validate_required"),
                   },
                 ]}
-                extra={t(
-                  "Đặt tên phù hợp cho khóa học sẽ giúp các học viên khác tìm kiếm dễ dàng hơn."
-                )}
+                extra={t("give_course_name")}
               >
-                <Input placeholder={t("Nhập tên khóa học...")} />
+                <Input placeholder={t("course_name_placeholder")} />
               </Form.Item>
               <Form.Item
-                label={t("Dạy")}
+                label={t("teacher_lang")}
                 name="language"
                 rules={[
                   {
                     required: true,
-                    message: t("Đây là thông tin bắt buộc."),
+                    message: t("validate_required"),
                   },
                 ]}
               >
                 <Select
                   showSearch
-                  placeholder={t("Chọn ngôn ngữ")}
+                  placeholder={t("select_lang")}
                   filterOption={(input, option) =>
                     (option?.label ?? "")
                       .toLowerCase()
@@ -357,18 +292,18 @@ const MyCourseAction = () => {
                 />
               </Form.Item>
               <Form.Item
-                label={t("Cho người nói")}
+                label={t("learner_lang")}
                 name="my_language"
                 rules={[
                   {
                     required: true,
-                    message: t("Đây là thông tin bắt buộc."),
+                    message: t("validate_required"),
                   },
                 ]}
               >
                 <Select
                   showSearch
-                  placeholder={t("Chọn ngôn ngữ")}
+                  placeholder={t("select_lang")}
                   filterOption={(input, option) =>
                     (option?.label ?? "")
                       .toLowerCase()
@@ -377,10 +312,10 @@ const MyCourseAction = () => {
                   options={optionLanguages}
                 />
               </Form.Item>
-              <Form.Item label={t("Thanh âm")} name="voice">
+              <Form.Item label={t("voice_lang")} name="voice">
                 <Select
                   showSearch
-                  placeholder={t("Chọn thanh âm")}
+                  placeholder={t("select_voice")}
                   filterOption={(input, option) =>
                     (option?.label ?? "")
                       .toLowerCase()
@@ -413,7 +348,7 @@ const MyCourseAction = () => {
                         size={24}
                         style={{ marginRight: "3px" }}
                       />
-                      {t("Tải ảnh lên")}
+                      {t("upload_image")}
                     </label>
                   </Button>
                 </div>
@@ -421,7 +356,7 @@ const MyCourseAction = () => {
                   type="file"
                   name="image"
                   id="upload-photo-course"
-                  onChange={(e) => setImage(e.target.files[0])}
+                  onChange={uploadFile}
                   style={{ display: "none" }}
                   accept="image/*"
                 />
@@ -429,16 +364,15 @@ const MyCourseAction = () => {
             )}
             <Col span={24}>
               <Form.Item
-                label={t("Mô tả")}
+                label={t("description")}
                 name="description"
                 rules={[
                   {
                     required: true,
                     whitespace: true,
-                    message: t("Đây là thông tin bắt buộc."),
+                    message: t("validate_required"),
                   },
                 ]}
-                extra={t("Mô tả khóa học bằng ngôn ngữ của người học.")}
               >
                 <TextArea rows={4} />
               </Form.Item>
@@ -455,7 +389,7 @@ const MyCourseAction = () => {
                   checked={value}
                   onChange={() => setValue(!value)}
                 >
-                  {t("Công khai")}
+                  {t("active")}
                 </Checkbox>
               </Form.Item>
               {courseId && (
@@ -470,7 +404,7 @@ const MyCourseAction = () => {
                       }}
                     >
                       <h4 style={{ marginTop: "10px" }}>{`${t(
-                        t("Danh sách các bài học")
+                        t("lecture_list")
                       )}:`}</h4>
                       <Button
                         size={"large"}
@@ -483,14 +417,14 @@ const MyCourseAction = () => {
                           )
                         }
                       >
-                        {t("Tạo bài học")}
+                        {t("create_lecture")}
                       </Button>
                     </div>
                     <Table
                       className="custom-table"
                       columns={columns}
                       dataSource={units}
-                      rowKey="id"
+                      rowKey={(record) => record._id}
                       loading={loading}
                     />
                   </Col>
@@ -505,7 +439,7 @@ const MyCourseAction = () => {
                   id="btn-solid"
                   onClick={() => history.goBack()}
                 >
-                  {t("Quay lại")}
+                  {t("back")}
                 </Button>
                 <Button
                   loading={loading}
@@ -514,7 +448,7 @@ const MyCourseAction = () => {
                   size={"large"}
                   block
                 >
-                  {!courseId ? t("Tạo mới") : t("Chỉnh sửa")}
+                  {!courseId ? t("common:create") : t("common:edit")}
                 </Button>
               </Space>
             </Col>
@@ -527,8 +461,9 @@ const MyCourseAction = () => {
   return (
     <AdminLayout
       breadcrumbs={[
-        t("Danh sách khóa học đã tạo"),
-        !courseId ? t("Tạo mới") : t("Chỉnh sửa"),
+        t("created_courses"),
+        !courseId ? t("common:create") : `${courseId}`,
+        courseId && t("common:edit"),
       ]}
     >
       {renderForm()}
@@ -536,4 +471,4 @@ const MyCourseAction = () => {
   );
 };
 
-export default MyCourseAction;
+export default CourseAction;

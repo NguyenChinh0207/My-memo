@@ -1,0 +1,40 @@
+{
+  "add_words": "単語を追加：",
+  "detail": "詳細",
+  "editing": "編集中",
+  "search_course": "コースを探す",
+
+  "level": "レベル",
+  "welcome": "メモへようこそ！",
+  "begin_text": "まだコースを選択していないようです！学べることが無限に広がっています。隣のボタンをクリックして、コースを選んでください。次に学ぶべきコースは何ですか？",
+  "learn_new_words": "新しい単語を学ぶ",
+
+  "user_list": "ユーザーリスト",
+  "fullname": "フルネーム",
+  "username": "ユーザー名",
+  "email": "メールアドレス",
+  "points": "ポイント",
+  "role": "役割",
+
+  "admin": "管理者",
+  "user": "ユーザー",
+
+  "keyword_placeholder": "検索キーワードを入力してください...",
+  "back": "戻る",
+  "start": "開始",
+  "continue": "続ける",
+
+  "edit": "編集",
+  "create": "作成",
+  "delete": "削除",
+  "yes": "はい",
+  "no": "いいえ",
+  "before": "前",
+  "next": "次",
+  "shuffle": "カードをシャッフル",
+  "validate_required": "このフィールドは必須です。",
+  "msg_please_try_again": "エラーが発生しました。後で再試行してください。",
+  "server_error": "エラーが発生しました",
+
+  "author_created": "My memo ©2022 Created by Chinh Nguyen"
+}

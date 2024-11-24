@@ -47,16 +47,15 @@ export const QUILL_CONFIG = {
 
 export const VI = "vi";
 export const EN = "en";
-export const DEFAULT_LANGUAGE = VI;
+export const JA = "ja";
+export const DEFAULT_LANGUAGE = EN;
 export const KEY_LANGUAGE = "language";
 export const MENU_KEY = "MENU_KEY";
 
 export const SCROLL_TO_ID = "scrollToId";
 
-export const DATETIME_FORMAT_EVENT_DETAIL = {
-  [VI]: "HH:mm A [ngày] DD [tháng] MM [năm] YYYY",
-  [EN]: "HH:mm A [ngày] DD [tháng] MM [năm] YYYY",
-};
+export const LIMIT = 15;
+
 export const DATE_TIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
 export const DATE_EVENT_USED_VOUCHER = "DD.MM.YYYY";
 //code error
@@ -64,7 +63,8 @@ export const CODE_ERROR_EMAIL_PASSWORD_NOT_CORRECT = "E0001";
 export const CODE_EMAIL_NOT_FOUND = "E0012";
 export const CODE_CONFIRM_TOKEN_NOT_FOUND = "E0013";
 export const CODE_ALREADY_EXIST = "E400";
-export const CODE_NOT_FOUND = "E401";
+export const CODE_NOT_FOUND = "E404";
+
 //end code error
 export const AUTH_TOKEN = "auth_token";
 export const SECRET_KEY = "secretKey";
@@ -73,7 +73,7 @@ export const DATE_DEFAULT = "DD-MM-YYYY";
 export const DATE_TIME_DEFAULT = "DD-MM-YYYY, HH:mm:ss";
 export const DATE_DASHBOARD_DEFAULT = "YYYY-MM-DD";
 export const ROLE_ADMIN = 1;
-export const ADMIN_ID = "63dabfa423328acaa3924255";
+// export const ADMIN_ID = "63dabfa423328acaa3924255";
 export const LANGUAGES_VOICES = [
   { id: 10, name: "German" },
   { id: 11, name: "English US" },
@@ -119,6 +119,7 @@ export const LANGUAGES = [
   "Ukranian",
   "Vietnamese",
 ];
+
 export const E001 = "E001";
 export const E002 = "E002";
 export const CODE_USERNAME_ALREADY = "E003";

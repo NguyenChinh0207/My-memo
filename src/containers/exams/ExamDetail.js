@@ -11,7 +11,7 @@ import { bindParams } from "../../config/function";
 import { COURSE_EDIT_PATH, EXAM_EDIT_PATH } from "../../config/path";
 
 const ExamDetail = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("course");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
   const { examId, courseId } = useParams();
@@ -29,7 +29,7 @@ const ExamDetail = () => {
       },
     },
     {
-      title: t("Câu hỏi"),
+      title: t("course:question"),
       width: "20%",
       align: "left",
       ellipsis: "true",
@@ -44,7 +44,7 @@ const ExamDetail = () => {
       },
     },
     {
-      title: t("Câu trả lời 1"),
+      title: t("answer1"),
       dataIndex: "answer",
       width: "13%",
       ellipsis: true,
@@ -58,7 +58,7 @@ const ExamDetail = () => {
       },
     },
     {
-      title: t("Câu trả lời 2"),
+      title: t("answer2"),
       dataIndex: "answer",
       width: "13%",
       ellipsis: true,
@@ -72,7 +72,7 @@ const ExamDetail = () => {
       },
     },
     {
-      title: t("Câu trả lời 3"),
+      title: t("answer3"),
       dataIndex: "answer",
       width: "13%",
       ellipsis: true,
@@ -86,7 +86,7 @@ const ExamDetail = () => {
       },
     },
     {
-      title: t("Câu trả lời 4"),
+      title: t("answer4"),
       dataIndex: "answer",
       width: "13%",
       ellipsis: true,
@@ -100,7 +100,7 @@ const ExamDetail = () => {
       },
     },
     {
-      title: t("Đáp án"),
+      title: t("correct_answer"),
       dataIndex: "correct",
       width: "10%",
       ellipsis: true,
@@ -130,8 +130,8 @@ const ExamDetail = () => {
         const { response } = error;
         notification.error({
           message: response?.data?.message
-            ? `${t("Đã có lỗi xảy ra")}: ${response?.data?.message}`
-            : t("Đã có lỗi xảy ra, vui lòng thử lại sau."),
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
         });
       })
       .then(() => setLoading(false));
@@ -142,29 +142,29 @@ const ExamDetail = () => {
       <Layout style={{ minWidth: "100vh" }} className="Exam">
         <div className="PageHead">
           <div className="PageHeadRow">
-            <div className="Title">{t("Chi tiết chủ đề")}</div>
+            <div className="Title">{t("topic_detail")}</div>
           </div>
         </div>
         {exam && (
           <div className="formQuestionsEdit">
             <div>
               <div className="labelName">
-                {`${t("Tên chủ đề")}:`}
+                {`${t("topic_name")}:`}
                 <span className="valueName">{exam?.name}</span>
               </div>
               <div className="label-wrap">
                 <div className="labelName">
-                  {`${t("Số lượng câu hỏi xuất hiện")}:`}
+                  {`${t("questions_appear")}:`}
                   <span className="valueName">{exam?.questions_appear}</span>
                 </div>
                 <div className="labelName">
-                  {`${t("Thời gian trả lời(phút)")}:`}
+                  {`${t("response_time")}:`}
                   <span className="valueName">{exam?.time_answer}</span>
                 </div>
               </div>
             </div>
             <Divider />
-            <p>{t("Danh sách câu hỏi")}</p>
+            <p>{t("question_list")}</p>
             <Table columns={columns} dataSource={questions} />
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <Button
@@ -179,7 +179,7 @@ const ExamDetail = () => {
                   )
                 }
               >
-                {t("Quay lại")}
+                {t("back")}
               </Button>
               <Button
                 type="primary"
@@ -194,7 +194,7 @@ const ExamDetail = () => {
                 className="ExamEdit"
                 loading={loading}
               >
-                {t("Chỉnh sửa chủ đề")}
+                {t("edit_topic")}
               </Button>
             </div>
           </div>
