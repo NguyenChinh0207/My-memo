@@ -19,10 +19,10 @@
   "admin": "管理者",
   "user": "ユーザー",
 
-  "keyword_placeholder": "検索キーワードを入力してください...",
   "back": "戻る",
   "start": "開始",
   "continue": "続ける",
+  "keyword_placeholder": "検索キーワードを入力してください...",
 
   "edit": "編集",
   "create": "作成",
