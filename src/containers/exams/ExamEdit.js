@@ -167,7 +167,7 @@ const ExamEdit = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const readUploadFile = (e) => {
@@ -237,7 +237,7 @@ const ExamEdit = () => {
               : t("common:msg_please_try_again"),
           });
         })
-        .then(() => setLoading(false));
+        .finally(() => setLoading(false));
     }
   };
 

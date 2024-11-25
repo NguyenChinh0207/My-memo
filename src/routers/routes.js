@@ -145,7 +145,7 @@ const routes = [
   {
     path: USER_LIST_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/users/UserList"),
     restricted: false,
     isAdmin: true,
@@ -153,7 +153,7 @@ const routes = [
   {
     path: USER_DETAIL_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/users/UserDetail"),
     restricted: false,
     isAdmin: true,
@@ -161,7 +161,7 @@ const routes = [
   {
     path: ADMIN_COURSE_LIST_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/courses/CourseList"),
     restricted: false,
     isAdmin: true,
@@ -169,7 +169,7 @@ const routes = [
   {
     path: ADMIN_COURSE_DETAIL_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/courses/CourseDetail"),
     restricted: false,
     isAdmin: true,
@@ -177,7 +177,7 @@ const routes = [
   {
     path: ADMIN_MY_COURSE_LIST_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/courses/MyCourseList"),
     restricted: false,
     isAdmin: true,
@@ -185,7 +185,7 @@ const routes = [
   {
     path: ADMIN_MY_COURSE_CREATE_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/courses/MyCourseAction"),
     restricted: false,
     isAdmin: true,
@@ -193,7 +193,7 @@ const routes = [
   {
     path: ADMIN_MY_COURSE_EDIT_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/courses/MyCourseAction"),
     restricted: false,
     isAdmin: true,
@@ -201,7 +201,7 @@ const routes = [
   {
     path: ADMIN_MY_COURSE_DETAIL_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/courses/MyCourseDetail"),
     restricted: false,
     isAdmin: true,
@@ -209,7 +209,7 @@ const routes = [
   {
     path: ADMIN_CREATE_UNIT_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/courses/units/UnitAction"),
     restricted: false,
     isAdmin: true,
@@ -217,7 +217,7 @@ const routes = [
   {
     path: ADMIN_EDIT_UNIT_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/courses/units/UnitAction"),
     restricted: false,
     isAdmin: true,
@@ -225,7 +225,7 @@ const routes = [
   {
     path: ADMIN_CREATE_LESSON_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/courses/units/RenderLessons"),
     restricted: false,
     isAdmin: true,
@@ -233,7 +233,7 @@ const routes = [
   {
     path: ADMIN_EDIT_LESSON_PATH,
     exact: true,
-    isPrivate: false,
+    isPrivate: true,
     component: import("../containers/admin/courses/units/RenderLessons"),
     restricted: false,
     isAdmin: true,

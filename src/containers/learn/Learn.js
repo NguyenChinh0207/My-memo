@@ -155,7 +155,7 @@ const Learn = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const nextClick = () => {

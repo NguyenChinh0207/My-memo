@@ -9,7 +9,7 @@ import validator from "validator";
 import { API_POST_PROGRESS, API_REGISTER } from "../../config/endpointApi";
 import { postAxios } from "../../Http";
 import { USER_LOGIN } from "../../config/path";
-import { CODE_EMAIL_ALREADY, CODE_USERNAME_ALREADY } from "../../config/const";
+import { CODE_EMAIL_ALREADY_EXIST, CODE_USERNAME_ALREADY_EXIST } from "../../config/const";
 
 const Signup = () => {
   const { t } = useTranslation("auth");
@@ -52,16 +52,16 @@ const Signup = () => {
       })
       .catch((error) => {
         const { response } = error;
-        if (response?.data?.code === CODE_USERNAME_ALREADY)
+        if (response?.data?.code === CODE_USERNAME_ALREADY_EXIST)
           notification.error({
             message: t("username_taken"),
           });
-        if (response?.data?.code === CODE_EMAIL_ALREADY)
+        if (response?.data?.code === CODE_EMAIL_ALREADY_EXIST)
           notification.error({
             message: t("email_taken"),
           });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -147,7 +147,7 @@ const Signup = () => {
                       ) {
                         return Promise.resolve();
                       } else {
-                        return Promise.reject("password_not_strong");
+                        return Promise.reject(t("password_not_strong"));
                       }
                     }
                     return Promise.resolve();

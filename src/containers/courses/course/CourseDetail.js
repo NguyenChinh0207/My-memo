@@ -113,7 +113,7 @@ const CourseDetail = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const checkIfOwner = (course) => {
@@ -172,7 +172,7 @@ const CourseDetail = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const learn = () => {

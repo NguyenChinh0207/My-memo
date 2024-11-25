@@ -185,7 +185,7 @@ const CourseAction = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const onClickDelete = (id) => {
@@ -206,7 +206,7 @@ const CourseAction = () => {
           message: t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const uploadFile = async (e) => {

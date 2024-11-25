@@ -60,7 +60,7 @@ const CoursesOwner = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const changeStatusActive = (id, active) => {
@@ -79,7 +79,7 @@ const CoursesOwner = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const onStatus = (id, active) => {

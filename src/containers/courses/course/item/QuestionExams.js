@@ -167,7 +167,7 @@ const QuestionExams = (props) => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const readUploadFile = (e) => {
@@ -228,7 +228,7 @@ const QuestionExams = (props) => {
           message: t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const onFinish = (data) => {
@@ -264,7 +264,7 @@ const QuestionExams = (props) => {
             message: t("common:msg_please_try_again"),
           });
         })
-        .then(() => setLoading(false));
+        .finally(() => setLoading(false));
     }
   };
 

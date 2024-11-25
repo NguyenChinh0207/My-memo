@@ -21,7 +21,14 @@ import {
   ADMIN_MY_COURSE_LIST_PATH,
 } from "../config/path";
 import { useTranslation } from "react-i18next";
-import { AUTH_TOKEN, EN, JA, KEY_LANGUAGE, USER_INFO, VI } from "../config/const";
+import {
+  AUTH_TOKEN,
+  EN,
+  JA,
+  KEY_LANGUAGE,
+  USER_INFO,
+  VI,
+} from "../config/const";
 import { getCurrentLanguage, getRole } from "../config/function";
 import i18n from "i18next";
 import avatar from "../assets/img/avatar.png";
@@ -131,20 +138,18 @@ const AdminLayout = (props) => {
           <Image src={img} className="Logo" />
         </div>
         <Menu
-          defaultSelectedKeys={[
+          selectedKeys={[
             `/${location.pathname.split("/")[1]}/${
               location.pathname.split("/")[2]
             }`,
           ]}
           mode="inline"
-        >
-          {/* {menuItems.map((item) => ( */}
-          {menus.map((item) => (
-            <Menu.Item key={item.key}>
-              <NavLink to={item.key}>{item.name}</NavLink>
-            </Menu.Item>
-          ))}
-        </Menu>
+          items={menus.map((item) => ({
+            key: item.key,
+            icon: item.icon,
+            label: <NavLink to={item.key}>{item.name}</NavLink>,
+          }))}
+        />
       </Sider>
 
       <Layout className="site-layout">
@@ -201,11 +206,11 @@ const AdminLayout = (props) => {
                   >
                     <Space size={"small"}>
                       <Avatar width={30} height={30} src={avatar} />
-                      <Tooltip color={"#c5c4c4"} placement="right">
+                      <div>
                         <span className="textColor username pointer">
                           {user_info?.username}
                         </span>
-                      </Tooltip>
+                      </div>
                     </Space>
                   </Dropdown>
                 </Space>
@@ -226,4 +231,5 @@ AdminLayout.defaultProps = {
 AdminLayout.propTypes = {
   breadcrumbs: PropTypes.array.isRequired,
 };
+
 export default AdminLayout;

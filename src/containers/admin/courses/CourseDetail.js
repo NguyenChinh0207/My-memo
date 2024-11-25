@@ -105,7 +105,7 @@ const CourseDetail = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const renderForm = () => {

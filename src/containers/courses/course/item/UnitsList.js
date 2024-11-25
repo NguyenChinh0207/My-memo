@@ -34,7 +34,7 @@ export const UnitsList = (items) => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
   return (
     <>

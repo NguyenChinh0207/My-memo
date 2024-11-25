@@ -3,6 +3,10 @@ export const API_LOGIN = `${API_BASE_AUTH}/login`;
 export const API_SAVE_USER = `${API_BASE_AUTH}/save/user`;
 export const API_REGISTER = `${API_BASE_AUTH}/register`;
 export const API_USER_EDIT = `${API_BASE_AUTH}/edit`;
+export const API_CHANGE_PASSWORD = `${API_BASE_AUTH}/change-password`;
+export const API_SEND_CODE_EMAIL = `${API_BASE_AUTH}/send-verification-code`;
+export const API_GENERATE_CODE = `${API_BASE_AUTH}/generate-code`;
+export const API_VERIFY_CODE = `${API_BASE_AUTH}/verify-code`;
 
 const API_BASE = `${process.env.REACT_APP_BASE_URL}/api`;
 export const API_COURSE_LIST = `${API_BASE}/courses`;

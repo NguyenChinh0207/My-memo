@@ -3,7 +3,14 @@ import { Layout, Menu, Avatar, Space, Dropdown, Tooltip } from "antd";
 import { IconEng, IconVi } from "../common/Icon/Icon";
 import { NavLink, useHistory, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AUTH_TOKEN, EN, JA, KEY_LANGUAGE, USER_INFO, VI } from "../config/const";
+import {
+  AUTH_TOKEN,
+  EN,
+  JA,
+  KEY_LANGUAGE,
+  USER_INFO,
+  VI,
+} from "../config/const";
 import { getCurrentLanguage } from "../config/function";
 import i18n from "i18next";
 import avatar from "../assets/img/avatar.png";
@@ -12,6 +19,7 @@ import {
   NotificationOutlined,
   BellOutlined,
   FolderOpenOutlined,
+  SettingOutlined
 } from "@ant-design/icons";
 import { AppContext } from "../context/AppContext";
 import "./PrivateLayout.scss";
@@ -22,20 +30,25 @@ import {
   HOME_PATH,
   USER_LOGIN,
   USER_REGISTER,
-} from "../config/path";
+} from "../config/path"; 
 import IconJapan from "../common/Icon/IconJapan";
+import ChangePassword from "../containers/auth/ChangePassword";
 
-const PrivateLayout = (props) => {
-  const { children } = props;
+const PrivateLayout = ({ children }) => {
   const { handleSelectLanguage, user_info } = useContext(AppContext);
   const history = useHistory();
   const location = useLocation();
   const { t } = useTranslation("homeLayout");
+
   const [visible, setVisible] = useState(false);
   const [visibleLogout, setVisibleLogout] = useState(false);
   const [visibleNotify, setVisibleNotify] = useState(false);
+  const [isChangeForgotPasswordModalOpen, setIsChangeForgotPasswordModalOpen] =
+    useState(false);
+
   const locale = getCurrentLanguage();
 
+  // Đổi ngôn ngữ
   const handleChangeLanguage = (e) => {
     localStorage.setItem(KEY_LANGUAGE, e.key);
     i18n.changeLanguage(e.key).then(() => {
@@ -44,10 +57,17 @@ const PrivateLayout = (props) => {
     handleSelectLanguage(e.key);
   };
 
+  const handleChangePassword = () => {
+    setIsChangeForgotPasswordModalOpen((prev) => !prev);
+  };
+  const handleModalClose = () => {
+    setIsChangeForgotPasswordModalOpen(false); 
+  };
+
+  // Xử lý đăng xuất
   const handleLogout = () => {
     localStorage.removeItem(AUTH_TOKEN);
     localStorage.removeItem(USER_INFO);
-    localStorage.removeItem("roleId");
     history.push(USER_LOGIN);
   };
 
@@ -55,7 +75,8 @@ const PrivateLayout = (props) => {
     history.push(COURSE_LIST_OWNER_PATH);
   };
 
-  const menu = (
+  // Menu đổi ngôn ngữ
+  const renderLanguageMenu = () => (
     <Menu onClick={handleChangeLanguage} selectedKeys={locale}>
       <Menu.Item key={EN}>
         <Avatar src={<IconEng />} />
@@ -69,60 +90,108 @@ const PrivateLayout = (props) => {
     </Menu>
   );
 
-  const menuUser = (
+  // Menu người dùng
+  const renderUserMenu = () => (
     <Menu>
       <Menu.Item
-        key={"courseCreated"}
+        key="courseCreated"
         icon={<FolderOpenOutlined />}
         onClick={handleCourses}
       >
         {t("courses_created")}
       </Menu.Item>
-      <Menu.Item
-        key={"logout"}
-        icon={<LogoutOutlined />}
-        onClick={handleLogout}
-      >
+      <Menu.Item key="changePassword" icon={<SettingOutlined />} onClick={handleChangePassword}>
+        {t("auth:change_password_title")}
+      </Menu.Item>
+      <ChangePassword triggerModal={isChangeForgotPasswordModalOpen} onModalClose={handleModalClose} />
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
         {t("btn_logout")}
       </Menu.Item>
     </Menu>
   );
 
-  const notifyList = (
+  // Menu thông báo
+  const renderNotifyMenu = () => (
     <Menu>
-      <Menu.Item key={"notify"} icon={<NotificationOutlined />}>
+      <Menu.Item key="notify" icon={<NotificationOutlined />}>
         {t("notify")}
       </Menu.Item>
     </Menu>
   );
 
-  const NavButton = (props) => {
-    const active = props.isActive ? "ActiveButton" : "";
-    return (
-      <NavLink to={props.to} className={"NavButton " + `${active}`}>
-        {props.children}
-      </NavLink>
-    );
-  };
+  // Nút điều hướng
+  const NavButton = ({ to, isActive, children }) => (
+    <NavLink to={to} className={`NavButton ${isActive ? "ActiveButton" : ""}`}>
+      {children}
+    </NavLink>
+  );
 
-  const url = `${location.pathname}`.split("/")[2];
-  const urlRouter = `${location.pathname}`;
-  let buttons = (
-    <>
+  // Hiển thị nút theo điều kiện
+  const url = location.pathname.split("/")[2];
+  const urlRouter = location.pathname;
+
+  const renderHeaderButtons = () => {
+    if ([USER_LOGIN, USER_REGISTER, DASHBOARD_PATH].includes(urlRouter)) {
+      return (
+        <div className="AuthNavButtonsDiv">
+          <Space size="large" style={{ marginRight: "12px" }}>
+            <Dropdown
+              overlay={renderLanguageMenu()}
+              trigger={["click"]}
+              onOpenChange={setVisible}
+              open={visible}
+            >
+              <Avatar
+                src={
+                  locale === VI ? (
+                    <IconVi />
+                  ) : locale === EN ? (
+                    <IconEng />
+                  ) : (
+                    <IconJapan />
+                  )
+                }
+              />
+            </Dropdown>
+          </Space>
+          <NavLink
+            to={USER_LOGIN}
+            className={`NavLoginSignup ${
+              urlRouter === USER_LOGIN ? "ActiveButtonLoginLogout" : ""
+            }`}
+          >
+            {t("btn_login")}
+          </NavLink>
+          <NavLink
+            to={USER_REGISTER}
+            className={`NavLoginSignup LRMargin ${
+              urlRouter === USER_REGISTER
+                ? "ActiveButtonLoginLogout"
+                : "SignUpPurple"
+            }`}
+            style={{ color: "#2b3648" }}
+          >
+            {t("btn_signup")}
+          </NavLink>
+        </div>
+      );
+    }
+
+    return (
       <div className="NavRow">
-        <NavButton to={HOME_PATH} isActive={url === "home"}>
-          {t("home")}
-        </NavButton>
-        <NavButton to={COURSES_PATH} isActive={url === "courses"}>
-          {t("courses")}
-        </NavButton>
-      </div>
-      <div>
-        <Space size={"large"}>
+        <div className="d-flex">
+          <NavButton to={HOME_PATH} isActive={url === "home"}>
+            {t("home")}
+          </NavButton>
+          <NavButton to={COURSES_PATH} isActive={url === "courses"}>
+            {t("courses")}
+          </NavButton>
+        </div>
+        <Space size="large">
           <Dropdown
-            overlay={menu}
+            overlay={renderLanguageMenu()}
             trigger={["click"]}
-            onOpenChange={(flag) => setVisible(flag)}
+            onOpenChange={setVisible}
             open={visible}
           >
             <Avatar
@@ -138,9 +207,9 @@ const PrivateLayout = (props) => {
             />
           </Dropdown>
           <Dropdown
-            overlay={notifyList}
+            overlay={renderNotifyMenu()}
             trigger={["click"]}
-            onOpenChange={(flag) => setVisibleNotify(flag)}
+            onOpenChange={setVisibleNotify}
             open={visibleNotify}
           >
             <div style={{ position: "relative" }}>
@@ -154,9 +223,9 @@ const PrivateLayout = (props) => {
             </div>
           </Dropdown>
           <Dropdown
-            overlay={menuUser}
+            overlay={renderUserMenu()}
             trigger={["click"]}
-            onOpenChange={(flag) => setVisibleLogout(flag)}
+            onOpenChange={setVisibleLogout}
             open={visibleLogout}
           >
             <div className="avatar-swap pointer">
@@ -164,76 +233,20 @@ const PrivateLayout = (props) => {
                 <Avatar width={26} height={26} src={avatar} />
                 <span className="avatar-status-online"></span>
               </div>
-              <Tooltip
-                title={user_info?.username}
-                color={"#c5c4c4"}
-                placement="right"
-              >
+              <div>
                 <span
                   style={{ marginLeft: "4px" }}
                   className="textColor username"
                 >
                   {user_info?.username}
                 </span>
-              </Tooltip>
+              </div>
             </div>
           </Dropdown>
         </Space>
       </div>
-    </>
-  );
-
-  if (
-    urlRouter === USER_LOGIN ||
-    urlRouter === USER_REGISTER ||
-    urlRouter === DASHBOARD_PATH
-  ) {
-    const loginBtnActive =
-      urlRouter === USER_LOGIN ? "ActiveButtonLoginLogout" : "loginBtn";
-    const signUpBtnActive =
-      urlRouter === USER_REGISTER ? "ActiveButtonLoginLogout" : "SignUpPurple";
-
-    buttons = (
-      <div className="HeaderRow" style={{ justifyContent: "flex-end" }}>
-        <div className="AuthNavButtonsDiv">
-          <Space size={"large"}>
-            <Dropdown
-              overlay={menu}
-              trigger={["click"]}
-              onOpenChange={(flag) => setVisible(flag)}
-              open={visible}
-            >
-              <Avatar
-                style={{ marginRight: "15px" }}
-                src={
-                  locale === VI ? (
-                    <IconVi />
-                  ) : locale === EN ? (
-                    <IconEng />
-                  ) : (
-                    <IconJapan />
-                  )
-                }
-              />
-            </Dropdown>
-          </Space>
-          <NavLink
-            to={USER_LOGIN}
-            className={"NavLoginSignup AuthNavButtonsDiv " + loginBtnActive}
-          >
-            {t("btn_login")}
-          </NavLink>
-          <NavLink
-            to={USER_REGISTER}
-            className={`NavLoginSignup LRMargin ${signUpBtnActive}`}
-            style={{ color: "#2b3648" }}
-          >
-            {t("btn_signup")}
-          </NavLink>
-        </div>
-      </div>
     );
-  }
+  };
 
   return (
     <Layout style={{ minWidth: "100vh" }} className="PrivateLayout">
@@ -241,18 +254,14 @@ const PrivateLayout = (props) => {
         <div className="HeaderWrap">
           <div className="HeaderRow">
             <NavLink to={HOME_PATH} className="LogoWrapper" />
-            {buttons}
+            {renderHeaderButtons()}
           </div>
         </div>
       </div>
       <Layout.Content style={{ marginTop: 62, minHeight: "100vh" }}>
         {children}
       </Layout.Content>
-      <Layout.Footer
-        style={{
-          textAlign: "center",
-        }}
-      >
+      <Layout.Footer style={{ textAlign: "center" }}>
         {t("common:author_created")}
       </Layout.Footer>
     </Layout>

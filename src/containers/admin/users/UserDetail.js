@@ -285,7 +285,7 @@ const UserDetail = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const loadMyCourses = (id) => {
@@ -302,7 +302,7 @@ const UserDetail = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const loadExamsByCourseId = (id) => {
@@ -322,7 +322,7 @@ const UserDetail = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const action = (id) => {

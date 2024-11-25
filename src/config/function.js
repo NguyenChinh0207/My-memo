@@ -32,9 +32,7 @@ export const getTranslationFiles = (languages, translationFiles) => {
         ] = require(`../locales/${languages[i]}/${translationFiles[j]}.json`);
       } catch (error) {}
     }
-  }
-  console.log("in ", resources);
-  
+  }  
   return resources;
 };
 
@@ -92,8 +90,10 @@ export const scrollToErrorFieldByName = (name) => {
   window.scrollTo(0, window.scrollY - el.offsetHeight - 72);
 };
 
-export const getRole = () =>
-  localStorage.getItem("roleId") ? localStorage.getItem("roleId") : 0;
+export const getRole = () => {
+  const roleId = localStorage.getItem('roleId');
+  return roleId ? parseInt(roleId, 10) : null; 
+};
 
 export const fetchList = async (endpoint, params) => {
   const { data } = await getAxios(endpoint, params);

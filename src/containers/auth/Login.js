@@ -11,18 +11,31 @@ import {
   API_POST_PROGRESS,
   API_SAVE_USER,
 } from "../../config/endpointApi";
-import { HOME_PATH, USER_LIST_PATH } from "../../config/path";
+import {
+  HOME_PATH,
+  USER_LIST_PATH,
+} from "../../config/path";
 import { postAxios } from "../../Http";
-import { E001, E002 } from "../../config/const";
+import { CODE_ERROR_EMAIL_PASSWORD_NOT_CORRECT, CODE_PASSWORD_NOT_CORRECT } from "../../config/const";
 import { saveAccessToken, saveUserInfo } from "../../config/function";
 import ReactFacebookLogin from "react-facebook-login";
 import { AppContext } from "../../context/AppContext";
+import ForgotPassword from "./ForgotPassword";
 
 const Login = () => {
   const { t } = useTranslation("auth");
   const history = useHistory();
   const [loading, setLoading] = useState(false);
   const { setUserInfo } = useContext(AppContext);
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
+    useState(false);
+
+  const handleForgotPasswordClick = () => {
+    setIsForgotPasswordModalOpen((prev) => !prev);
+  };
+  const handleModalClose = () => {
+    setIsForgotPasswordModalOpen(false); 
+  };
 
   const onFinish = async (data) => {
     setLoading(true);
@@ -38,16 +51,16 @@ const Login = () => {
       })
       .catch((error) => {
         const { response } = error;
-        if (response?.data?.code === E001)
+        if (response?.data?.code === CODE_ERROR_EMAIL_PASSWORD_NOT_CORRECT)
           notification.error({
             message: t("input_user_password_incorrect"),
           });
-        if (response?.data?.code === E002)
+        if (response?.data?.code === CODE_PASSWORD_NOT_CORRECT)
           notification.error({
             message: t("password_invalid"),
           });
       })
-      .then(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const responseFacebook = (response) => {
@@ -120,9 +133,14 @@ const Login = () => {
               >
                 <Checkbox>{t("remember_me")}</Checkbox>
               </Form.Item>
-              {/* <NavLink className="login-form-forgot" to={USER_FORGOT_PASSWORD}>
+              <a
+                onClick={handleForgotPasswordClick}
+                className="login-form-forgot"
+                href="#"
+              >
                 {t("forgot_password")}
-              </NavLink> */}
+              </a>
+              <ForgotPassword triggerModal={isForgotPasswordModalOpen} onModalClose={handleModalClose} />
             </Form.Item>
             <Form.Item>
               <Button
