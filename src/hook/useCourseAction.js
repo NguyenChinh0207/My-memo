@@ -53,15 +53,13 @@ export const useCourseAction = () => {
           : t("course:msg_create_course_success"),
       });
 
-      history.push(
-        bindParams(
+      history.push({
+        pathname: bindParams(
           courseId ? ADMIN_MY_COURSE_DETAIL_PATH : ADMIN_MY_COURSE_LIST_PATH,
-          {
-            courseId: courseId,
-            state: { detail: res?.data },
-          }
-        )
-      );
+          { courseId: courseId }
+        ),
+        state: { detail: res?.data }, 
+      });
     } catch (error) {
       const { response } = error;
       notification.error({

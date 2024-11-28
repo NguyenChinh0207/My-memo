@@ -10,7 +10,7 @@ export const useFileUpload = () => {
     const file = e.target.files[0];
 
     if (file) {
-      // Kiểm tra loại tệp
+      // check type
       const isImage = file.type.startsWith("image/");
       const isVideo = file.type.startsWith("video/");
 
@@ -18,18 +18,18 @@ export const useFileUpload = () => {
         notification.error({
           message: t("msg_file_invalid"),
         });
-        return ""; // Trả về chuỗi rỗng nếu file không hợp lệ
+        return ""; 
       }
 
-      // Tạo FormData để gửi tệp
+      // Create formdata send file
       const formData = new FormData();
       formData.append("file", file);
 
       try {
-        const apiUrl = API_UPLOAD_FILE; // Chọn API phù hợp
+        const apiUrl = API_UPLOAD_FILE; 
 
         const res = await postAxios(apiUrl, formData, {
-          headers: { "Content-Type": "multipart/form-data" }, // Đảm bảo header đúng
+          headers: { "Content-Type": "multipart/form-data" }, 
         });
 
         notification.success({
@@ -38,7 +38,6 @@ export const useFileUpload = () => {
           ),
         });
 
-        // Trả về đường dẫn file (giả định API trả về `filePath`)
         return res.data?.filePath;
       } catch (error) {
         notification.error({
@@ -46,14 +45,13 @@ export const useFileUpload = () => {
             isImage ? t("upload_image_failed") : t("upload_video_failed")
           ),
         });
-        return ""; // Trả về chuỗi rỗng nếu gặp lỗi
+        return ""; 
       }
     } else {
       console.error("No file selected");
-      return ""; // Trả về chuỗi rỗng nếu không có file nào được chọn
+      return ""; 
     }
   };
-
 
   return { handleFileUpload };
 };

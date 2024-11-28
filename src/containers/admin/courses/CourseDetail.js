@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {useEffect, useState } from "react";
 import Row from "antd/es/grid/row";
 import {
   Col,
@@ -11,12 +11,15 @@ import {
   Image,
 } from "antd";
 import { useTranslation } from "react-i18next";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams,matchPath } from "react-router-dom";
 import "./CourseList";
 import AdminLayout from "../../../layout/AdminLayout";
 import { API_UNIT_LIST_BY_COURSE } from "../../../config/endpointApi";
 import moment from "moment";
 import { postAxios } from "../../../Http";
+import { FULL_PATH_FILE } from "../../../config/const";
+import { ADMIN_COURSE_DETAIL_PATH } from "../../../config/path";
+import useColumns from "../../../hook/useColumns";
 
 const CourseDetail = () => {
   const params = useParams();
@@ -26,45 +29,13 @@ const CourseDetail = () => {
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState({});
   const [units, setUnits] = useState([]);
+  const isCourseDetail = matchPath(location.pathname, {
+    path: ADMIN_COURSE_DETAIL_PATH,
+    exact: true,
+    strict: false,
+  });
 
-  const columns = [
-    {
-      title: "#",
-      dataIndex: "key",
-      render: (value, data, index) => {
-        return index + 1;
-      },
-    },
-    {
-      title: t("lecture_name"),
-      dataIndex: "name",
-      render: (name) => {
-        return name;
-      },
-    },
-    {
-      title: t("image"),
-      dataIndex: "image",
-      render: (image) => {
-        return <img src={image} style={{ width: "60px", height: "60px" }} />;
-      },
-    },
-    {
-      title: t("description"),
-      dataIndex: "description",
-      ellipsis: true,
-      render: (description) => {
-        return description;
-      },
-    },
-    {
-      title: t("created_time"),
-      dataIndex: "createdAt",
-      render: (createdAt) => {
-        return createdAt ? moment(createdAt).format("YYYY-MM-DD") : "";
-      },
-    },
-  ];
+  const columns = useColumns('lecture', []);
 
   const Label = (props) => (
     <span className="common-label--black">{props.children} :</span>
@@ -77,12 +48,14 @@ const CourseDetail = () => {
       </span>
     );
   };
-
   useEffect(() => {
-    if (courseId && location?.state?.detail) {
-      const detail = location.state.detail;
-      
-      setDetail(detail);
+    if (!courseId) return;
+    if (location?.state?.detail) {
+      const detailData = {
+        ...location.state.detail,
+        image: `${FULL_PATH_FILE}/${location.state.detail.image}`,
+      };
+      setDetail(detailData);
     }
   }, [location]);
 
@@ -91,6 +64,7 @@ const CourseDetail = () => {
   }, []);
 
   const loadUnits = () => {
+
     setLoading(true);
     postAxios(API_UNIT_LIST_BY_COURSE, { courseId })
       .then((res) => {
@@ -180,7 +154,7 @@ const CourseDetail = () => {
               <Col span={24}>
                 <Label style={{ marginTop: "10px" }}>{`${t(
                   t("lecture_list")
-                )}:`}</Label>
+                )}`}</Label>
                 <Table
                   className="custom-table"
                   columns={columns}
@@ -199,7 +173,7 @@ const CourseDetail = () => {
   return (
     <AdminLayout
       breadcrumbs={[
-        t("course_list"),
+        isCourseDetail ? t("course_list") : t("created_courses"),
         !courseId ? t("common:create") : `${courseId}`,
       ]}
     >

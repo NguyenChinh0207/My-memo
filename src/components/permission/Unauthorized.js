@@ -1,5 +1,4 @@
 import React from 'react';
-import PrivateLayout from "../../layout/PrivateLayout";
 import {Button, Result} from "antd";
 import { useHistory } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -9,7 +8,6 @@ const Unauthorized = () => {
 
   const { t } = useTranslation("common");
   return (
-    // <PrivateLayout>
       <Result
         status="403"
         title="403"
@@ -24,7 +22,6 @@ const Unauthorized = () => {
           </Button>
         }
       />
-    // </PrivateLayout>
   );
 };
 

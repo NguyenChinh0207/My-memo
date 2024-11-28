@@ -33,8 +33,8 @@ export const EXAM_EDIT_PATH = `${EXAMS_PATH}/:examId/edit`;
 export const EXAM_ONLINE_PATH = `${EXAMS_PATH}/:examId/online`;
 
 // Admin
-export const USER_LIST_PATH = `${ADMIN_PATH}/users`;
-export const USER_DETAIL_PATH = `${ADMIN_PATH}/users/:userId`;
+export const ADMIN_USER_LIST_PATH = `${ADMIN_PATH}/users`;
+export const ADMIN_USER_DETAIL_PATH = `${ADMIN_PATH}/users/:userId`;
 export const ADMIN_COURSE_LIST_PATH = `${ADMIN_PATH}/courses`;
 export const ADMIN_COURSE_DETAIL_PATH = `${ADMIN_PATH}/courses/:courseId/detail`;
 
@@ -42,9 +42,10 @@ export const ADMIN_MY_COURSE_LIST_PATH = `${ADMIN_PATH}/my-courses`;
 export const ADMIN_MY_COURSE_CREATE_PATH = `${ADMIN_PATH}/my-courses/create`;
 export const ADMIN_MY_COURSE_EDIT_PATH = `${ADMIN_PATH}/my-courses/:courseId/edit`;
 export const ADMIN_MY_COURSE_DETAIL_PATH = `${ADMIN_PATH}/my-courses/:courseId/detail`;
-
-export const ADMIN_CREATE_UNIT_PATH = `${ADMIN_PATH}/courses/:courseId/unit/create`;
-export const ADMIN_EDIT_UNIT_PATH = `${ADMIN_PATH}/courses/:courseId/unit/:unitId/edit`;
-
-export const ADMIN_CREATE_LESSON_PATH = `${ADMIN_PATH}/courses/:courseId/unit/:unitId/lesson/create`;
-export const ADMIN_EDIT_LESSON_PATH = `${ADMIN_PATH}/courses/:courseId/unit/:unitId/lesson/:lessonId/edit`;
+ 
+// Lecture
+export const ADMIN_CREATE_UNIT_PATH = `${ADMIN_PATH}/my-courses/:courseId/unit/create`;
+export const ADMIN_EDIT_UNIT_PATH = `${ADMIN_PATH}/my-courses/:courseId/unit/:unitId/edit`;
+// Lesson
+export const ADMIN_CREATE_LESSON_PATH = `${ADMIN_PATH}/my-courses/:courseId/unit/:unitId/lesson/create`;
+export const ADMIN_EDIT_LESSON_PATH = `${ADMIN_PATH}/my-courses/:courseId/unit/:unitId/lesson/:lessonId/edit`;

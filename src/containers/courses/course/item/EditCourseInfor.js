@@ -2,19 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import "../CourseDetail.scss";
 import { useTranslation } from "react-i18next";
 // import AWS from "aws-sdk";
-import {
-  Button,
-  Checkbox,
-  Form,
-  Image,
-  Input,
-  Select,
-} from "antd";
+import { Button, Checkbox, Form, Image, Input, Select } from "antd";
 import logoCourses from "../../../../assets/img/logoCourses.png";
 import { UploadOutlined } from "@ant-design/icons";
 import { optionLanguages, optionVoices } from "../../../../config/function";
 import { useFileUpload } from "../../../../hook/useFileUpload";
 import { useCourseAction } from "../../../../hook/useCourseAction";
+import { FULL_PATH_FILE } from "../../../../config/const";
 
 const EditCourseInfor = (props) => {
   const { t } = useTranslation("course");
@@ -40,7 +34,8 @@ const EditCourseInfor = (props) => {
   };
   useEffect(() => {
     if (image && typeof image === "string") {
-      setPreview(image);
+      const filePath = `${FULL_PATH_FILE}/${image}`;
+      setPreview(filePath);
     }
   }, [image]);
 
@@ -51,6 +46,7 @@ const EditCourseInfor = (props) => {
       } else {
         setValue(false);
       }
+      // course.image = course.image ? `${FULL_PATH_FILE}/${course.image}` : null;
       form.setFieldsValue(course);
     }
     return () => {
@@ -70,7 +66,7 @@ const EditCourseInfor = (props) => {
       body.active = 0;
     }
     body.id = course?._id;
-    if (image && image.name) {
+    if (image) {
       body.image = image;
     }
     await handleCourseAction(body.id, body, t, setLoading);
@@ -196,7 +192,7 @@ const EditCourseInfor = (props) => {
       <div className="imgWrapper">
         <Image
           className="imgCourseEdit"
-          src={preview || course?.image || logoCourses}
+          src={preview ? preview : course?.image ? `${FULL_PATH_FILE}/${course.image}` : logoCourses}
         />
         <Button style={{ marginTop: "15px" }}>
           <label htmlFor="upload-photo-course" className="label-upload">

@@ -146,7 +146,6 @@ const CourseDetail = () => {
       title: `${t("confirm_leave_course")}`,
       icon: <ExclamationCircleFilled />,
       onOk: () => {
-        // Cập nhật progress khi rời khỏi khóa học
         updateProgressOnLeave(courseId);
         updateCourse("remove"); // Tiến hành rời khóa học
       },
@@ -155,7 +154,6 @@ const CourseDetail = () => {
   };
 
   const updateCourse = (action) => {
-    setLoading(true);
     setLoadMyCourses(false);
     postAxios(`${API_ACTION_MY_COURSE}/${action}`, {
       courseId: courseId,
@@ -163,6 +161,10 @@ const CourseDetail = () => {
     })
       .then((res) => {
         setLoadMyCourses(true);
+        if (action === "remove") {
+          setAdded(false);
+          setWordsLearned(0); 
+        }
       })
       .catch((error) => {
         const { response } = error;
@@ -225,7 +227,6 @@ const CourseDetail = () => {
     setCurCardId(1);
     setLoadingCard(false);
   };
-
   return (
     <PrivateLayout>
       {loading || isLoading ? (
@@ -266,7 +267,7 @@ const CourseDetail = () => {
                       added={added}
                       openModal={openModal}
                     />
-                  )}
+                  )} 
                 </>
               ) : (
                 <>

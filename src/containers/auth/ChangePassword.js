@@ -11,7 +11,7 @@ import validator from "validator";
 const ChangePassword = ({ triggerModal, onModalClose }) => {
   const { t } = useTranslation("auth");
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false); // Thêm state loading
+  const [loading, setLoading] = useState(false); 
   const { user_info } = useContext(AppContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,7 +22,7 @@ const ChangePassword = ({ triggerModal, onModalClose }) => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    if (onModalClose) onModalClose(); // Gọi callback để đồng bộ trạng thái triggerModal
+    if (onModalClose) onModalClose(); 
   };
 
   const onFinish = async (data) => {
@@ -42,9 +42,9 @@ const ChangePassword = ({ triggerModal, onModalClose }) => {
         },
       ]);
     }
-    setLoading(true); // Bật trạng thái loading khi bắt đầu gửi email
+    setLoading(true); 
     try {
-      if (onModalClose) onModalClose(); // Đồng bộ trạng thái khi form gửi thành công
+      if (onModalClose) onModalClose(); 
       await postAxios(API_CHANGE_PASSWORD, {
         userId: user_info._id,
         oldPassword: data.oldPassword,
@@ -70,7 +70,7 @@ const ChangePassword = ({ triggerModal, onModalClose }) => {
         });
       }
     } finally {
-      setLoading(false); // Tắt trạng thái loading sau khi hoàn thành
+      setLoading(false); 
       setIsModalOpen(false);
     }
   };

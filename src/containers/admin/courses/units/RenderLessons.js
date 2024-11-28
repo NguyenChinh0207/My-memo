@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router-dom";
 import "./Units.scss";
 import "react-quill/dist/quill.snow.css";
-import { QUILL_CONFIG } from "../../../../config/const";
+import { FULL_PATH_FILE, QUILL_CONFIG } from "../../../../config/const";
 import ReactQuill from "react-quill";
 import {
   UploadOutlined,
@@ -67,9 +67,10 @@ const RenderLessons = () => {
 
   useEffect(() => {
     if (video && typeof video === "string") {
-      setPreview(video);
+      const filePath = `${FULL_PATH_FILE}/${video}`;
+      setPreview(filePath);
     }
- }, [video]);
+  }, [video]);
 
   useEffect(() => {
     if (lessonId && location?.state?.detail) {
@@ -163,14 +164,13 @@ const RenderLessons = () => {
     setVideo(video_path);
   };
 
-
   const onFinish = async (body) => {
     body.id = lessonId;
     body.unitId = unitId;
     body.newWords = arrayNewWords;
     body.questions = questions;
 
-    if (video && video.name) {
+    if (video) {
       body.video = video;
     }
     await handleLessonAction(lessonId, body, t, setLoading);
@@ -272,7 +272,16 @@ const RenderLessons = () => {
                   </Col>
                 </Row>
               </Form.Item>
-              <Form.Item label={t("lesson_type")} name="tagType">
+              <Form.Item
+                label={t("lesson_type")}
+                name="tagType"
+                rules={[
+                  {
+                    required: true,
+                    message: t("validate_required"),
+                  },
+                ]}
+              >
                 <Radio.Group
                   name="radiogroup"
                   onChange={(e) => setType(e.target.value)}
@@ -291,6 +300,20 @@ const RenderLessons = () => {
                     {t("read")}
                   </Radio>
                 </Radio.Group>
+                <Form.Item
+                  label={t("content")}
+                  name="content"
+                  initialvalue={""}
+                >
+                  <ReactQuill
+                    className="news-content-editor"
+                    name="editor"
+                    modules={QUILL_CONFIG.modules}
+                    formats={QUILL_CONFIG.formats}
+                    onChange={handleChangeQuill}
+                    value={content || ""}
+                  />
+                </Form.Item>
               </Form.Item>
               {type === 1 && (
                 <div>
@@ -491,17 +514,6 @@ const RenderLessons = () => {
                   ))}
                 </div>
               )}
-
-              <Form.Item label={t("content")} name="content" initialvalue={""}>
-                <ReactQuill
-                  className="news-content-editor"
-                  name="editor"
-                  modules={QUILL_CONFIG.modules}
-                  formats={QUILL_CONFIG.formats}
-                  onChange={handleChangeQuill}
-                  value={content || ""}
-                />
-              </Form.Item>
             </Col>
             <Col
               span={24}

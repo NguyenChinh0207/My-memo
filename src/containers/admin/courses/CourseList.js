@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import Layout from "antd/lib/layout/layout";
+import logoCourses from "../../../assets/img/logoCourses.png";
 import {
   Button,
   Form,
   Image,
   Input,
+  Popconfirm,
   notification,
+  Popover,
   Space,
   Spin,
   Table,
   Checkbox,
+  Select,
 } from "antd";
 import AdminLayout from "../../../layout/AdminLayout";
 import "./CourseList.scss";
@@ -19,26 +23,43 @@ import { SearchOutlined } from "@ant-design/icons";
 import { postAxios } from "../../../Http";
 import {
   API_COURSES_LIST_ALL,
+  API_COURSE_DELETE,
+  API_COURSE_OWNER_LIST,
+  API_UNIQUE_USERS,
 } from "../../../config/endpointApi";
 import { bindParams } from "../../../config/function";
 import {
+  ADMIN_MY_COURSE_DETAIL_PATH,
+  ADMIN_MY_COURSE_CREATE_PATH,
+  ADMIN_MY_COURSE_EDIT_PATH,
+  ADMIN_MY_COURSE_LIST_PATH,
   ADMIN_COURSE_DETAIL_PATH,
 } from "../../../config/path";
-import { LIMIT } from "../../../config/const";
+import IconMoreInfo from "../../../common/Icon/IconMoreInfo";
+import IconEdit from "../../../common/Icon/IconEdit";
+import IconDelete from "../../../common/Icon/IconDelete";
+import { CODE_NOT_FOUND, FULL_PATH_FILE, LIMIT } from "../../../config/const";
+import { AppContext } from "../../../context/AppContext";
+import { useLocation } from "react-router-dom/cjs/react-router-dom";
 
 const CourseList = () => {
   const { t } = useTranslation("course");
   const history = useHistory();
+  const location = useLocation();
+  const { user_info } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState();
-  const [currentPage, setCurrentPage] = useState(1); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersData, setUsersData] = useState([]);
+  const [ownerId, setOwnerId] = useState();
+  const isCreatedCourses = location.pathname === ADMIN_MY_COURSE_LIST_PATH;
 
   const ACTIVE_COURSE_OPTIONS = [
     {
-      label: t("active"), 
+      label: t("active"),
       value: 1,
     },
     {
@@ -51,12 +72,48 @@ const CourseList = () => {
     return {
       onClick: () =>
         history.push({
-          pathname: `${bindParams(ADMIN_COURSE_DETAIL_PATH, {
-            courseId: record._id,
-          })}`,
+          pathname: `${bindParams(
+            isCreatedCourses
+              ? ADMIN_MY_COURSE_DETAIL_PATH
+              : ADMIN_COURSE_DETAIL_PATH,
+            {
+              courseId: record._id,
+            }
+          )}`,
           state: { detail: record },
         }),
     };
+  };
+
+  const action = (record) => {
+    return (
+      <div>
+        <div
+          className="d-flex align-items-center pointer"
+          onClick={() =>
+            history.push({
+              pathname: `${bindParams(ADMIN_MY_COURSE_EDIT_PATH, {
+                courseId: record._id,
+              })}`,
+              state: { detail: record },
+            })
+          }
+        >
+          <IconEdit />
+          <div className="pl-1">{t("common:edit")}</div>
+        </div>
+        <Popconfirm
+          className="d-flex align-items-center pointer"
+          title={t("confirm_delete_course")}
+          onConfirm={() => handleDelete(record._id, record.owner._id)}
+          okText={t("common:yes")}
+          cancelText={t("common:no")}
+        >
+          <IconDelete />
+          <div className="pl-1">{t("common:delete")}</div>
+        </Popconfirm>
+      </div>
+    );
   };
 
   const columns = [
@@ -72,12 +129,17 @@ const CourseList = () => {
       title: t("image"),
       dataIndex: "image",
       render: (image) => {
-        return <Image src={image} style={{ width: "60px", height: "60px" }} />;
+        return (
+          <Image
+            src={image ? `${FULL_PATH_FILE}/${image}` : logoCourses}
+            style={{ width: "60px", height: "60px" }}
+          />
+        );
       },
       onCell,
     },
     {
-      title: t("course_list"),
+      title: t("course_name"),
       dataIndex: "name",
       render: (name) => {
         return name;
@@ -118,16 +180,72 @@ const CourseList = () => {
     },
   ];
 
+  if (isCreatedCourses) {
+    columns.push({
+      title: "",
+      dataIndex: "",
+      width: "5%",
+      align: "center",
+      render: (record) => (
+        <Popover
+          placement="bottom"
+          content={() => action(record)}
+          title=""
+          trigger="click"
+        >
+          <div className="moreIcon">
+            <IconMoreInfo />
+          </div>
+        </Popover>
+      ),
+    });
+  }
+
+  useEffect(() => {
+    if (!isCreatedCourses) {
+      loadUniqueUsers();
+    }
+  }, []);
+
+  const loadUniqueUsers = async () => {
+    await postAxios(API_UNIQUE_USERS)
+      .then((res) => {
+        setUsersData(
+          res.data.map((user) => ({ value: user._id, label: user.username }))
+        );
+      })
+      .catch((error) => {
+        const { response } = error;
+        console.log(error);
+        notification.error({
+          message: response?.data?.message
+            ? `${t("common:server_error")}: ${response?.data?.message}`
+            : t("common:msg_please_try_again"),
+        });
+      });
+  };
+
   useEffect(() => {
     loadAllCourses();
-  }, [keyword, status]);
+  }, [keyword, status, ownerId]);
 
   const loadAllCourses = () => {
     setLoading(true);
 
-    const params = { keyword, status: status !== null ? status : undefined };
+    let params = {
+      keyword,
+      status: status !== null ? status : undefined,
+    };
+    if (isCreatedCourses) {
+      params.userId = user_info._id;
+    }else{
+      params.userId = ownerId;
+    }
 
-    postAxios(API_COURSES_LIST_ALL, params)
+    postAxios(
+      API_COURSE_OWNER_LIST ,
+      params
+    )
       .then((res) => {
         setTotal(res?.total);
         setData(res?.data);
@@ -140,7 +258,13 @@ const CourseList = () => {
             : t("common:msg_please_try_again"),
         });
       })
-      .finally(() => setLoading(false)); // Sử dụng `finally` để đảm bảo setLoading(false) luôn được gọi
+      .finally(() => setLoading(false));
+  };
+
+
+
+  const onChangeUser = (data) => {
+    setOwnerId(data);
   };
 
   const onSearch = (data) => {
@@ -152,8 +276,34 @@ const CourseList = () => {
     setStatus(checkedValues);
   };
 
+  const handleDelete = (course_id, user_id) => {
+    setLoading(true);
+    postAxios(API_COURSE_DELETE, { courseId: course_id, userId: user_id })
+      .then((res) => {
+        notification.success({
+          message: t("delete_course_success"),
+        });
+        loadAllCourses();
+      })
+      .catch((error) => {
+        const { response } = error;
+        if (response?.data?.code === CODE_NOT_FOUND) {
+          notification.error({
+            message: `${t("course_not_found")}`,
+          });
+          return;
+        }
+        notification.error({
+          message: t("common:msg_please_try_again"),
+        });
+      })
+      .finally(() => setLoading(false));
+  };
+
   return (
-    <AdminLayout breadcrumbs={[t("course_list")]}>
+    <AdminLayout
+      breadcrumbs={[isCreatedCourses ? t("created_courses") : t("course_list")]}
+    >
       {loading ? (
         <div
           style={{
@@ -167,14 +317,29 @@ const CourseList = () => {
         </div>
       ) : (
         <Layout className="banner-wrapper banner-form">
+          {isCreatedCourses && (
+            <div className="create-center">
+              <NavLink to={ADMIN_MY_COURSE_CREATE_PATH}>
+                <Button className="btn btn-common" size="large">
+                  {t("create_course")}
+                </Button>
+              </NavLink>
+            </div>
+          )}
           <Space size={"large"} direction={"vertical"}>
             <div className="site-layout-background">
               <div className="banner--title">
                 <div className="banner-header">
-                  <div style={{ fontWeight: "bold" }}>{[t("course_list")]}</div>
+                  <div style={{ fontWeight: "bold" }}>
+                    {[
+                      isCreatedCourses
+                        ? t("created_courses")
+                        : t("course_list"),
+                    ]}
+                  </div>
                   <div className="search-wrap">
                     <Form
-                      className="tabbar-form"
+                      className="tabbar-form align-items-center"
                       onFinish={onSearch}
                       initialValues={{ keyword: keyword, status: status }}
                     >
@@ -187,6 +352,23 @@ const CourseList = () => {
                           onChange={onChangeCheckbox}
                         />
                       </Form.Item>
+                      {!isCreatedCourses && (
+                        <Form.Item>
+                          <Select
+                            showSearch
+                            style={{
+                              width: 200,
+                            }}
+                            size={"large"}
+                            placeholder={t("select_username_placeholder")}
+                            optionFilterProp="label"
+                            onChange={onChangeUser}
+                            options={usersData}
+                            value={ownerId}
+                            allowClear
+                          />
+                        </Form.Item>
+                      )}
                       <Form.Item
                         name={"keyword"}
                         className="input-search-discount"

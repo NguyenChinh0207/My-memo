@@ -10,6 +10,7 @@ import {
 import Layout from "antd/lib/layout/layout";
 import { postAxios } from "../../Http";
 import {
+  API_COURSE_DELETE,
   API_COURSE_EDIT,
   API_COURSE_OWNER_LIST,
 } from "../../config/endpointApi";
@@ -27,6 +28,7 @@ import {
 } from "@ant-design/icons";
 import logoCourses from "../../assets/img/logoCourses.png";
 import { AppContext } from "../../context/AppContext";
+import { CODE_NOT_FOUND, FULL_PATH_FILE } from "../../config/const";
 
 const CoursesOwner = () => {
   const { t } = useTranslation("course");
@@ -82,6 +84,30 @@ const CoursesOwner = () => {
       .finally(() => setLoading(false));
   };
 
+  const onDelete =async (courseId)=>{
+    setLoading(true);
+    postAxios(API_COURSE_DELETE, { courseId: courseId, userId: user_info._id })
+      .then((res) => {
+        notification.success({
+          message: t("delete_course_success"),
+        });
+        loadCourses();
+      })
+      .catch((error) => {
+        const { response } = error;
+        if (response?.data?.code === CODE_NOT_FOUND) {
+          notification.error({
+            message: `${t("course_not_found")}`,
+          });
+          return;
+        }
+        notification.error({
+          message: t("common:msg_please_try_again"),
+        });
+      })
+      .finally(() => setLoading(false));
+  }
+
   const onStatus = (id, active) => {
     confirm({
       title: t("confim_change_status"),
@@ -111,7 +137,7 @@ const CoursesOwner = () => {
               <div className="tilteCourseOwner">
                 <img
                   className="imgCourseOwner"
-                  src={item?.image ? item.image : logoCourses}
+                  src={item?.image ? `${FULL_PATH_FILE}/${item.image}` : logoCourses}
                 />
                 <div className="titleItem">
                   <h3
@@ -156,6 +182,14 @@ const CoursesOwner = () => {
                         onClick={() => onStatus(item._id, item.active)}
                       >
                         {t("change_status")}
+                      </div>
+                    </li>
+                    <li>
+                      <div
+                        className={"TooltipLink"}
+                        onClick={() => onDelete(item._id)}
+                      >
+                        {t("delete_course")}
                       </div>
                     </li>
                   </ul>

@@ -16,7 +16,7 @@ import { IconEng, IconVi } from "../common/Icon/Icon";
 import { NavLink, useHistory, useLocation } from "react-router-dom";
 import {
   USER_LOGIN,
-  USER_LIST_PATH,
+  ADMIN_USER_LIST_PATH,
   ADMIN_COURSE_LIST_PATH,
   ADMIN_MY_COURSE_LIST_PATH,
 } from "../config/path";
@@ -32,7 +32,7 @@ import {
 import { getCurrentLanguage, getRole } from "../config/function";
 import i18n from "i18next";
 import avatar from "../assets/img/avatar.png";
-import { LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined, BookOutlined } from "@ant-design/icons";
 import { AppContext } from "../context/AppContext";
 import "./AdminLayout.scss";
 import img from "../assets/img/logoIcon.PNG";
@@ -40,6 +40,7 @@ import IconJapan from "../common/Icon/IconJapan";
 
 const { SubMenu } = Menu;
 
+// Layout Admin
 const AdminLayout = (props) => {
   const { breadcrumbs, children } = props;
   const { handleSelectLanguage, openedMenus, user_info } =
@@ -55,7 +56,7 @@ const AdminLayout = (props) => {
 
   let menus = [
     {
-      key: USER_LIST_PATH,
+      key: ADMIN_USER_LIST_PATH,
       name: t("user_list"),
       icon: <UserOutlined />,
     },
@@ -67,7 +68,7 @@ const AdminLayout = (props) => {
     {
       key: ADMIN_MY_COURSE_LIST_PATH,
       name: t("created_course_list"),
-      icon: <SolutionOutlined />,
+      icon: <BookOutlined />,
     },
   ];
 

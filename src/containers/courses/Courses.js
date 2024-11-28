@@ -24,6 +24,7 @@ import { bindParams } from "../../config/function";
 import { SearchOutlined } from "@ant-design/icons";
 import logoCourses from "../../assets/img/logoCourses.png";
 import { AppContext } from "../../context/AppContext";
+import { FULL_PATH_FILE } from "../../config/const";
 
 const Courses = () => {
   const { t } = useTranslation("course");
@@ -167,7 +168,7 @@ const Courses = () => {
                             cover={
                               <img
                                 className="imgCourse"
-                                src={item?.image ? item.image : logoCourses}
+                                src={item?.image ? `${FULL_PATH_FILE}/${item.image}` : logoCourses}
                               />
                             }
                           >

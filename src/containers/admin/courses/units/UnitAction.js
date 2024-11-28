@@ -28,12 +28,11 @@ import IconMoreInfo from "../../../../common/Icon/IconMoreInfo";
 import moment from "moment";
 import IconEdit from "../../../../common/Icon/IconEdit";
 import { DeleteOutlined } from "@ant-design/icons";
-import logoCourses from "../../../../assets/img/logoCourses.png";
 import {
   ADMIN_CREATE_LESSON_PATH,
   ADMIN_EDIT_LESSON_PATH,
 } from "../../../../config/path";
-import { CODE_ALREADY_EXIST, CODE_NOT_FOUND } from "../../../../config/const";
+import { CODE_NOT_FOUND, FULL_PATH_FILE } from "../../../../config/const";
 import { useFileUpload } from "../../../../hook/useFileUpload";
 import { useUnitAction } from "../../../../hook/useUnitAction";
 
@@ -62,7 +61,8 @@ const UnitAction = () => {
 
   useEffect(() => {
     if (image && typeof image === "string") {
-      setPreview(image);
+      const filePath = `${FULL_PATH_FILE}/${image}`;
+      setPreview(filePath);
     }
   }, [image]);
 
@@ -119,6 +119,7 @@ const UnitAction = () => {
     },
     {
       title: `${t("lecture_name_teaching")}`,
+      width: "30%",
       dataIndex: "titleTargetLanguage",
       render: (titleTargetLanguage) => {
         return titleTargetLanguage;
@@ -213,7 +214,7 @@ const UnitAction = () => {
     body.id = unitId;
     body.courseId = courseId;
 
-    if (image && image.name) {
+    if (image) {
       body.image = image;
     }
     await handleUnitAction(unitId, body, t, setLoading);
@@ -262,7 +263,7 @@ const UnitAction = () => {
                 <TextArea rows={4} />
               </Form.Item>
             </Col>
-            <Col span={24} style={{ display: "flex", justifyContent: "start" }}>
+            <Col span={24} style={{ display: "flex", justifyContent: "center" }}>
               <div className="imgWrapper" style={{ alignItems: "center" }}>
                 <Image
                   className="imgCourseEdit"
@@ -270,9 +271,11 @@ const UnitAction = () => {
                     padding: 0,
                   }}
                   src={
-                    location?.state?.detail?.image
-                      ? location?.state?.detail?.image
-                      : preview
+                    preview
+                      ? preview
+                      : location?.state?.detail?.image
+                      ? `${FULL_PATH_FILE}/${location?.state?.detail?.image}`
+                      : null
                   }
                 />
                 <Button style={{ marginTop: "15px" }}>
@@ -291,7 +294,33 @@ const UnitAction = () => {
                 accept="image/*"
               />
             </Col>
+            
           </Row>
+          <Space>
+            <Row>
+              <Col span={24} className={"area-button"}>
+                <Space>
+                  <Button
+                    size={"large"}
+                    className={"btn btnBack"}
+                    id="btn-solid"
+                    onClick={() => history.goBack()}
+                  >
+                    {t("back")}
+                  </Button>
+                  <Button
+                    loading={loading}
+                    htmlType={"submit"}
+                    className={"btn btn-common"}
+                    size={"large"}
+                    block
+                  >
+                    {!unitId ? t("common:create") : t("common:edit")}
+                  </Button>
+                </Space>
+              </Col>
+            </Row>
+          </Space>
           {unitId && (
             <Row>
               <Col span={24}>
@@ -331,29 +360,6 @@ const UnitAction = () => {
               </Col>
             </Row>
           )}
-          <Row>
-            <Col span={24} className={"area-button"}>
-              <Space>
-                <Button
-                  size={"large"}
-                  className={"btn btnBack"}
-                  id="btn-solid"
-                  onClick={() => history.goBack()}
-                >
-                  {t("back")}
-                </Button>
-                <Button
-                  loading={loading}
-                  htmlType={"submit"}
-                  className={"btn btn-common"}
-                  size={"large"}
-                  block
-                >
-                  {!unitId ? t("common:create") : t("common:edit")}
-                </Button>
-              </Space>
-            </Col>
-          </Row>
         </Form>
       </div>
     );

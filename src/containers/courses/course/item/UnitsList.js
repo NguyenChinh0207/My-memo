@@ -8,6 +8,7 @@ import { UNIT_DETAIL_PATH } from "../../../../config/path";
 import { postAxios } from "../../../../Http";
 import "../CourseDetail.scss";
 import logoUnits from "../../../../assets/img/unit.jpg";
+import { FULL_PATH_FILE } from "../../../../config/const";
 
 export const UnitsList = (items) => {
   const { t } = useTranslation("common");
@@ -72,7 +73,7 @@ export const UnitsList = (items) => {
                         cover={
                           <img
                             className="imgCourse"
-                            src={item?.image ? item.image : logoUnits}
+                            src={item?.image ? `${FULL_PATH_FILE}/${item.image}` : logoUnits}
                           />
                         }
                       >

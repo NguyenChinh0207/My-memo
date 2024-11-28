@@ -11,12 +11,12 @@ import {
   API_POST_PROGRESS,
   API_SAVE_USER,
 } from "../../config/endpointApi";
-import {
-  HOME_PATH,
-  USER_LIST_PATH,
-} from "../../config/path";
+import { HOME_PATH, ADMIN_USER_LIST_PATH } from "../../config/path";
 import { postAxios } from "../../Http";
-import { CODE_ERROR_EMAIL_PASSWORD_NOT_CORRECT, CODE_PASSWORD_NOT_CORRECT } from "../../config/const";
+import {
+  CODE_ERROR_EMAIL_PASSWORD_NOT_CORRECT,
+  CODE_PASSWORD_NOT_CORRECT,
+} from "../../config/const";
 import { saveAccessToken, saveUserInfo } from "../../config/function";
 import ReactFacebookLogin from "react-facebook-login";
 import { AppContext } from "../../context/AppContext";
@@ -34,7 +34,7 @@ const Login = () => {
     setIsForgotPasswordModalOpen((prev) => !prev);
   };
   const handleModalClose = () => {
-    setIsForgotPasswordModalOpen(false); 
+    setIsForgotPasswordModalOpen(false);
   };
 
   const onFinish = async (data) => {
@@ -46,19 +46,27 @@ const Login = () => {
         setUserInfo(res?.data);
         localStorage.setItem("roleId", res?.data.role);
         if (res?.data?.role === 1) {
-          history.push(USER_LIST_PATH);
+          history.push(ADMIN_USER_LIST_PATH);
         } else history.push(HOME_PATH);
       })
       .catch((error) => {
         const { response } = error;
-        if (response?.data?.code === CODE_ERROR_EMAIL_PASSWORD_NOT_CORRECT)
+        if (response?.data?.code === CODE_ERROR_EMAIL_PASSWORD_NOT_CORRECT) {
           notification.error({
             message: t("input_user_password_incorrect"),
           });
-        if (response?.data?.code === CODE_PASSWORD_NOT_CORRECT)
+          return;
+        } else if (response?.data?.code === CODE_PASSWORD_NOT_CORRECT) {
           notification.error({
             message: t("password_invalid"),
           });
+          return;
+        } else {
+          notification.error({
+            message: t("common:server_error"),
+          });
+          return;
+        }
       })
       .finally(() => setLoading(false));
   };
@@ -140,7 +148,10 @@ const Login = () => {
               >
                 {t("forgot_password")}
               </a>
-              <ForgotPassword triggerModal={isForgotPasswordModalOpen} onModalClose={handleModalClose} />
+              <ForgotPassword
+                triggerModal={isForgotPasswordModalOpen}
+                onModalClose={handleModalClose}
+              />
             </Form.Item>
             <Form.Item>
               <Button

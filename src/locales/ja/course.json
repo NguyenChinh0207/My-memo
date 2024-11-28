@@ -9,7 +9,7 @@
   "start_pratice": "練習開始",
   "change_status": "ステータスを変更",
   "created_courses": "作成したコース",
-  "delete_course": "コースを削除",
+  "delete_course": "削除",
   "course_detail": "コース詳細",
   "history": "履歴",
   "next_up": "次へ",
@@ -77,8 +77,8 @@
   "deactive": "非公開",
 
   "lecture": "講義",
-  "create_lecture": "講義を作成",
-  "delete_lecture": "講義を削除",
+  "create_lecture": "作成",
+  "delete_lecture": "削除",
   "lecture_list": "講義リスト",
   "lecture_name": "講義名",
   "lecture_name_placeholder": "講義名を入力...",
@@ -113,6 +113,7 @@
   "edit": "編集",
   "question_number": "質問番号",
   "watch_lesson": "次のレッスンを見てください",
+  "summary_content": "レッスンの概要",
 
   "leave_course": "コースを離れる",
   "add_to_my_courses": "マイコースに追加",
@@ -128,10 +129,12 @@
   "example_placeholder": "例を入力...",
   "question_placeholder": "質問を入力...",
   "answer_placeholder": "回答を入力...",
+  "select_username_placeholder": "ユーザ選択",
+
 
   "msg_create_course_success": "新しいコースの作成が成功しました！",
   "msg_edit_course_success": "コースの編集が成功しました！",
-  "msg_file_invalid": "無効なファイルです。写真またはビデオを選択してください。",
+  "msg_file_invalid": "無効なファイルです。",
   "upload_image_success": "画像のアップロードが成功しました！",
   "upload_video_success": "ビデオのアップロードが成功しました！",
   "upload_image_failed": "画像のアップロードに失敗しました！",

@@ -21,7 +21,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { postAxios } from "../../../Http";
 import { API_USERS_LIST } from "../../../config/endpointApi";
 import { bindParams } from "../../../config/function";
-import { USER_DETAIL_PATH } from "../../../config/path";
+import { ADMIN_USER_DETAIL_PATH } from "../../../config/path";
 import { LIMIT } from "../../../config/const";
 
 const UserList = () => {
@@ -50,7 +50,7 @@ const UserList = () => {
       return {
         onClick: () =>
           history.push({
-            pathname: `${bindParams(USER_DETAIL_PATH, {
+            pathname: `${bindParams(ADMIN_USER_DETAIL_PATH, {
               userId: record._id,
             })}`,
             state: { detail: record },
@@ -215,9 +215,9 @@ const UserList = () => {
                 pagination={{
                   total: total,
                   pageSize: LIMIT,
-                  current: currentPage, // Trang hiện tại
+                  current: currentPage, 
                   onChange: (page) => {
-                    setCurrentPage(page); // Cập nhật trang khi người dùng thay đổi trang
+                    setCurrentPage(page); 
                   },
                 }}
               />

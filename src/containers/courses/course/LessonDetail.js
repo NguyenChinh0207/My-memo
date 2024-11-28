@@ -26,6 +26,7 @@ import {
   API_LESSON_DETAIL,
 } from "../../../config/endpointApi";
 import { PlayCircleOutlined } from "@ant-design/icons";
+import { FULL_PATH_FILE } from "../../../config/const";
 
 const LessonDetail = () => {
   const { t } = useTranslation("course");
@@ -98,7 +99,7 @@ const LessonDetail = () => {
           </h2>
           <div className="borderVideo">
             <video width="700" controls>
-              <source src={lesson.video} />
+              <source src={`${FULL_PATH_FILE}/${lesson.video}`} />
             </video>
           </div>
         </div>
@@ -110,7 +111,7 @@ const LessonDetail = () => {
       <>
         <div className="summaryWrap">
           <h2 style={{ fontWeight: "bold", color: "red" }}>
-            {t("Tóm tắt bài học").toUpperCase()}
+            {t("summary_content").toUpperCase()}
           </h2>
         </div>
         <div

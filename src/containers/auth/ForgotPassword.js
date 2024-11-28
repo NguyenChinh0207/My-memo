@@ -13,7 +13,7 @@ const ForgotPassword = ({ triggerModal, onModalClose }) => {
   const [email, setEmail] = useState("");
   const [flag, setFlag] = useState(false);
 
-  const [loading, setLoading] = useState(false); // Thêm state loading
+  const [loading, setLoading] = useState(false); 
 
   useEffect(() => {
     setIsModalMailOpen(triggerModal);
@@ -21,7 +21,7 @@ const ForgotPassword = ({ triggerModal, onModalClose }) => {
 
   const handleModalClose = () => {
     setIsModalMailOpen(false);
-    if (onModalClose) onModalClose(); // Gọi callback để đồng bộ trạng thái triggerModal
+    if (onModalClose) onModalClose(); 
   };
 
   const handleModalCodeClose = () => {
@@ -30,9 +30,9 @@ const ForgotPassword = ({ triggerModal, onModalClose }) => {
 
   const onFinish = async (data) => {
     setEmail(data.email);
-    setLoading(true); // Bật trạng thái loading khi bắt đầu gửi email
+    setLoading(true); 
     try {
-      if (onModalClose) onModalClose(); // Đồng bộ trạng thái khi form gửi thành công
+      if (onModalClose) onModalClose(); 
       await postAxios(API_GENERATE_CODE, { email: data.email });
 
       setFlag(true);
@@ -53,7 +53,7 @@ const ForgotPassword = ({ triggerModal, onModalClose }) => {
         });
       }
     } finally {
-      setLoading(false); // Tắt trạng thái loading sau khi hoàn thành
+      setLoading(false); 
       setIsModalMailOpen(false);
 
     }
@@ -81,7 +81,7 @@ const ForgotPassword = ({ triggerModal, onModalClose }) => {
         });
       }
     } finally {
-      setLoading(false); // Tắt trạng thái loading sau khi hoàn thành
+      setLoading(false); 
     }
   };
 

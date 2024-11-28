@@ -111,8 +111,9 @@
   "upload_question_list": "Tải danh sách câu hỏi lên",
   "download_template": "Tải mẫu câu hỏi về",
   "edit": "Chỉnh sửa",
-  "question_number": "Số câu hỏi",
+  "question_number": "Câu hỏi số",
   "watch_lesson": "Vui lòng xem bài học sau",
+  "summary_content": "Tổng quan bài học",
 
   "leave_course": "Rời khỏi khóa học",
   "add_to_my_courses": "Thêm vào khóa học của tôi",
@@ -128,6 +129,7 @@
   "example_placeholder": "Nhập ví dụ...",
   "question_placeholder": "Nhập câu hỏi...",
   "answer_placeholder": "Nhập câu trả lời...",
+  "select_username_placeholder": " Chọn tên user",
 
   "msg_create_course_success": "Tạo khóa học mới thành công!",
   "msg_edit_course_success": "Chỉnh sửa khóa học thành công!",

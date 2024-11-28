@@ -114,7 +114,7 @@ const ExamOnline = () => {
               <div key={index}>
                 <div className="question">
                   <p>{`${t("question_number")} ${index + 1}:`} </p>
-                  <p>{item.content}</p>
+                  <span>{item.content}</span>
                 </div>
                 <div className="answer">
                   <Radio.Group

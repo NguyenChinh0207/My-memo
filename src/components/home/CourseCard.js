@@ -8,6 +8,7 @@ import { COURSE_DETAIL_PATH, COURSE_LEARN_PATH } from "../../config/path";
 import { bindParams } from "../../config/function";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 import { Modal } from "antd";
+import { FULL_PATH_FILE } from "../../config/const";
 
 const CourseCard = (props) => {
   const { t } = useTranslation("course");
@@ -23,7 +24,7 @@ const CourseCard = (props) => {
       onCancel: () => {},
     });
   };
-  
+
   const learnClick = () => {
     if (Number(course.totalWords) !== 0) {
       history.push(bindParams(COURSE_LEARN_PATH, { courseId: courseId }));
@@ -49,7 +50,11 @@ const CourseCard = (props) => {
         <div className={"CardTop"}>
           <div className={"ImgWrapper"}>
             <img
-              src={course?.image || logoCourses}
+              src={
+                course?.image
+                  ? `${FULL_PATH_FILE}/${course?.image}`
+                  : logoCourses
+              }
               className={"Image"}
               alt=""
             />

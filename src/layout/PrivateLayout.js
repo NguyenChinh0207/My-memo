@@ -48,7 +48,7 @@ const PrivateLayout = ({ children }) => {
 
   const locale = getCurrentLanguage();
 
-  // Đổi ngôn ngữ
+  // change language
   const handleChangeLanguage = (e) => {
     localStorage.setItem(KEY_LANGUAGE, e.key);
     i18n.changeLanguage(e.key).then(() => {
@@ -64,7 +64,7 @@ const PrivateLayout = ({ children }) => {
     setIsChangeForgotPasswordModalOpen(false); 
   };
 
-  // Xử lý đăng xuất
+  // logout
   const handleLogout = () => {
     localStorage.removeItem(AUTH_TOKEN);
     localStorage.removeItem(USER_INFO);
@@ -75,7 +75,7 @@ const PrivateLayout = ({ children }) => {
     history.push(COURSE_LIST_OWNER_PATH);
   };
 
-  // Menu đổi ngôn ngữ
+  // Menu change language
   const renderLanguageMenu = () => (
     <Menu onClick={handleChangeLanguage} selectedKeys={locale}>
       <Menu.Item key={EN}>
@@ -90,7 +90,7 @@ const PrivateLayout = ({ children }) => {
     </Menu>
   );
 
-  // Menu người dùng
+  // Menu user
   const renderUserMenu = () => (
     <Menu>
       <Menu.Item
@@ -110,7 +110,7 @@ const PrivateLayout = ({ children }) => {
     </Menu>
   );
 
-  // Menu thông báo
+  // Menu notify
   const renderNotifyMenu = () => (
     <Menu>
       <Menu.Item key="notify" icon={<NotificationOutlined />}>
@@ -119,14 +119,14 @@ const PrivateLayout = ({ children }) => {
     </Menu>
   );
 
-  // Nút điều hướng
+  // Navigation button
   const NavButton = ({ to, isActive, children }) => (
     <NavLink to={to} className={`NavButton ${isActive ? "ActiveButton" : ""}`}>
       {children}
     </NavLink>
   );
 
-  // Hiển thị nút theo điều kiện
+  // View
   const url = location.pathname.split("/")[2];
   const urlRouter = location.pathname;
 
@@ -219,7 +219,7 @@ const PrivateLayout = ({ children }) => {
                 height={26}
                 src={<BellOutlined />}
               />
-              <span className="badge-up pointer">6</span>
+              <span className="badge-up pointer">0</span>
             </div>
           </Dropdown>
           <Dropdown

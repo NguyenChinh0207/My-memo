@@ -31,17 +31,18 @@ import {
 } from "../../../config/endpointApi";
 import {
   ADMIN_CREATE_UNIT_PATH,
-  ADMIN_EDIT_UNIT_PATH
+  ADMIN_EDIT_UNIT_PATH,
 } from "../../../config/path";
 import { AppContext } from "../../../context/AppContext";
 import IconMoreInfo from "../../../common/Icon/IconMoreInfo";
 import moment from "moment";
 import IconEdit from "../../../common/Icon/IconEdit";
 import logoCourses from "../../../assets/img/logoCourses.png";
-import { CODE_NOT_FOUND } from "../../../config/const";
+import { CODE_NOT_FOUND, FULL_PATH_FILE } from "../../../config/const";
 import { UploadOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useFileUpload } from "../../../hook/useFileUpload";
 import { useCourseAction } from "../../../hook/useCourseAction";
+import useColumns from "../../../hook/useColumns";
 
 const CourseAction = () => {
   const [form] = Form.useForm();
@@ -93,45 +94,7 @@ const CourseAction = () => {
       </div>
     );
   };
-
-  const columns = [
-    {
-      title: "#",
-      dataIndex: "key",
-      with: "10%",
-      render: (value, data, index) => {
-        return index + 1;
-      },
-    },
-    {
-      title: t("lecture_name"),
-      dataIndex: "name",
-      render: (name) => {
-        return name;
-      },
-    },
-    {
-      title: t("image"),
-      dataIndex: "image",
-      render: (image) => {
-        return <Image src={image} style={{ width: "60px", height: "60px" }} />;
-      },
-    },
-    {
-      title: t("description"),
-      dataIndex: "description",
-      ellipsis: true,
-      render: (description) => {
-        return description;
-      },
-    },
-    {
-      title: t("created_time"),
-      dataIndex: "createdAt",
-      render: (createdAt) => {
-        return createdAt ? moment(createdAt).format("YYYY-MM-DD") : "";
-      },
-    },
+  const columns = useColumns("lecture", [
     {
       title: "",
       dataIndex: "",
@@ -150,7 +113,7 @@ const CourseAction = () => {
         </Popover>
       ),
     },
-  ];
+  ]);
 
   useEffect(() => {
     if (courseId && location?.state?.detail) {
@@ -166,7 +129,8 @@ const CourseAction = () => {
 
   useEffect(() => {
     if (image && typeof image === "string") {
-      setPreview(image);
+      const filePath = `${FULL_PATH_FILE}/${image}`;
+      setPreview(filePath);
     }
   }, [image]);
 
@@ -222,8 +186,8 @@ const CourseAction = () => {
     } else {
       body.active = 0;
     }
-
-    if (image && image.name) {
+    console.log(image);
+    if (image) {
       body.image = image;
     }
 
@@ -334,9 +298,7 @@ const CourseAction = () => {
                   <Image
                     className="imgCourseEdit"
                     src={
-                      location?.state?.detail?.image
-                        ? location?.state?.detail?.image
-                        : preview
+                      preview ? preview : location?.state?.detail?.image ?`${FULL_PATH_FILE}/${location?.state?.detail?.image}` : logoCourses
                     }
                   />
                   <Button style={{ marginTop: "15px" }}>
@@ -392,6 +354,29 @@ const CourseAction = () => {
                   {t("active")}
                 </Checkbox>
               </Form.Item>
+              <Space>
+              <Col span={24} className={"area-button"}>
+              <Space>
+                <Button
+                  size={"large"}
+                  className={"btn btnBack"}
+                  id="btn-solid"
+                  onClick={() => history.goBack()}
+                >
+                  {t("back")}
+                </Button>
+                <Button
+                  loading={loading}
+                  htmlType={"submit"}
+                  className={"btn btn-common"}
+                  size={"large"}
+                  block
+                >
+                  {!courseId ? t("common:create") : t("common:edit")}
+                </Button>
+              </Space>
+            </Col>
+              </Space>
               {courseId && (
                 <Row>
                   <Col span={24}>
@@ -405,7 +390,7 @@ const CourseAction = () => {
                     >
                       <h4 style={{ marginTop: "10px" }}>{`${t(
                         t("lecture_list")
-                      )}:`}</h4>
+                      )}`}</h4>
                       <Button
                         size={"large"}
                         className={"btn btn-common"}
@@ -431,27 +416,7 @@ const CourseAction = () => {
                 </Row>
               )}
             </Col>
-            <Col span={24} className={"area-button"}>
-              <Space>
-                <Button
-                  size={"large"}
-                  className={"btn btnBack"}
-                  id="btn-solid"
-                  onClick={() => history.goBack()}
-                >
-                  {t("back")}
-                </Button>
-                <Button
-                  loading={loading}
-                  htmlType={"submit"}
-                  className={"btn btn-common"}
-                  size={"large"}
-                  block
-                >
-                  {!courseId ? t("common:create") : t("common:edit")}
-                </Button>
-              </Space>
-            </Col>
+            
           </Row>
         </Form>
       </div>

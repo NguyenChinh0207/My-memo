@@ -19,16 +19,18 @@ const useGetMyCourse = (loadMyCourses = false) => {
   const [wordsLearned, setWordsLearned] = useState(0);
 
   useEffect(() => {
-    setIsLoading(true);
-    loadData();
-  }, [userId]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    if (loadMyCourses) {
+    if (userId) {
+      setIsLoading(true);
       loadData();
     }
-  }, [loadMyCourses]);
+  }, [userId]); // Chỉ phụ thuộc vào userId, tránh vòng lặp với các trạng thái khác
+  
+  useEffect(() => {
+    if (loadMyCourses) {
+      setIsLoading(true);
+      loadData();
+    }
+  }, [loadMyCourses]); // Không thêm progress hoặc myCourses ở đây
 
   const updateProgressOnLeave = (courseId) => {
     
@@ -129,7 +131,9 @@ const useGetMyCourse = (loadMyCourses = false) => {
             : t("common:msg_please_try_again"),
         });
       })
-      .then(() => setIsLoading(false));
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const data = { myCourses, progress, wordsLearned, level, points };

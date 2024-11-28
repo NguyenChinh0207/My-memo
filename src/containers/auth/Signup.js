@@ -9,7 +9,10 @@ import validator from "validator";
 import { API_POST_PROGRESS, API_REGISTER } from "../../config/endpointApi";
 import { postAxios } from "../../Http";
 import { USER_LOGIN } from "../../config/path";
-import { CODE_EMAIL_ALREADY_EXIST, CODE_USERNAME_ALREADY_EXIST } from "../../config/const";
+import {
+  CODE_EMAIL_ALREADY_EXIST,
+  CODE_USERNAME_ALREADY_EXIST,
+} from "../../config/const";
 
 const Signup = () => {
   const { t } = useTranslation("auth");
@@ -52,14 +55,22 @@ const Signup = () => {
       })
       .catch((error) => {
         const { response } = error;
-        if (response?.data?.code === CODE_USERNAME_ALREADY_EXIST)
+        if (response?.data?.code === CODE_USERNAME_ALREADY_EXIST) {
           notification.error({
             message: t("username_taken"),
           });
-        if (response?.data?.code === CODE_EMAIL_ALREADY_EXIST)
+          return;
+        } else if (response?.data?.code === CODE_EMAIL_ALREADY_EXIST) {
           notification.error({
             message: t("email_taken"),
           });
+          return;
+        } else {
+          notification.error({
+            message: t("common:server_error"),
+          });
+          return;
+        }
       })
       .finally(() => setLoading(false));
   };
@@ -168,6 +179,8 @@ const Signup = () => {
                   message: t("field_require"),
                 },
               ]}
+              extra={t("password_rule")}
+
             >
               <Input.Password placeholder={t("password_again_placeholder")} />
             </Form.Item>

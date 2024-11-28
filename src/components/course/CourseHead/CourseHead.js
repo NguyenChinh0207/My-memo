@@ -23,12 +23,13 @@ import { RightOutlined } from "@ant-design/icons";
 import { API_EXAM_DETAIL, API_EXAM_LIST } from "../../../config/endpointApi";
 import { postAxios } from "../../../Http";
 import { AppContext } from "../../../context/AppContext";
+import { FULL_PATH_FILE } from "../../../config/const";
 
 const { Option } = Select;
 
 const CourseHead = (props) => {
   const { t } = useTranslation("course");
-  const { name, description, owner, edit, added, setShowCard } = props;
+  const { words, name, description, owner, edit, added, setShowCard } = props;
   const history = useHistory();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [exams, setExams] = useState([]);
@@ -112,7 +113,14 @@ const CourseHead = (props) => {
             {props.name ? (
               <React.Fragment>
                 <div className="course-detail-wrapper-edit">
-                  <img className="imgCourseDetailEdit" src={logoCourses} />
+                  <img
+                    className="imgCourseDetailEdit"
+                    src={
+                      props?.image
+                        ? `${FULL_PATH_FILE}/${props?.image}`
+                        : logoCourses
+                    }
+                  />
                   <div className="CourseDetails">
                     <div className="TitleCourseEdit">{name}</div>
                   </div>
@@ -135,7 +143,11 @@ const CourseHead = (props) => {
                 <div className="course-detail-wrapper">
                   <Image
                     className="imgCourseDetail"
-                    src={props?.image ? props.image : logoCourses}
+                    src={
+                      props?.image
+                        ? `${FULL_PATH_FILE}/${props.image}`
+                        : logoCourses
+                    }
                   />
                   <div className="CourseDetails">
                     <div className="breadcumb">
@@ -165,7 +177,7 @@ const CourseHead = (props) => {
                             {t("test_exam")}
                           </Button>
                         </div>
-                        {owner._id !== user_info._id && (
+                        {words && words.length > 1 && owner._id !== user_info._id && (
                           <div style={{ marginTop: "10px" }}>
                             <Button
                               type="default"

@@ -3,17 +3,13 @@ import "../CourseDetail.scss";
 import { useTranslation } from "react-i18next";
 import {
   Button,
-  Checkbox,
   Divider,
   Form,
-  Image,
   Input,
-  InputNumber,
   notification,
   Popconfirm,
   Table,
 } from "antd";
-import { AppContext } from "../../../../context/AppContext";
 import { useHistory, useParams } from "react-router-dom";
 import { CaretDownOutlined, UploadOutlined } from "@ant-design/icons";
 import { EXAM_DETAIL_PATH, EXAM_EDIT_PATH } from "../../../../config/path";
@@ -89,7 +85,7 @@ const QuestionExams = (props) => {
       width: "20%",
       align: "left",
       render: (time_answer) => {
-        return `${time_answer} ${t("seconds")}`;
+        return `${time_answer} ${t("minutes")}`;
       },
       onCell,
     },

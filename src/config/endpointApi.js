@@ -19,6 +19,7 @@ export const API_COURSE_DELETE = `${API_COURSE_LIST}/delete`;
 export const API_COURSE_EDIT = `${API_COURSE_LIST}/edit`;
 export const API_COURSES_LIST_ALL = `${API_COURSE_LIST}/list/all`;
 export const API_UPLOAD_FILE = `${API_COURSE_LIST}/upload`;
+export const API_UNIQUE_USERS = `${API_COURSE_LIST}/unique/users`;
 
 const API_WORD_LIST = `${API_BASE}/words`;
 export const API_CREATE_WORD = `${API_WORD_LIST}/create`;
